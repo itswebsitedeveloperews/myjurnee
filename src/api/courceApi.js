@@ -1,0 +1,4 @@
+import { extractData, userAuthFetch, userRawFetch } from './server';
+
+export const getCourse = () =>
+    userAuthFetch.get('/wp-json/learndash/v1/courses').then(extractData);
