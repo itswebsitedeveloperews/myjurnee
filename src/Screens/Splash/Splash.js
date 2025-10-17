@@ -9,28 +9,16 @@ const Splash = props => {
 
     setTimeout(() => {
       localStorageHelper
-        .getItemsFromStorage([StorageKeys.IS_LOGGED, StorageKeys.USER_TYPE])
+        .getItemsFromStorage([StorageKeys.IS_LOGGED])
         .then(resp => {
           console.log('resp', resp);
           let loginPreserved = resp[StorageKeys.IS_LOGGED];
-          let userType = resp[StorageKeys.USER_TYPE];
 
-          // if (loginPreserved == 'true' && userType !== 'null') {
-          //   if (userType == 'Architect / Interior') {
-          //     props.navigation.replace('ArchitectStack', {
-          //       initialRoute: 'ArchitectBottomTab',
-          //     });
-          //   } else if (userType == 'Customer') {
-          //     props.navigation.replace('CustomerStack', {
-          //       initialRoute: 'CustomerBottomTab',
-          //     });
-          //   } else if (userType == 'Agency') {
-          //     // Add check for if already purchased plan
-          //     props.navigation.replace('AgencyStack');
-          //   }
-          // } else {
-          props.navigation.replace('DashboardStack'); //replace when completed with Authstack
-          // }
+          if (loginPreserved == 'true') {
+            props.navigation.replace('DashboardStack');
+          } else {
+            props.navigation.replace('AuthStack'); //replace when completed with Authstack
+          }
         });
     }, 1500);
   }, []);

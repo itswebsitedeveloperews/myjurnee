@@ -1,150 +1,280 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Keyboard,
-  SafeAreaView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  ImageBackground,
+  Image,
+  ScrollView,
+  Alert,
 } from 'react-native';
+import { useDispatch } from 'react-redux';
 import FastImage from 'react-native-fast-image';
-import {safeAreaStyle} from '../../Common/CommonStyles';
-import {COLORS} from '../../Common/Constants/colors';
-import {FONTS} from '../../Common/Constants/fonts';
-import {IMAGES} from '../../Common/Constants/images';
-import HightBox from '../Components/HightBox';
+import { safeAreaStyle } from '../../Common/CommonStyles';
+import { COLORS } from '../../Common/Constants/colors';
+import { FONTS } from '../../Common/Constants/fonts';
+import { IMAGES } from '../../Common/Constants/images';
 import IButton from '../Components/IButton';
 import ITextField from '../Components/ITextField';
-import {LogUserIn} from '../../redux/auth/authActions';
-import {useDispatch} from 'react-redux';
+import { JWTLogin } from '../../redux/auth/authActions';
 
 const Login = props => {
-  const [mobileNum, setMobileNum] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
-  const onContinue = () => {
-    if (!mobileNum) {
-      alert('Please Enter mobile num');
-    } else if (mobileNum.length !== 10) {
-      alert('Please Enter valid mobile num');
-    } else {
-      setLoading(true);
-      dispatch(
-        LogUserIn({mobileNum, onSuccess: onSuccess, onFailure: onFailure}),
-      );
+  const onLogin = () => {
+    if (!username) {
+      Alert.alert('Error', 'Please enter username or email');
+      return;
+    } else if (!password) {
+      Alert.alert('Error', 'Please enter password');
+      return;
     }
+
+    setLoading(true);
+
+    dispatch(JWTLogin({
+      username: username,
+      password: password,
+      onSuccess: (response) => {
+        setLoading(false);
+        console.log('Login successful:', response);
+        // Navigate to dashboard or next screen
+        props.navigation.replace('DashboardStack');
+      },
+      onFailure: (error) => {
+        setLoading(false);
+        console.log('Login failed:', error);
+        Alert.alert('Login Failed', error || 'Invalid credentials. Please try again.');
+      }
+    }));
   };
 
-  const onSuccess = data => {
-    alert(data.otp);
-    setLoading(false);
-    props.navigation.navigate('OTP_Verify', {mobileNum});
+  const onContinueWithoutLogin = () => {
+    // Navigate to dashboard without login
+    props.navigation.replace('DashboardStack');
   };
 
-  const onFailure = () => {
-    setLoading(false);
+  const onSignUp = () => {
+    // Navigate to sign up screen
+    props.navigation.navigate('Signup');
+  };
+
+  const onForgotPassword = () => {
+    // Navigate to forgot password screen
+    props.navigation.navigate('ForgotPassword');
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <SafeAreaView style={safeAreaStyle}>
-        <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <View style={{paddingHorizontal: 20, paddingTop: 70}}>
-            <Text style={styles.titleText}>Enter your mobile number</Text>
-            <Text style={styles.subTitleText}>
-              We’ll send you an OTP on given mobile number
-            </Text>
-            <HightBox height={27} />
-            <Text style={styles.subTitleText}>Your mobile number</Text>
-
-            <View style={{flexDirection: 'row', marginTop: 5}}>
-              <View style={styles.countryCode}>
-                <Text style={styles.codeText}>+91</Text>
+    <ImageBackground source={IMAGES.LOGIN_BG_IMAGE} style={{ flex: 1 }}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        automaticallyAdjustKeyboardInsets={true}
+      >
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+          <View style={styles.container}>
+            {/* Content */}
+            <View style={styles.contentContainer}>
+              {/* Logo and Tagline */}
+              <View style={styles.logoContainer}>
                 <FastImage
-                  source={IMAGES.IC_CHEVRON_RIGHT}
-                  style={{height: 20, width: 20, marginLeft: 5}}
+                  source={IMAGES.HOME_SCREEN_LOGO_V1}
+                  style={styles.logo}
                   resizeMode="contain"
                 />
               </View>
-              <ITextField
-                keyboardType="phone-pad"
-                onChangeText={text => setMobileNum(text)}
-                value={mobileNum}
-                maxLength={10}
-                mainViewStyle={{
-                  backgroundColor: COLORS.pr_background,
-                  marginLeft: 7,
-                }}
-              />
-            </View>
-          </View>
 
-          <View style={styles.bottomContainer}>
-            <Text style={styles.bottomText}>
-              By registering, you accept our{' '}
-              <Text style={styles.underlineText}>Terms of Use</Text> and{' '}
-              <Text style={styles.underlineText}>Privacy Policy</Text>
-            </Text>
-            <View style={{marginTop: 30}}>
-              <IButton
-                title={'Continue'}
-                onPress={onContinue}
-                loading={loading}
-              />
+              {/* Sign In Title */}
+              <Text style={styles.signInTitle}>Sign in</Text>
+
+              {/* Input Fields */}
+              <View style={styles.inputContainer}>
+                <ITextField
+                  placeholder="Username or email"
+                  value={username}
+                  onChangeText={setUsername}
+                  leftIcon={IMAGES.IC_USER_PROFILE}
+                  mainViewStyle={styles.inputField}
+                />
+
+                <ITextField
+                  placeholder="Password"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  leftIcon={IMAGES.IC_LOCK}
+                  rightIcon={showPassword ? IMAGES.IC_EYE : IMAGES.IC_EYE_OFF}
+                  onRightIconPress={() => setShowPassword(!showPassword)}
+                  mainViewStyle={[styles.inputField, styles.passwordField]}
+                />
+
+                <TouchableOpacity onPress={onForgotPassword} style={styles.forgotPasswordContainer}>
+                  <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Login Button */}
+              <View style={styles.buttonContainer}>
+                <IButton
+                  title="Login"
+                  onPress={onLogin}
+                  loading={loading}
+                  mainViewStyle={styles.loginButton}
+                />
+              </View>
+
+              {/* Continue without login */}
+              <TouchableOpacity onPress={onContinueWithoutLogin} style={styles.continueWithoutLoginContainer}>
+                <FastImage
+                  source={IMAGES.IC_USER_PROFILE}
+                  style={styles.continueIcon}
+                  resizeMode="contain"
+                />
+                <Text style={styles.continueWithoutLoginText}>Continue without logging in</Text>
+                <Image
+                  source={IMAGES.IC_ARROW_RIGHT_CHEVRON}
+                  style={styles.continueArrow}
+                  resizeMode="contain"
+                  tintColor={COLORS.textColor}
+                />
+              </TouchableOpacity>
+
+
+              {/* Sign Up Link */}
+              <View style={styles.signUpContainer}>
+                <Text style={styles.signUpText}>
+                  Don't have an account? <Text style={styles.signUpLink} onPress={onSignUp}>Sign Up →</Text>
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </ScrollView>
+    </ImageBackground>
   );
 };
 
 export default Login;
 
 const styles = StyleSheet.create({
-  titleText: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
-    fontSize: 26,
-    lineHeight: 34,
-    color: COLORS.textColor,
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    minHeight: '100%',
   },
-  subTitleText: {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 40,
+    // justifyContent: 'center',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 90,
+  },
+  logo: {
+    height: 60,
+    width: 200,
+  },
+  tagline: {
     fontFamily: FONTS.OUTFIT_REGULAR,
     fontSize: 14,
-    lineHeight: 20,
-    color: COLORS.textColor64,
+    color: COLORS.textColor,
     marginTop: 8,
   },
-  countryCode: {
+  signInTitle: {
+    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontSize: 30,
+    marginTop: 30,
+    color: COLORS.textColor,
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  inputField: {
+    marginBottom: 16,
+    backgroundColor: COLORS.white,
+    borderWidth: 0
+  },
+  passwordField: {
+    marginBottom: 8,
+  },
+  forgotPasswordContainer: {
+    alignSelf: 'flex-end',
+    marginBottom: 20,
+  },
+  forgotPasswordText: {
+    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontSize: 14,
+    color: COLORS.textColor64,
+  },
+  buttonContainer: {
+    marginBottom: 20,
+  },
+  loginButton: {
+    backgroundColor: '#8B5CF6', // Purple color from design
+    borderRadius: 10,
     height: 48,
-    borderColor: COLORS.textColor64,
-    borderWidth: 1,
+  },
+  continueWithoutLoginContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 10,
-    paddingHorizontal: 16,
+    justifyContent: 'center',
+    marginBottom: 30,
     paddingVertical: 12,
-    backgroundColor: COLORS.pr_background,
   },
-  codeText: {
+  continueIcon: {
+    height: 20,
+    width: 20,
+    marginRight: 8,
+  },
+  continueWithoutLoginText: {
     fontFamily: FONTS.OUTFIT_REGULAR,
     fontSize: 16,
     color: COLORS.textColor,
+    marginRight: 8,
   },
-  bottomContainer: {paddingHorizontal: 20, marginBottom: 30},
-  bottomText: {
+  continueArrow: {
+    height: 16,
+    width: 16,
+  },
+  signUpContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  signUpText: {
     fontFamily: FONTS.OUTFIT_REGULAR,
     fontSize: 14,
-    lineHeight: 22,
-    textAlign: 'center',
-    paddingHorizontal: 15,
     color: COLORS.textColor,
   },
-  underlineText: {
+  signUpLink: {
     fontFamily: FONTS.OUTFIT_MEDIUM,
-    textDecorationLine: 'underline',
+    color: COLORS.textColor,
   },
 });

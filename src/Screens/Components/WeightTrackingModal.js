@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     uploadArea: {
         borderWidth: 2,
         borderColor: COLORS.textColor14,
-        borderStyle: 'dashed',
+        // borderStyle: 'dashed',
         borderRadius: 12,
         padding: 40,
         alignItems: 'center',

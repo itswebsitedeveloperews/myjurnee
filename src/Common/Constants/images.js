@@ -3,6 +3,8 @@ export const IMAGES = {
   SPLASH_BG: require('../../assets/images_new/splash_bg.jpeg'),
   DOWNLOAD_BLACK: require('../../assets/images_new/download_black.png'),
   DELETE_ICON: require('../../assets/images_new/delete.png'),
+  LOGIN_BG_IMAGE: require('../../assets/images_new/login_background_img.png'),
+  HOME_SCREEN_LOGO_V1: require('../../assets/images_new/home_screen_logo_v1.png'),
 
   //Onboarding image
   IC_ONBOARDING_TOP: require('../../assets/images/onboardingTop.png'),
@@ -56,4 +58,15 @@ export const IMAGES = {
   MESSAGE_BOX: require('../../assets/images/messageBox.png'),
   IC_USERS: require('../../assets/images/users.png'),
   IC_SCALE: require('../../assets/images/scale.png'),
+
+  // Login screen icons
+  IC_USER_PROFILE: require('../../assets/images/user.png'),
+  IC_LOCK: require('../../assets/images/briefcase.png'), // Using briefcase as lock placeholder
+  IC_EYE_OFF: require('../../assets/images/eye.png'), // Using eye as eye_off placeholder
+  IC_ARROW_RIGHT_CHEVRON: require('../../assets/images/arrow_right.png'),
+
+  // Profile screen icons
+  IC_SETTINGS: require('../../assets/images/briefcase.png'), // Using briefcase as settings placeholder
+  IC_SHOPPING_BASKET: require('../../assets/images/briefcase.png'), // Using briefcase as shopping basket placeholder
+  IC_LIBRARY: require('../../assets/images/file_text.png'), // Using file_text as library placeholder
 };

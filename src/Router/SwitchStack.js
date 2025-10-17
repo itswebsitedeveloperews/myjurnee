@@ -16,8 +16,8 @@ const SwitchStack = () => {
       initialRouteName="Splash"
       screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Splash" component={Splash} />
+      <Stack.Screen name="AuthStack" component={AuthStack} />
       <Stack.Screen name="DashboardStack" component={DashboardStack} />
-      {/* <Stack.Screen name="AuthStack" component={AuthStack} /> */}
       {/*<Stack.Screen name="CustomerStack" component={CustomerStack} />
       <Stack.Screen name="AgencyStack" component={AgencyStack} /> */}
     </Stack.Navigator>

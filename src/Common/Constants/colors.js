@@ -12,4 +12,5 @@ export const COLORS = {
   orange: '#E56000',
   grayText: '#313641',
   pr_lavender: '#C5D0F0',
+  profile_bg: '#E8E0FF', // Light purple background for profile screen
 };

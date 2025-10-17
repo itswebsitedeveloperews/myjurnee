@@ -1,22 +1,21 @@
-import React, {useEffect, useState} from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React, { useEffect, useState } from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 //Screens
-import Onboarding from '../Screens/Login/Onboarding';
 import Login from '../Screens/Login/Login';
-// import OTP_Verify from '../Screens/Login/OTP_Verify';
-import RoleSelection from '../Screens/Login/RoleSelection';
+import Signup from '../Screens/Login/Signup';
+import ForgotPassword from '../Screens/Login/ForgotPassword';
 
 const AuthStack = createNativeStackNavigator();
 
 const AuthStacks = () => {
   return (
     <AuthStack.Navigator
-      screenOptions={{headerShown: false}}
+      screenOptions={{ headerShown: false }}
       initialRouteName="Login">
       <AuthStack.Screen name="Login" component={Login} />
-      {/* <AuthStack.Screen name="OTP_Verify" component={OTP_Verify} /> */}
-      <AuthStack.Screen name="RoleSelection" component={RoleSelection} />
+      <AuthStack.Screen name="Signup" component={Signup} />
+      <AuthStack.Screen name="ForgotPassword" component={ForgotPassword} />
     </AuthStack.Navigator>
   );
 };

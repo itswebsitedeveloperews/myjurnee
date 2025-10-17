@@ -1,12 +1,12 @@
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {COLORS} from '../../Common/Constants/colors';
-import {FONTS} from '../../Common/Constants/fonts';
-import {IMAGES} from '../../Common/Constants/images';
-import {windowHeight} from '../../Utils/Dimentions';
+import { COLORS } from '../../Common/Constants/colors';
+import { FONTS } from '../../Common/Constants/fonts';
+import { IMAGES } from '../../Common/Constants/images';
+import { windowHeight } from '../../Utils/Dimentions';
 
-const UserCard = ({onViewCustomer = () => {}, data}) => {
+const UserCard = ({ onViewCustomer = () => { }, data }) => {
   return (
     <TouchableOpacity style={styles.container} disabled>
       <FastImage
@@ -29,9 +29,9 @@ const UserCard = ({onViewCustomer = () => {}, data}) => {
             onPress={() => onViewCustomer(data)}>
             <FastImage
               source={IMAGES.IC_EYE}
-              style={{height: 16, width: 16, marginRight: 5}}
+              style={{ height: 16, width: 16, marginRight: 5 }}
               resizeMode="contain"
-              tintColor={COLORS.pr_blue}
+            // tintColor={COLORS.pr_blue}
             />
             <Text style={styles.btnText}>{'View'}</Text>
           </TouchableOpacity>

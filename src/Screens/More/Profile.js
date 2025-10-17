@@ -1,211 +1,106 @@
 import React, { useEffect, useState } from 'react';
 import {
-  FlatList,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import FastImage from 'react-native-fast-image';
+import { useDispatch } from 'react-redux';
 import { safeAreaStyle } from '../../Common/CommonStyles';
-import { FONTS } from '../../Common/Constants/fonts';
 import { COLORS } from '../../Common/Constants/colors';
-import HightBox from '../Components/HightBox';
 import { IMAGES } from '../../Common/Constants/images';
-import { StorageKeys, localStorageHelper } from '../../Common/localStorageHelper';
-import { useDispatch, useSelector } from 'react-redux';
-import { getProfileData } from '../../redux/profile/profileActions';
-import { logoutAction } from '../../redux/auth/authActions';
-
-const profileData = [
-  {
-    id: 1,
-    title: 'Selected agencies list',
-    subTitle: 'View your selected agencies for projects',
-    logo: IMAGES.IC_BRIEFCASE,
-  },
-  {
-    id: 2,
-    title: 'Past projects',
-    subTitle: 'See your past completed projects',
-    logo: IMAGES.IC_FILE,
-  },
-  {
-    id: 3,
-    title: 'Account',
-    subTitle: 'Manage your account related information',
-    logo: IMAGES.IC_USER,
-  },
-  {
-    id: 4,
-    title: 'Logout',
-    subTitle: 'Logout from your Okay account on this device',
-    logo: IMAGES.IC_LOGOUT,
-  },
-];
+import ProfileBox from '../Components/ProfileBox';
+import MenuItem from '../Components/MenuItem';
+import SectionHeader from '../Components/SectionHeader';
+import IButton from '../Components/IButton';
+import { LogUserOut } from '../../redux/auth/authActions';
 
 const Profile = props => {
-  // const [loading, setLoading] = useState(false);
-  // const [userType, setUserType] = useState('');
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  const [userData, setUserData] = useState({
+    username: 'educatebystw',
+    handle: '@educatebystw',
+    profileImage: IMAGES.IC_USER_PROFILE, // Using user icon as placeholder
+  });
 
-  // const userProfileData = useSelector(
-  //   state => state.profile?.profileData || {},
-  // );
+  const onSettingsPress = () => {
+    // Navigate to settings screen
+    // props.navigation.navigate('Settings');
+    console.log('Settings pressed');
+  };
 
-  // useEffect(() => {
-  //   setLoading(true);
-  //   dispatch(getProfileData({onSuccess, onFailure}));
+  const onBuildBoxPress = () => {
+    // Navigate to build a box screen
+    // props.navigation.navigate('BuildBox');
+    console.log('Build a box pressed');
+  };
 
-  //   localStorageHelper
-  //     .getItemFromStorage(StorageKeys.USER_TYPE)
-  //     .then(async type => {
-  //       setUserType(type);
-  //     });
-  // }, []);
+  const onMyLibraryPress = () => {
+    // Navigate to my library screen
+    // props.navigation.navigate('MyLibrary');
+    console.log('My Library pressed');
+  };
 
-  // const onSuccess = () => {
-  //   setLoading(false);
-  // };
-
-  // const onFailure = () => {
-  //   setLoading(false);
-  // };
-
-  // const onSuccessLogout = () => {
-  //   localStorageHelper.clearStorage().then(resp => {
-  //     console.log('Logout done');
-  //     props.navigation.replace('Splash');
-  //   });
-  // };
-  // const onFailureLogout = () => {};
-
-  // //CLICK EVENTS
-  // const onEditProfile = () => {
-  //   props.navigation.navigate('EditProfile', {userProfileData});
-  // };
-
-  // const onLogout = () => {
-  //   dispatch(
-  //     logoutAction({onSuccess: onSuccessLogout, onFailure: onFailureLogout}),
-  //   );
-  // };
-
-  // const onProfileSettingClick = id => {
-  //   switch (id) {
-  //     case 1:
-  //       props.navigation.navigate('SelectedAgencies');
-  //       break;
-  //     case 2:
-  //       props.navigation.navigate('PastProjects');
-  //       break;
-  //     case 3:
-  //       props.navigation.navigate('AccountDelete');
-  //       break;
-  //     case 4:
-  //       onLogout();
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // };
-
-  // //RENDER METHOD
-  // const renderProfileContainer = () => {
-  //   return (
-  //     <View style={styles.profileContainer}>
-  //       <FastImage
-  //         source={require('../../assets/temp/profileTemp.png')}
-  //         style={styles.img}
-  //         resizeMode="contain"
-  //       />
-  //       <View style={{...styles.rightContainer, marginLeft: 12}}>
-  //         <Text style={styles.title} numberOfLines={1}>
-  //           {userProfileData?.full_name || 'Name'}
-  //         </Text>
-  //         <Text style={styles.subTitle} numberOfLines={1}>
-  //           {userType || 'Architect / Interior'}
-  //         </Text>
-  //       </View>
-  //       <View>
-  //         <TouchableOpacity
-  //           style={styles.editBtn}
-  //           onPress={() => onEditProfile()}>
-  //           <FastImage
-  //             source={IMAGES.IC_PENCIL}
-  //             style={{height: 13, width: 13}}
-  //             resizeMode="contain"
-  //           />
-  //         </TouchableOpacity>
-  //       </View>
-  //     </View>
-  //   );
-  // };
-
-  // const renderProfileItems = ({item}) => {
-  //   return (
-  //     <TouchableOpacity
-  //       onPress={() => onProfileSettingClick(item.id)}
-  //       style={{...styles.profileContainer, alignItems: 'flex-start'}}>
-  //       <FastImage
-  //         source={item.logo}
-  //         style={{height: 24, width: 24}}
-  //         resizeMode="contain"
-  //       />
-  //       <View style={styles.profileRightContainer}>
-  //         <View style={[styles.rightContainer]}>
-  //           <Text style={styles.title} numberOfLines={1}>
-  //             {item.title}
-  //           </Text>
-  //           <HightBox height={8} />
-  //           <Text style={styles.subTitle} numberOfLines={1}>
-  //             {item.subTitle}
-  //           </Text>
-  //         </View>
-  //         <View>
-  //           <FastImage
-  //             source={IMAGES.IC_ARROW_DOWN}
-  //             style={{height: 24, width: 24, transform: [{rotate: '-90deg'}]}}
-  //             resizeMode="contain"
-  //           />
-  //         </View>
-  //       </View>
-  //     </TouchableOpacity>
-  //   );
-  // };
-
-  // const renderProfileSettings = () => {
-  //   return (
-  //     <FlatList
-  //       data={profileData}
-  //       renderItem={renderProfileItems}
-  //       keyExtractor={({id}) => id.toString()}
-  //       style={{flex: 1}}
-  //       showsVerticalScrollIndicator={false}
-  //       scrollEnabled={false}
-  //       ItemSeparatorComponent={() => <HightBox height={15} />}
-  //       // ListFooterComponent={() => <HightBox height={15} />}
-  //     />
-  //   );
-  // };
+  const onLogoutPress = () => {
+    dispatch(LogUserOut({
+      onSuccess: () => {
+        // Navigate to AuthStack after successful logout
+        props.navigation.reset({
+          index: 0,
+          routes: [{ name: 'AuthStack' }],
+        });
+      },
+      onFailure: (error) => {
+        console.log('Logout failed:', error);
+        // You can show an alert or toast here if needed
+      }
+    }));
+  };
 
   return (
-    <SafeAreaView style={safeAreaStyle}>
-      <Text>Profile</Text>
-      {/* <View style={{flex: 1, paddingHorizontal: 20}}>
-        <View style={{alignItems: 'center'}}>
-          <Text style={styles.title}>Profile</Text>
+    <SafeAreaView style={[safeAreaStyle, styles.container]}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Profile Box */}
+        <ProfileBox
+          profileImage={userData.profileImage}
+          username={userData.username}
+          handle={userData.handle}
+        />
+
+        {/* APP SETTINGS Section */}
+        <SectionHeader title="APP SETTINGS" />
+        <MenuItem
+          icon={IMAGES.IC_SETTINGS}
+          title="Settings"
+          onPress={onSettingsPress}
+        />
+
+        {/* SHAKE THAT WEIGHT SHOP Section */}
+        <SectionHeader title="SHAKE THAT WEIGHT SHOP" />
+        <MenuItem
+          icon={IMAGES.IC_SHOPPING_BASKET}
+          title="Build a box"
+          onPress={onBuildBoxPress}
+        />
+        <MenuItem
+          icon={IMAGES.IC_LIBRARY}
+          title="My Library"
+          onPress={onMyLibraryPress}
+        />
+
+        {/* Logout Button */}
+        <View style={styles.logoutContainer}>
+          <IButton
+            title="Logout"
+            onPress={onLogoutPress}
+            customContainer={styles.logoutButton}
+          />
         </View>
-        <HightBox height={30} />
-        {renderProfileContainer()}
-        <View style={styles.border} />
-        <Text style={styles.title}>Profile settings</Text>
-        <HightBox height={22} />
-        {renderProfileSettings()}
-        <Text style={styles.versionText}>Okay v1.0</Text>
-        <HightBox height={30} />
-      </View> */}
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -213,53 +108,21 @@ const Profile = props => {
 export default Profile;
 
 const styles = StyleSheet.create({
-  title: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
-    color: COLORS.textColor,
-    fontSize: 18,
-  },
-  profileContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profileRightContainer: {
+  container: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomColor: 'rgba(16, 22, 35, 0.12)',
-    borderBottomWidth: 1,
-    marginLeft: 12,
+    backgroundColor: COLORS.profile_bg,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
     paddingBottom: 20,
   },
-  img: {
-    height: 64,
-    width: 64,
-    borderRadius: 50,
+  logoutContainer: {
+    marginTop: 30,
+    paddingHorizontal: 20,
   },
-  rightContainer: {
-    flex: 1,
-  },
-  subTitle: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
-    color: COLORS.textColor,
-    fontSize: 14,
-  },
-  editBtn: {
-    backgroundColor: 'transparent',
-    borderRadius: 50,
-    borderColor: 'rgba(0, 100, 229, 0.12)',
-    borderWidth: 1,
-    padding: 12,
-  },
-  border: {
-    borderColor: 'rgba(16, 22, 35, 0.12)',
-    borderWidth: 1,
-    marginVertical: 20,
-  },
-  versionText: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
-    color: COLORS.textColor64,
-    fontSize: 12,
-    textAlign: 'center',
+  logoutButton: {
+    backgroundColor: '#FF4444', // Red color for logout button
   },
 });
