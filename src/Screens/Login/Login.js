@@ -23,8 +23,8 @@ import ITextField from '../Components/ITextField';
 import { JWTLogin } from '../../redux/auth/authActions';
 
 const Login = props => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState(__DEV__ ? 'educatebystw' : '');
+  const [password, setPassword] = useState(__DEV__ ? 'a$ipMwVbGYseEhEz$C' : '');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();

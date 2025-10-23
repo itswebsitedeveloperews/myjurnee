@@ -14,24 +14,14 @@ const PhotoSlider = ({ photos = [], style }) => {
     const defaultPhotos = [
         {
             id: 1,
-            image: require('../../assets/temp/profileTemp.png'),
+            image: { filePath: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg' },
             date: '09 September 2025'
         },
         {
             id: 2,
-            image: require('../../assets/temp/agencyPic.png'),
+            image: { filePath: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg' },
             date: '15 August 2025'
         },
-        {
-            id: 3,
-            image: require('../../assets/temp/tempprofilePic.png'),
-            date: '22 July 2025'
-        },
-        {
-            id: 4,
-            image: require('../../assets/temp/agency1Temp.png'),
-            date: '30 June 2025'
-        }
     ];
 
     const photoData = photos.length > 0 ? photos : defaultPhotos;
@@ -39,7 +29,7 @@ const PhotoSlider = ({ photos = [], style }) => {
     const renderPhotoItem = ({ item }) => (
         <View style={styles.photoFrame}>
             <FastImage
-                source={item.image}
+                source={{ uri: item.image.filePath }}
                 style={styles.photo}
                 resizeMode="cover"
             />

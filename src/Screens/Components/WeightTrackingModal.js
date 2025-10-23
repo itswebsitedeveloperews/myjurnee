@@ -19,25 +19,59 @@ import { FONTS } from '../../Common/Constants/fonts';
 
 const { width, height } = Dimensions.get('window');
 
-const WeightTrackingModal = ({ isVisible, onClose, onSubmit }) => {
+const SetGoalWeightModal = ({ isVisible, onClose, onSubmit }) => {
     const [weight, setWeight] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [dateString, setDateString] = useState(
+        new Date().toISOString().split('T')[0]
+    );
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedPhotos, setSelectedPhotos] = useState([]);
 
     const handleSubmit = () => {
-        if (!weight.trim()) {
-            Alert.alert('Error', 'Please enter your weight');
+        // Validate date (cannot be in the future)
+        const today = new Date();
+        today.setHours(23, 59, 59, 999); // End of today
+        if (selectedDate > today) {
+            Alert.alert('Error', 'Date cannot be in the future');
             return;
         }
 
-        const weightData = {
-            weight: parseFloat(weight),
-            date: selectedDate,
-            photos: selectedPhotos,
+        // Validate date (cannot be too far in the past - more than 1 year)
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        if (selectedDate < oneYearAgo) {
+            Alert.alert('Error', 'Date cannot be more than 1 year in the past');
+            return;
+        }
+
+        // Check if user has entered weight
+        const hasWeight = weight.trim() && !isNaN(parseFloat(weight)) && parseFloat(weight) > 0;
+
+        // Check if user has selected photos
+        const hasPhotos = selectedPhotos.length > 0;
+
+        if (!hasWeight && !hasPhotos) {
+            Alert.alert('Error', 'Please enter your weight or select a photo');
+            return;
+        }
+
+        // Validate weight if provided
+        if (hasWeight) {
+            const weightValue = parseFloat(weight);
+            if (weightValue < 20 || weightValue > 500) {
+                Alert.alert('Error', 'Please enter a weight between 20 and 500 kg');
+                return;
+            }
+        }
+
+        const data = {
+            date: dateString,
+            weight: hasWeight ? parseFloat(weight) : null,
+            photos: hasPhotos ? selectedPhotos : [],
         };
 
-        onSubmit(weightData);
+        onSubmit(data);
         handleClose();
     };
 
@@ -71,7 +105,17 @@ const WeightTrackingModal = ({ isVisible, onClose, onSubmit }) => {
         setShowDatePicker(Platform.OS === 'ios');
         if (selectedDate) {
             setSelectedDate(selectedDate);
+
+            // Use local date methods instead of toISOString()
+            const year = selectedDate.getFullYear();
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            const day = String(selectedDate.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+
+            console.log('dateStr', dateStr); // Will show 2025-10-22
+            setDateString(dateStr);
         }
+
     };
 
     const handlePhotoUpload = () => {
@@ -96,7 +140,10 @@ const WeightTrackingModal = ({ isVisible, onClose, onSubmit }) => {
 
         launchCamera(options, (response) => {
             if (response.assets && response.assets[0]) {
-                setSelectedPhotos([...selectedPhotos, response.assets[0]]);
+                // Replace existing photo with new one
+                setSelectedPhotos([response.assets[0]]);
+            } else if (response.error) {
+                Alert.alert('Error', 'Failed to take photo. Please try again.');
             }
         });
     };
@@ -107,12 +154,15 @@ const WeightTrackingModal = ({ isVisible, onClose, onSubmit }) => {
             quality: 0.8,
             maxWidth: 1000,
             maxHeight: 1000,
-            selectionLimit: 5, // Allow multiple selection
+            selectionLimit: 1, // Allow only one photo
         };
 
         launchImageLibrary(options, (response) => {
-            if (response.assets) {
-                setSelectedPhotos([...selectedPhotos, ...response.assets]);
+            if (response.assets && response.assets[0]) {
+                // Replace existing photo with new one
+                setSelectedPhotos([response.assets[0]]);
+            } else if (response.error) {
+                Alert.alert('Error', 'Failed to select photo. Please try again.');
             }
         });
     };
@@ -153,7 +203,7 @@ const WeightTrackingModal = ({ isVisible, onClose, onSubmit }) => {
                                     style={styles.input}
                                     value={weight}
                                     onChangeText={setWeight}
-                                    placeholder="0.0 stones"
+                                    placeholder="0.0 kg"
                                     placeholderTextColor={COLORS.textColor44}
                                     keyboardType="numeric"
                                 />
@@ -175,14 +225,14 @@ const WeightTrackingModal = ({ isVisible, onClose, onSubmit }) => {
                         </View>
                     </View>
 
-                    {/* Upload Progress Photos Section */}
+                    {/* Upload Progress Photo Section */}
                     <View style={styles.photoSection}>
-                        <Text style={styles.photoSectionTitle}>Upload Progress Photos</Text>
+                        <Text style={styles.photoSectionTitle}>Upload Progress Photo</Text>
 
-                        {/* Selected Photos Preview */}
+                        {/* Selected Photo Preview */}
                         {selectedPhotos.length > 0 && (
                             <View style={styles.selectedPhotosContainer}>
-                                <Text style={styles.selectedPhotosTitle}>Selected Photos ({selectedPhotos.length})</Text>
+                                <Text style={styles.selectedPhotosTitle}>Selected Photo</Text>
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.photosScroll}>
                                     {selectedPhotos.map((photo, index) => (
                                         <View key={index} style={styles.photoPreview}>
@@ -217,15 +267,15 @@ const WeightTrackingModal = ({ isVisible, onClose, onSubmit }) => {
                     <TouchableOpacity
                         style={[
                             styles.updateButton,
-                            weight.trim() ? styles.updateButtonEnabled : styles.updateButtonDisabled
+                            (weight.trim() || selectedPhotos.length > 0) ? styles.updateButtonEnabled : styles.updateButtonDisabled
                         ]}
                         onPress={handleSubmit}
-                        disabled={!weight.trim()}
+                        disabled={!weight.trim() && selectedPhotos.length === 0}
                     >
                         <Text style={[
                             styles.updateButtonText,
-                            weight.trim() ? styles.updateButtonTextEnabled : styles.updateButtonTextDisabled
-                        ]}>Update</Text>
+                            (weight.trim() || selectedPhotos.length > 0) ? styles.updateButtonTextEnabled : styles.updateButtonTextDisabled
+                        ]}>Update Progress</Text>
                     </TouchableOpacity>
                 </ScrollView>
 
@@ -543,4 +593,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default WeightTrackingModal;
+export default SetGoalWeightModal;

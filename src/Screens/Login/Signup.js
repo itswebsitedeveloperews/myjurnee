@@ -46,9 +46,9 @@ const Signup = props => {
         setIsLoading(true);
 
         dispatch(RegisterUser({
-            username: username.trim(),
-            email: email.trim(),
-            password: password.trim(),
+            username: username,
+            email: email,
+            password: password,
             onSuccess: (response) => {
                 setIsLoading(false);
                 Alert.alert('Success', 'Account created successfully!', [

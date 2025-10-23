@@ -2,16 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { COLORS } from '../../Common/Constants/colors';
+import { getCurrentWeekDates } from '../../Utils/Utils';
 
 interface WeightTrackerChartProps {
-  data?: {
-    labels: string[];
-    datasets: {
-      data: number[];
-      color?: (opacity: number) => string;
-      strokeWidth?: number;
-    }[];
-  };
+
+  data: (number | null)[];
   goalWeight?: number;
   selectedIndex?: number;
   onDataPointPress?: (data: any) => void;
@@ -28,17 +23,19 @@ const WeightTrackerChart: React.FC<WeightTrackerChartProps> = ({
 
   // Default data matching the image
   const defaultData = {
-    labels: ['16', '17', '18', '19', '20', '21', '22'],
+    labels: getCurrentWeekDates(),
     datasets: [
       {
-        data: [95, 92.5, 94, 91, 90, 89, 88],
+        data: data || [90, 95, 80, 75, 32, 25, 67],
         color: (opacity = 1) => COLORS.pr_lavender,
         strokeWidth: 3,
       },
     ],
   };
 
-  const chartData = data || defaultData;
+  const chartData = defaultData;
+
+  console.log('chartData', chartData)
 
   useEffect(() => {
     const updateDimensions = () => {

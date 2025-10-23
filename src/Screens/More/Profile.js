@@ -14,14 +14,53 @@ import MenuItem from '../Components/MenuItem';
 import SectionHeader from '../Components/SectionHeader';
 import IButton from '../Components/IButton';
 import { LogUserOut } from '../../redux/auth/authActions';
+import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 
 const Profile = props => {
   const dispatch = useDispatch();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [userNickName, setUserNickName] = useState('');
   const [userData, setUserData] = useState({
     username: 'educatebystw',
     handle: '@educatebystw',
     profileImage: IMAGES.IC_USER_PROFILE, // Using user icon as placeholder
   });
+
+  useEffect(() => {
+    checkAuthentication();
+  }, [])
+
+  const checkAuthentication = async () => {
+    try {
+      const isLoggedIn = await localStorageHelper.getItemFromStorage(StorageKeys.IS_LOGGED);
+      if (isLoggedIn === 'true') {
+        setIsAuthenticated(true);
+        getUserDetailsFromLocalStorage();
+      } else {
+        setIsAuthenticated(false);
+
+      }
+    } catch (error) {
+      console.log('Error checking authentication:', error);
+    }
+  };
+
+  const getUserDetailsFromLocalStorage = () => {
+    localStorageHelper
+      .getItemsFromStorage([StorageKeys.USER_NAME, StorageKeys.USER_NICKNAME])
+      .then(resp => {
+        console.log('resp', resp);
+        let userName = resp[StorageKeys.USER_NAME];
+        let userNickName = resp[StorageKeys.USER_NICKNAME];
+
+        setUserData({
+          username: userName,
+          handle: `@${userNickName || ''}`,
+          profileImage: IMAGES.IC_USER_PROFILE,
+        })
+      });
+  }
 
   const onSettingsPress = () => {
     // Navigate to settings screen
@@ -65,11 +104,11 @@ const Profile = props => {
         contentContainerStyle={styles.scrollContent}
       >
         {/* Profile Box */}
-        <ProfileBox
+        {isAuthenticated && <ProfileBox
           profileImage={userData.profileImage}
           username={userData.username}
           handle={userData.handle}
-        />
+        />}
 
         {/* APP SETTINGS Section */}
         <SectionHeader title="APP SETTINGS" />
@@ -93,13 +132,15 @@ const Profile = props => {
         />
 
         {/* Logout Button */}
-        <View style={styles.logoutContainer}>
-          <IButton
-            title="Logout"
-            onPress={onLogoutPress}
-            customContainer={styles.logoutButton}
-          />
-        </View>
+        {
+          isAuthenticated &&
+          <View style={styles.logoutContainer}>
+            <IButton
+              title="Logout"
+              onPress={onLogoutPress}
+              customContainer={styles.logoutButton}
+            />
+          </View>}
       </ScrollView>
     </SafeAreaView>
   );

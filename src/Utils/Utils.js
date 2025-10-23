@@ -1,6 +1,6 @@
 import RNFS from 'react-native-fs';
 import _ from 'lodash';
-import {Linking} from 'react-native';
+import { Linking } from 'react-native';
 
 export const isFunction = funCtion => _.isFunction(funCtion);
 
@@ -35,3 +35,27 @@ export const openLinks = async link => {
 
 export const noImag =
   'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png';
+
+export const getCurrentWeekDates = () => {
+  const currentDate = new Date();
+  const startOfWeek = new Date(currentDate);
+  startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+  const labels = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    return d.getDate().toString();
+  });
+  return labels;
+};
+
+export const getFullWeekDatesArray = () => {
+  const currentDate = new Date();
+  const startOfWeek = new Date(currentDate);
+  startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+  const labels = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    return d.toISOString().split('T')[0];
+  });
+  return labels;
+};

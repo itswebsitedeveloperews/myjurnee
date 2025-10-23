@@ -5,6 +5,8 @@ export const StorageKeys = {
   FCM_TOKEN: 'fcmToken',
   PHONE: 'PHONE',
   USER_ID: 'USER_ID',
+  USER_NAME: 'USER_NAME',
+  USER_NICKNAME: 'USER_NICKNAME',
   USER_TYPE: 'USER_TYPE',
   ACCESS_TOKEN: 'ACCESS_TOKEN',
   NAME: 'NAME',
@@ -71,7 +73,7 @@ class LocalStorageHelper {
         });
     });
 
-  setStorageItem = ({key, value}) =>
+  setStorageItem = ({ key, value }) =>
     new Promise((resolve, reject) => {
       AsyncStorage.setItem(key, value)
         .then(resp => {
@@ -83,7 +85,7 @@ class LocalStorageHelper {
         });
     });
 
-  setStorageArrayItem = ({key, value}) =>
+  setStorageArrayItem = ({ key, value }) =>
     new Promise((resolve, reject) => {
       AsyncStorage.setItem(key, JSON.stringify(value))
         .then(resp => {

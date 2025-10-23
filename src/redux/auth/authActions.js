@@ -69,6 +69,8 @@ export const JWTLogin = ({ username, password, onSuccess, onFailure }) => {
             storageData[StorageKeys.ACCESS_TOKEN] = response.token || '';
             storageData[StorageKeys.IS_LOGGED] = 'true';
             storageData[StorageKeys.USER_ID] = String(response.user_id) || '';
+            storageData[StorageKeys.USER_NAME] = String(response.user_display_name) || '';
+            storageData[StorageKeys.USER_NICKNAME] = String(response.user_nicename) || '';
 
             localStorageHelper
               .setStorageItems(storageData)
