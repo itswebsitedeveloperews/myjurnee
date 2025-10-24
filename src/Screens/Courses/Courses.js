@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import { IMAGES } from '../../Common/Constants/images';
 
-const CoursesScreen = () => {
+const CoursesScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [selectedFilter, setSelectedFilter] = useState('All Courses');
@@ -76,8 +76,12 @@ const CoursesScreen = () => {
         return 0;
     });
 
+    const OnCoursePress = () => {
+        navigation.navigate('CourseDetailScreen');
+    }
+
     const renderCourseItem = ({ item, index }) => (
-        <View style={styles.courseItem}>
+        <TouchableOpacity onPress={() => OnCoursePress()} style={styles.courseItem}>
             <View style={styles.courseThumbnail}>
                 <TouchableOpacity style={styles.startCourseButton}>
                     <Text style={styles.startCourseText}>Start Course</Text>
@@ -104,7 +108,7 @@ const CoursesScreen = () => {
                     </TouchableOpacity>
                 </View>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 
     const renderHeader = useMemo(() => (
@@ -171,7 +175,7 @@ const CoursesScreen = () => {
     if (loading) {
         return (
             <SafeAreaView style={styles.container}>
-                <StatusBar barStyle="light-content" backgroundColor={COLORS.pr_blue} />
+                <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color={COLORS.pr_blue} />
                     <Text style={styles.loadingText}>Loading courses...</Text>
@@ -182,7 +186,7 @@ const CoursesScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor={COLORS.pr_blue} />
+            <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
             <FlatList
                 data={courseData}
                 renderItem={renderCourseItem}

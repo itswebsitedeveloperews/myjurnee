@@ -194,10 +194,7 @@ const WeightTrackerScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={safeAreaStyle}>
-            {/* <StatusBar
-                barStyle="dark-content"
-                backgroundColor="#F5F5F5"
-            /> */}
+            <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
             <View style={{ paddingHorizontal: 20 }}>
                 <INavBar title="Weight Tracker" EmptyBackButton={true} />
                 {!isAuthenticated && (
