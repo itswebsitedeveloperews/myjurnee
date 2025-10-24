@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { safeAreaStyle } from '../../Common/CommonStyles';
 import FastImage from 'react-native-fast-image';
@@ -10,15 +10,38 @@ import { FONTS } from '../../Common/Constants/fonts';
 import ITextField from '../Components/ITextField';
 import { windowHeight } from '../../Utils/Dimentions';
 import IButton from '../Components/IButton';
+import { useDispatch } from 'react-redux';
+import { ForgotPasswordAction } from '../../redux/auth/authActions';
 
 const ForgotPassword = props => {
     const [email, setEmail] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useDispatch();
+
     const onSubmit = () => {
         if (!email) {
-            alert('Please enter email address');
-        } else {
-            alert('Email address submitted');
+            Alert.alert('Please enter email address');
+            return;
         }
+
+        setIsLoading(true);
+
+        dispatch(ForgotPasswordAction({
+            email: email,
+            onSuccess: (response) => {
+                setIsLoading(false);
+                Alert.alert('Success', response?.message ?? 'Link shared successfully!', [
+                    {
+                        text: 'OK',
+                        onPress: () => props.navigation.navigate('Login')
+                    }
+                ]);
+            },
+            onFailure: (errorMessage) => {
+                setIsLoading(false);
+                Alert.alert('Link share Failed', errorMessage || 'Something went wrong. Please try again.');
+            }
+        }));
     }
     return (
         <SafeAreaView style={safeAreaStyle}>
@@ -39,7 +62,8 @@ const ForgotPassword = props => {
                 </View>
                 <View style={styles.buttonContainer}>
                     <IButton
-                        title="Submit"
+                        title={isLoading ? "Submitting Account..." : "Submit"}
+                        loading={isLoading}
                         onPress={onSubmit}
                         mainViewStyle={styles.submitButton}
                     />

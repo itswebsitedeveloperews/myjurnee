@@ -24,6 +24,7 @@ import {
   logout,
   signIn,
   register,
+  forgotPassword,
 } from '../../api/authApis';
 
 export const LogUserIn = ({ mobileNum, onSuccess, onFailure }) => {
@@ -137,6 +138,39 @@ export const RegisterUser = ({ username, email, password, onSuccess, onFailure }
       console.log('Register Error!', error);
       if (isFunction(onFailure)) {
         onFailure('An unexpected error occurred during registration');
+      }
+    }
+  };
+};
+
+export const ForgotPasswordAction = ({ email, onSuccess, onFailure }) => {
+  return async dispatch => {
+    try {
+      forgotPassword(email)
+        .then(response => {
+          // console.log('Forgot password response---', response);
+
+          // Check if response contains user data (id, username, email) indicating successful registration
+          if (response) {
+            if (isFunction(onSuccess)) {
+              onSuccess(response);
+            }
+          } else {
+            if (isFunction(onFailure)) {
+              onFailure(cleanErrorMessage(response?.message || 'Forgot password failed'));
+            }
+          }
+        })
+        .catch(err => {
+          console.log('Register error:', err);
+          if (isFunction(onFailure)) {
+            onFailure(cleanErrorMessage(err?.response?.data?.message || 'Forgot password failed'));
+          }
+        });
+    } catch (error) {
+      console.log('Register Error!', error);
+      if (isFunction(onFailure)) {
+        onFailure('An unexpected error occurred during sending link for forgot password');
       }
     }
   };

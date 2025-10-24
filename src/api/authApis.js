@@ -55,3 +55,15 @@ export const register = (username, email, password) => {
     },
   }).then(extractData);
 };
+
+//Forgot password API
+export const forgotPassword = (email) => {
+  const params = new URLSearchParams();
+  params.append('email', email);
+
+  return userRawFetch.post('wp-json/custom-api/v1/forgot-password?email', params.toString(), {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  }).then(extractData);
+};

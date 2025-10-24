@@ -105,7 +105,7 @@ const Signup = props => {
                     title={isLoading ? "Creating Account..." : "Create Account"}
                     onPress={onSignupClick}
                     mainViewStyle={styles.signupButton}
-                    disabled={isLoading}
+                    loading={isLoading}
                 />
             </View>
         </SafeAreaView>
