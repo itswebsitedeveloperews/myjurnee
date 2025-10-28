@@ -76,12 +76,12 @@ const CoursesScreen = ({ navigation }) => {
         return 0;
     });
 
-    const OnCoursePress = () => {
-        navigation.navigate('CourseDetailScreen');
+    const OnCoursePress = (item) => {
+        navigation.navigate('CourseDetailScreen', { courseId: item.ID || '' });
     }
 
     const renderCourseItem = ({ item, index }) => (
-        <TouchableOpacity onPress={() => OnCoursePress()} style={styles.courseItem}>
+        <TouchableOpacity onPress={() => OnCoursePress(item)} style={styles.courseItem}>
             <View style={styles.courseThumbnail}>
                 <TouchableOpacity style={styles.startCourseButton}>
                     <Text style={styles.startCourseText}>Start Course</Text>

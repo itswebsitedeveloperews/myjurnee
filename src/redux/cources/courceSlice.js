@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 //Data for bottomtab
 const initialState = {
   courseData: [],
+  courseDetailData: {}
 };
 
 export const courceSlice = createSlice({
@@ -13,13 +14,17 @@ export const courceSlice = createSlice({
       state.courseData = payload;
     },
 
-
+    onCourseDetailSuccess: (state, data) => {
+      const { payload } = data;
+      state.courseDetailData = payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
 export const {
   onCourseSuccess,
+  onCourseDetailSuccess
 } = courceSlice.actions;
 
 export default courceSlice.reducer;

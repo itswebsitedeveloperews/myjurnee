@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     View,
     Text,
@@ -7,7 +7,8 @@ import {
     Animated,
     StyleSheet,
     StatusBar,
-    Dimensions
+    Dimensions,
+    ActivityIndicator
 } from 'react-native';
 import {
     FileText,
@@ -19,6 +20,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import { windowWidth } from '../../Utils/Dimentions';
 import INavBar from '../Components/INavBar';
 import { FONTS } from '../../Common/Constants/fonts';
+import { getCourseDetailAction } from '../../redux/cources/courceActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { formatDate } from '../../Utils/Utils';
 
 const source = {
     html: `
@@ -127,6 +131,26 @@ const source = {
 };
 
 const CourseDetailScreen = (props) => {
+    const [loading, setLoading] = useState(false);
+
+    const courseId = props.route.params?.courseId;
+    const dispatch = useDispatch();
+    const courseData = useSelector(state => state.cource?.courseDetailData || null)
+
+    useEffect(() => {
+        setLoading(true);
+        dispatch(getCourseDetailAction({ courseId, onSuccess, onFailure }));
+    }, []);
+
+    const onSuccess = () => {
+        setLoading(false);
+    };
+
+    const onFailure = () => {
+        setLoading(false);
+    };
+
+
     const scrollY = useRef(new Animated.Value(0)).current;
 
     const lessons = [
@@ -149,6 +173,22 @@ const CourseDetailScreen = (props) => {
         outputRange: [0, -50],
         extrapolate: 'clamp',
     });
+
+    const OnLessonClick = () => {
+        props.navigation.navigate('LessonDetailScreen');
+    }
+
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={COLORS.pr_blue} />
+                    <Text style={styles.loadingText}>Loading course detail...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
@@ -174,9 +214,9 @@ const CourseDetailScreen = (props) => {
                 />
                 <View style={{ height: 50 }} />
                 <Text style={styles.courseTitle} numberOfLines={5}>
-                    Course: Social Situations Mastery – Your Complete Guide to Staying on Track at a Restaurant
+                    {courseData.title || ''}
                 </Text>
-                <Text style={styles.dateText}>Sep 12, 2025</Text>
+                <Text style={styles.dateText}>{formatDate(courseData.publish_date) || ''}</Text>
             </Animated.View>
 
             <Animated.ScrollView
@@ -193,31 +233,33 @@ const CourseDetailScreen = (props) => {
                     <Text style={styles.cardTitle}>COURSE INCLUDES</Text>
                     <View style={styles.includesRow}>
                         <FileText color="#666" size={28} />
-                        <Text style={styles.includesText}>4 Lessons</Text>
+                        <Text style={styles.includesText}>{courseData.lessons?.length || 0} Lessons</Text>
                     </View>
                 </View>
 
 
-                <View style={styles.contentSection}>
+                {courseData?.lessons?.length > 0 && <View style={styles.contentSection}>
                     <Text style={styles.sectionTitle}>Course Content</Text>
 
-                    {lessons.map((lesson) => (
-                        <View key={lesson.id} style={styles.lessonCard}>
+                    {courseData?.lessons.map((lesson) => (
+                        <TouchableOpacity onPress={() => OnLessonClick()} key={lesson.ID} style={styles.lessonCard}>
                             <View style={styles.lessonContent}>
                                 <FileText color="#666" size={24} />
-                                <Text style={styles.lessonTitle}>{lesson.title}</Text>
+                                <Text style={styles.lessonTitle} numberOfLines={2}>{lesson.title}</Text>
                             </View>
                             <View style={styles.checkbox} />
-                        </View>
+                        </TouchableOpacity>
                     ))}
-                </View>
+                </View>}
 
                 {/* Course Description */}
                 <View style={styles.courseDescription}>
                     <Text style={styles.sectionTitle}>Course Description</Text>
                     <RenderHtml
                         contentWidth={windowWidth}
-                        source={source}
+                        source={{
+                            html: courseData.content
+                        }}
                     />
                 </View>
                 <View style={{ height: 70 }} />
@@ -243,7 +285,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#c7d2fe',
     },
 
-
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     downloadButton: {
         backgroundColor: '#fff',
         borderRadius: 20,

@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from '../Screens/Home/Home';
 import CoursesScreen from '../Screens/Courses/Courses';
 import CourseDetailScreen from '../Screens/Courses/CourseDetailScreen';
+import LessonDetailScreen from '../Screens/Courses/LessonDetailScreen';
 
 const Courses = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ const CoursesStack = () => {
             initialRouteName="CoursesScreen">
             <Courses.Screen name="CoursesScreen" component={CoursesScreen} />
             <Courses.Screen name="CourseDetailScreen" component={CourseDetailScreen} />
+            <Courses.Screen name="LessonDetailScreen" component={LessonDetailScreen} />
         </Courses.Navigator>
     );
 };

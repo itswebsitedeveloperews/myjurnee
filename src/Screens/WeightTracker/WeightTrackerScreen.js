@@ -99,7 +99,7 @@ const WeightTrackerScreen = ({ navigation }) => {
                 weightMap[entry.date] = entry.weight;
             });
             // Map full dates to weights (null if no data)
-            const data = fullWeekDates.map(date => weightMap[date] ?? null);
+            const data = fullWeekDates.map(date => weightMap[date] ?? 0);
 
             return data;
         } catch (error) {

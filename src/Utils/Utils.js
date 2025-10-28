@@ -59,3 +59,9 @@ export const getFullWeekDatesArray = () => {
   });
   return labels;
 };
+
+export function formatDate(dateString) {
+  const date = new Date(dateString.replace(' ', 'T')); // make it ISO compatible
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  return date.toLocaleDateString('en-US', options);
+}

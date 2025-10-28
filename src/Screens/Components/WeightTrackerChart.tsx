@@ -5,7 +5,6 @@ import { COLORS } from '../../Common/Constants/colors';
 import { getCurrentWeekDates } from '../../Utils/Utils';
 
 interface WeightTrackerChartProps {
-
   data: (number | null)[];
   goalWeight?: number;
   selectedIndex?: number;
