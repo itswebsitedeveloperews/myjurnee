@@ -3,6 +3,7 @@ import authReducer from './auth';
 import dashboardSlice from './dashboard/dashboardSlice';
 import profileSlice from './profile/profileSlice';
 import courceSlice from './cources/courceSlice';
+import weightLogSlice from './WeightLogs/weightLogSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,6 @@ export const store = configureStore({
     dashboard: dashboardSlice,
     profile: profileSlice,
     cource: courceSlice,
-    // agency: agencySlice,
+    weightLogs: weightLogSlice,
   },
 });

@@ -185,7 +185,7 @@ const CoursesScreen = ({ navigation }) => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['top']}>
             <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
             <FlatList
                 data={courseData}

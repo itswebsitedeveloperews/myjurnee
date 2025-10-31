@@ -64,14 +64,14 @@ export const JWTLogin = ({ username, password, onSuccess, onFailure }) => {
         .then(response => {
           console.log('JWT login response---', response);
 
-          if (response?.token) {
+          if (response?.success) {
             const storageData = {};
 
-            storageData[StorageKeys.ACCESS_TOKEN] = response.token || '';
+            storageData[StorageKeys.ACCESS_TOKEN] = response?.data?.token || '';
             storageData[StorageKeys.IS_LOGGED] = 'true';
-            storageData[StorageKeys.USER_ID] = String(response.user_id) || '';
-            storageData[StorageKeys.USER_NAME] = String(response.user_display_name) || '';
-            storageData[StorageKeys.USER_NICKNAME] = String(response.user_nicename) || '';
+            storageData[StorageKeys.USER_ID] = String(response?.data?.user_id) || '';
+            storageData[StorageKeys.USER_NAME] = String(response?.data?.user_display_name) || '';
+            storageData[StorageKeys.USER_NICKNAME] = String(response?.data?.user_nicename) || '';
 
             localStorageHelper
               .setStorageItems(storageData)
@@ -79,9 +79,9 @@ export const JWTLogin = ({ username, password, onSuccess, onFailure }) => {
                 console.log('Saved JWT credentials in localstorage');
 
                 if (isFunction(onSuccess)) {
-                  onSuccess(response);
+                  onSuccess(response?.data);
                 }
-                dispatch(onLogin(response));
+                dispatch(onLogin(response?.data));
               })
               .catch(error => {
                 console.log('JWT login storage error:', error);

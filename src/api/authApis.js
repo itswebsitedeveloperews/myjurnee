@@ -35,7 +35,7 @@ export const jwtLogin = (username, password) => {
   params.append('username', username);
   params.append('password', password);
 
-  return userRawFetch.post('/wp-json/jwt-auth/v1/token', params.toString(), {
+  return userRawFetch.post('/wp-json/mobile/v1/login', params.toString(), {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },

@@ -15,6 +15,8 @@ import { FONTS } from '../../Common/Constants/fonts';
 import { COLORS } from '../../Common/Constants/colors';
 import SetGoalWeightModal from '../Components/SetGoalWeightModal';
 import { getCurrentWeekDates, getFullWeekDatesArray } from '../../Utils/Utils';
+import { useDispatch } from 'react-redux';
+import { setWeightGoalAction, setWeightGoalProgessAction } from '../../redux/WeightLogs/weightLogActions';
 
 const WeightTrackerScreen = ({ navigation }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -31,6 +33,7 @@ const WeightTrackerScreen = ({ navigation }) => {
     const [recentPhotos, setRecentPhotos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         checkAuthentication();
@@ -145,32 +148,47 @@ const WeightTrackerScreen = ({ navigation }) => {
             const hasWeight = data.weight !== null && data.weight !== undefined;
             const hasPhotos = data.photos && data.photos.length > 0;
 
-            if (hasWeight && hasPhotos) {
-                // Both weight and photos - create weight entry with photos
-                await WeightTrackingService.addWeightEntry({
-                    weight: data.weight,
-                    date: data.date,
-                    photos: data.photos
+            localStorageHelper
+                .getItemFromStorage(StorageKeys.USER_ID)
+                .then(async userId => {
+                    setLoading(true);
+                    const payload = {
+                        "user_id": userId,
+                        "weight": data.weight,
+                        "date": data.date,
+                        "images": data.photos
+                    }
+                    dispatch(setWeightGoalProgessAction({
+                        onSuccess, onFailure, payload
+                    }))
                 });
-                console.log('Weight entry with photos saved successfully');
-            } else if (hasWeight) {
-                // Only weight - create weight entry without photos
-                await WeightTrackingService.addWeightEntry({
-                    weight: data.weight,
-                    date: data.date,
-                    photos: []
-                });
-                console.log('Weight entry saved successfully');
-            } else if (hasPhotos) {
-                // Only photos - create photo entry
-                await WeightTrackingService.addPhotoEntry({
-                    date: data.date,
-                    image: data.photos[0] // Only one photo allowed
-                });
-                console.log('Photo entry saved successfully');
-            }
 
-            await loadWeightData(); // Refresh data after adding new entry
+            // if (hasWeight && hasPhotos) {
+            //     // Both weight and photos - create weight entry with photos
+            //     await WeightTrackingService.addWeightEntry({
+            //         weight: data.weight,
+            //         date: data.date,
+            //         photos: data.photos
+            //     });
+            //     console.log('Weight entry with photos saved successfully');
+            // } else if (hasWeight) {
+            //     // Only weight - create weight entry without photos
+            //     await WeightTrackingService.addWeightEntry({
+            //         weight: data.weight,
+            //         date: data.date,
+            //         photos: []
+            //     });
+            //     console.log('Weight entry saved successfully');
+            // } else if (hasPhotos) {
+            //     // Only photos - create photo entry
+            //     await WeightTrackingService.addPhotoEntry({
+            //         date: data.date,
+            //         image: data.photos[0] // Only one photo allowed
+            //     });
+            //     console.log('Photo entry saved successfully');
+            // }
+
+            // await loadWeightData(); // Refresh data after adding new entry
         } catch (error) {
             console.log('Error saving data:', error);
             Alert.alert(
@@ -181,10 +199,28 @@ const WeightTrackerScreen = ({ navigation }) => {
         }
     };
 
+    const onSuccess = () => {
+        setLoading(false);
+    };
+
+    const onFailure = () => {
+        setLoading(false);
+    };
+
     const handleSetGoalWeightSubmit = async (data) => {
         try {
-            await WeightTrackingService.setGoalWeight(data.weight);
-            await loadWeightData();
+            localStorageHelper
+                .getItemFromStorage(StorageKeys.USER_ID)
+                .then(async userId => {
+                    setLoading(true);
+                    const payload = {
+                        "user_id": userId,
+                        "goal_weight": data.weight.toString()
+                    }
+                    dispatch(setWeightGoalAction({ payload, onSuccess, onFailure }));
+                    await WeightTrackingService.setGoalWeight(data.weight);
+                    await loadWeightData();
+                });
         } catch (error) {
             console.log('Error setting goal weight:', error);
         }
@@ -193,7 +229,7 @@ const WeightTrackerScreen = ({ navigation }) => {
     // Now we show dummy data for non-authenticated users
 
     return (
-        <SafeAreaView style={safeAreaStyle}>
+        <SafeAreaView style={safeAreaStyle} edges={['top']} >
             <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
             <View style={{ paddingHorizontal: 20 }}>
                 <INavBar title="Weight Tracker" EmptyBackButton={true} />

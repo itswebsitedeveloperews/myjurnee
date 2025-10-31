@@ -9,6 +9,7 @@ import {
     Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
 import { safeAreaStyle } from '../../Common/CommonStyles';
 import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
@@ -18,6 +19,7 @@ import { IMAGES } from '../../Common/Constants/images';
 import WeightTrackingService from '../../Services/WeightTrackingService';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 import PhotoStorageService from '../../Services/PhotoStorageService';
+import { getWeightLogsAction } from '../../redux/WeightLogs/weightLogActions';
 
 const LogHistoryScreen = ({ navigation, route }) => {
     const [logs, setLogs] = useState([]);
@@ -25,6 +27,9 @@ const LogHistoryScreen = ({ navigation, route }) => {
     const [deletedItem, setDeletedItem] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const dispatch = useDispatch();
+
+    const weightLogsData = useSelector(state => state.weightLogs?.logsData || []);
 
     useEffect(() => {
         checkAuthentication();
@@ -97,13 +102,27 @@ const LogHistoryScreen = ({ navigation, route }) => {
     const loadLogs = async () => {
         try {
             setLoading(true);
-            const entries = await WeightTrackingService.getWeightEntries();
-            setLogs(entries);
+            dispatch(getWeightLogsAction({
+                userId: '3',
+                onFailure,
+                onSuccess
+            }))
+            // const entries = await WeightTrackingService.getWeightEntries();
+            // setLogs(entries);
         } catch (error) {
             console.log('Error loading logs:', error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const onSuccess = () => {
+        setLoading(false);
+        setLogs(weightLogsData);
+    };
+
+    const onFailure = () => {
+        setLoading(false);
     };
 
     const handleDelete = async (itemId) => {
@@ -201,12 +220,9 @@ const LogHistoryScreen = ({ navigation, route }) => {
 
     const renderWeightEntry = (item) => {
         const getImageSource = (photo) => {
-            if (photo && photo.fileName) {
+            if (photo && photo.originalUri) {
                 // Photo was saved to file system
-                return { uri: PhotoStorageService.getPhotoUri(photo.fileName) };
-            } else if (photo && photo.uri) {
-                // Photo is still in temporary location
-                return { uri: photo.uri };
+                return { uri: photo.originalUri };
             } else {
                 // Fallback to default image
                 return require('../../assets/temp/profileTemp.png');
@@ -226,19 +242,19 @@ const LogHistoryScreen = ({ navigation, route }) => {
                         )}
                     </View>
                     <View style={styles.changeInfo}>
-                        {item.change !== undefined && item.change !== 0 && (
+                        {item.change !== undefined && (
                             <View style={styles.changeContainer}>
                                 <Text style={[
                                     styles.changeIcon,
                                     { color: item.changeType === 'loss' ? '#4CAF50' : '#F44336' }
                                 ]}>
-                                    {item.changeType === 'loss' ? '↓' : '↑'}
+                                    {item.changeType === 'loss' ? '↓' : item.changeType === 'gain' ? '↑' : ''}
                                 </Text>
                                 <Text style={[
                                     styles.changeText,
                                     { color: item.changeType === 'loss' ? '#4CAF50' : '#F44336' }
                                 ]}>
-                                    {item.changeType === 'loss' ? '-' : '+'} {Math.abs(item.change).toFixed(1)} kg
+                                    {item.change || ''}
                                 </Text>
                             </View>
                         )}
@@ -263,13 +279,10 @@ const LogHistoryScreen = ({ navigation, route }) => {
     };
 
     const renderPhotoEntry = (item) => {
-        const getImageSource = () => {
-            if (item.image && item.image.fileName) {
+        const getImageSource = (photoItem) => {
+            if (photoItem && photoItem?.originalUri) {
                 // Photo was saved to file system
-                return { uri: PhotoStorageService.getPhotoUri(item.image.fileName) };
-            } else if (item.image && item.image.uri) {
-                // Photo is still in temporary location
-                return { uri: item.image.uri };
+                return { uri: photoItem?.originalUri };
             } else {
                 // Fallback to default image
                 return require('../../assets/temp/profileTemp.png');
@@ -284,7 +297,7 @@ const LogHistoryScreen = ({ navigation, route }) => {
                         <Text style={styles.dateText}>{formatDate(item.date)}</Text>
                     </View>
                     <View style={styles.photoContainer}>
-                        <Image source={getImageSource()} style={styles.photoThumbnail} />
+                        <Image source={getImageSource(item?.photos[0])} style={styles.photoThumbnail} />
                         <TouchableOpacity
                             style={styles.deleteButton}
                             onPress={() => handleDelete(item.id)}
@@ -301,7 +314,7 @@ const LogHistoryScreen = ({ navigation, route }) => {
     // Now we show dummy data for non-authenticated users
 
     return (
-        <SafeAreaView style={safeAreaStyle}>
+        <SafeAreaView style={safeAreaStyle} edges={['top']}>
             <View style={{ paddingHorizontal: 20 }}>
                 <INavBar
                     title="Log History"
@@ -324,14 +337,14 @@ const LogHistoryScreen = ({ navigation, route }) => {
                     <View style={styles.loadingContainer}>
                         <Text style={styles.loadingText}>Loading...</Text>
                     </View>
-                ) : logs.length === 0 ? (
+                ) : weightLogsData?.length === 0 ? (
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>No weight entries yet</Text>
                         <Text style={styles.emptySubtext}>Start tracking your weight to see your progress here</Text>
                     </View>
                 ) : (
-                    logs.map((item) =>
-                        item.type === 'weight' ? renderWeightEntry(item) : renderPhotoEntry(item)
+                    weightLogsData?.map((item) =>
+                        item.type === 'weight' ? renderWeightEntry(item) : item.type === 'weightwithphoto' ? renderWeightEntry(item) : renderPhotoEntry(item)
                     )
                 )}
             </ScrollView>

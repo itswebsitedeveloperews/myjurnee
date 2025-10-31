@@ -1,4 +1,4 @@
-import {COLORS} from './Constants/colors';
+import { COLORS } from './Constants/colors';
 
 export const safeAreaStyle = {
   flex: 1,

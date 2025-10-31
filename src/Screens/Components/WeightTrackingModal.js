@@ -65,10 +65,16 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit }) => {
             }
         }
 
+        if (hasPhotos) {
+            const asset = selectedPhotos[0];
+            const base64Image = asset.base64;
+            var imageData = `data:${asset.type};base64,${base64Image}`;
+        }
+
         const data = {
             date: dateString,
             weight: hasWeight ? parseFloat(weight) : null,
-            photos: hasPhotos ? selectedPhotos : [],
+            photos: hasPhotos ? [imageData] : [],
         };
 
         onSubmit(data);
@@ -133,6 +139,7 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit }) => {
     const openCamera = () => {
         const options = {
             mediaType: 'photo',
+            includeBase64: true,
             quality: 0.8,
             maxWidth: 1000,
             maxHeight: 1000,
@@ -151,6 +158,7 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit }) => {
     const openImageLibrary = () => {
         const options = {
             mediaType: 'photo',
+            includeBase64: true,
             quality: 0.8,
             maxWidth: 1000,
             maxHeight: 1000,
