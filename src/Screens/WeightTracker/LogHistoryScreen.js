@@ -19,7 +19,7 @@ import { IMAGES } from '../../Common/Constants/images';
 import WeightTrackingService from '../../Services/WeightTrackingService';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 import PhotoStorageService from '../../Services/PhotoStorageService';
-import { getWeightLogsAction } from '../../redux/WeightLogs/weightLogActions';
+import { deleteWeightLogAction, getWeightLogsAction } from '../../redux/WeightLogs/weightLogActions';
 
 const LogHistoryScreen = ({ navigation, route }) => {
     const [logs, setLogs] = useState([]);
@@ -101,12 +101,19 @@ const LogHistoryScreen = ({ navigation, route }) => {
 
     const loadLogs = async () => {
         try {
-            setLoading(true);
-            dispatch(getWeightLogsAction({
-                userId: '3',
-                onFailure,
-                onSuccess
-            }))
+
+            localStorageHelper
+                .getItemFromStorage(StorageKeys.USER_ID)
+                .then(async userId => {
+                    setLoading(true);
+                    dispatch(getWeightLogsAction({
+                        userId: userId,
+                        onFailure,
+                        onSuccess
+                    }))
+                });
+
+
             // const entries = await WeightTrackingService.getWeightEntries();
             // setLogs(entries);
         } catch (error) {
@@ -119,6 +126,12 @@ const LogHistoryScreen = ({ navigation, route }) => {
     const onSuccess = () => {
         setLoading(false);
         setLogs(weightLogsData);
+    };
+
+    const onSuccessDelete = () => {
+        setLoading(false);
+        loadLogs();
+        route.params.onDataRefresh();
     };
 
     const onFailure = () => {
@@ -156,20 +169,25 @@ const LogHistoryScreen = ({ navigation, route }) => {
                     text: 'Delete',
                     style: 'destructive',
                     onPress: async () => {
-                        const itemToDelete = logs.find(log => log.id === itemId);
-                        setDeletedItem(itemToDelete);
+                        // const itemToDelete = logs.find(log => log.id === itemId);
+                        // setDeletedItem(itemToDelete);
 
                         try {
-                            await WeightTrackingService.deleteEntry(itemId);
-                            route.params.onDataRefresh();
-                            setLogs(logs.filter(log => log.id !== itemId));
-                            setShowUndo(true);
+                            dispatch(deleteWeightLogAction({
+                                logId: itemId,
+                                onSuccess: onSuccessDelete,
+                                onFailure
+                            }))
+                            // await WeightTrackingService.deleteEntry(itemId);
+                            // route.params.onDataRefresh();
+                            // setLogs(logs.filter(log => log.id !== itemId));
+                            // setShowUndo(true);
 
-                            // Auto hide undo after 5 seconds
-                            setTimeout(() => {
-                                setShowUndo(false);
-                                setDeletedItem(null);
-                            }, 5000);
+                            // // Auto hide undo after 5 seconds
+                            // setTimeout(() => {
+                            //     setShowUndo(false);
+                            //     setDeletedItem(null);
+                            // }, 5000);
                         } catch (error) {
                             console.log('Error deleting entry:', error);
                             Alert.alert('Error', 'Failed to delete entry');

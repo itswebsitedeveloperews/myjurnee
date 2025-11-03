@@ -3,18 +3,23 @@ import { StyleSheet, View, ActivityIndicator, ImageBackground } from 'react-nati
 import { COLORS } from '../../Common/Constants/colors';
 import { StorageKeys, localStorageHelper } from '../../Common/localStorageHelper';
 import { IMAGES } from '../../Common/Constants/images';
+import { useDispatch } from 'react-redux';
+import { onUserIdSuccess } from '../../redux/profile/profileSlice';
 
 const Splash = props => {
+
+  const dispatch = useDispatch();
   useEffect(() => {
 
     setTimeout(() => {
       localStorageHelper
-        .getItemsFromStorage([StorageKeys.IS_LOGGED])
+        .getItemsFromStorage([StorageKeys.IS_LOGGED, StorageKeys.USER_ID])
         .then(resp => {
           console.log('resp', resp);
           let loginPreserved = resp[StorageKeys.IS_LOGGED];
 
           if (loginPreserved == 'true') {
+            dispatch(onUserIdSuccess(resp[StorageKeys.USER_ID]));
             props.navigation.replace('DashboardStack');
           } else {
             props.navigation.replace('AuthStack'); //replace when completed with Authstack

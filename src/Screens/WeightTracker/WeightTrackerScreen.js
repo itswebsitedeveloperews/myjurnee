@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StatusBar, StyleSheet, Alert } from 'react-native';
+import { View, Text, ScrollView, StatusBar, StyleSheet, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { safeAreaStyle } from '../../Common/CommonStyles';
 import WeightTrackerChart from '../Components/WeightTrackerChart';
@@ -15,8 +15,9 @@ import { FONTS } from '../../Common/Constants/fonts';
 import { COLORS } from '../../Common/Constants/colors';
 import SetGoalWeightModal from '../Components/SetGoalWeightModal';
 import { getCurrentWeekDates, getFullWeekDatesArray } from '../../Utils/Utils';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setWeightGoalAction, setWeightGoalProgessAction } from '../../redux/WeightLogs/weightLogActions';
+import { getWeightLogs } from '../../api/weightGoalApi';
 
 const WeightTrackerScreen = ({ navigation }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -31,10 +32,11 @@ const WeightTrackerScreen = ({ navigation }) => {
     });
     const [chartData, setChartData] = useState([]);
     const [recentPhotos, setRecentPhotos] = useState([]);
+    const [weightLogs, setWeightLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const dispatch = useDispatch();
-
+    const userId = useSelector(state => state.profile?.userId || '');
     useEffect(() => {
         checkAuthentication();
     }, []);
@@ -72,15 +74,12 @@ const WeightTrackerScreen = ({ navigation }) => {
     const loadWeightData = async () => {
         try {
             setLoading(true);
-            const stats = await WeightTrackingService.getWeightStatistics();
-            const chart = await WeightTrackingService.getChartData();
-            const photos = await WeightTrackingService.getRecentPhotos();
 
-            const chartData = await prepareChartData(chart);
-
-            setWeightStats(stats);
-            setChartData(chartData);
-            setRecentPhotos(photos);
+            const response = await getWeightLogs(userId);
+            if (response?.success) {
+                setWeightLogs(response?.data || []);
+                await handleStatistics(response?.data || []);
+            }
         } catch (error) {
             console.log('Error loading weight data:', error);
         } finally {
@@ -88,9 +87,19 @@ const WeightTrackerScreen = ({ navigation }) => {
         }
     };
 
-    const prepareChartData = async (weightData) => {
+    const handleStatistics = async (weightLogs) => {
+        const stats = await WeightTrackingService.getWeightStatistics(weightLogs);
+        const photos = await WeightTrackingService.getRecentPhotos(weightLogs);
+        const chartData = await prepareChartData(weightLogs);
+
+        setWeightStats(stats);
+        setChartData(chartData);
+        setRecentPhotos(photos);
+    }
+
+    const prepareChartData = async (weightLogs) => {
         try {
-            const chart = await WeightTrackingService.getChartData();
+            const chart = await WeightTrackingService.getChartData(weightLogs);
 
             if (chart && chart.length == 0) {
                 return [0, 0, 0, 0, 0, 0, 0]
@@ -145,9 +154,6 @@ const WeightTrackerScreen = ({ navigation }) => {
 
     const handleWeightSubmit = async (data) => {
         try {
-            const hasWeight = data.weight !== null && data.weight !== undefined;
-            const hasPhotos = data.photos && data.photos.length > 0;
-
             localStorageHelper
                 .getItemFromStorage(StorageKeys.USER_ID)
                 .then(async userId => {
@@ -199,8 +205,9 @@ const WeightTrackerScreen = ({ navigation }) => {
         }
     };
 
-    const onSuccess = () => {
+    const onSuccess = async () => {
         setLoading(false);
+        await loadWeightData();
     };
 
     const onFailure = () => {
@@ -228,6 +235,17 @@ const WeightTrackerScreen = ({ navigation }) => {
     // Remove the authentication check that blocks the entire screen
     // Now we show dummy data for non-authenticated users
 
+    if (loading) {
+        return (
+            <SafeAreaView style={safeAreaStyle} edges={['top']} >
+                <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={COLORS.black} />
+                </View>
+            </SafeAreaView>
+        );
+    }
+
     return (
         <SafeAreaView style={safeAreaStyle} edges={['top']} >
             <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
@@ -243,6 +261,7 @@ const WeightTrackerScreen = ({ navigation }) => {
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
+                refreshControl={<RefreshControl refreshing={loading} onRefresh={loadWeightData} />}
             >
 
                 {/* Top Row Cards */}
@@ -310,8 +329,8 @@ const WeightTrackerScreen = ({ navigation }) => {
 
                 {/* Progress Photos */}
                 <ProgressPhotos
-                    initialPhoto={recentPhotos.length > 0 ? recentPhotos[recentPhotos.length - 1]?.image : 'https://img.freepik.com/premium-vector/overweight-blonde-woman-icon-cartoon-overweight-blonde-woman-vector-icon-web-design-isolated-white-background_98402-34738.jpg'}
-                    latestPhoto={recentPhotos.length > 0 ? recentPhotos[0]?.image : 'https://img.freepik.com/premium-vector/overweight-blonde-woman-icon-cartoon-overweight-blonde-woman-vector-icon-web-design-isolated-white-background_98402-34738.jpg'}
+                    initialPhoto={recentPhotos.length > 0 ? recentPhotos[recentPhotos.length - 1]?.filePath : 'https://img.freepik.com/premium-vector/overweight-blonde-woman-icon-cartoon-overweight-blonde-woman-vector-icon-web-design-isolated-white-background_98402-34738.jpg'}
+                    latestPhoto={recentPhotos.length > 0 ? recentPhotos[0]?.filePath : 'https://img.freepik.com/premium-vector/overweight-blonde-woman-icon-cartoon-overweight-blonde-woman-vector-icon-web-design-isolated-white-background_98402-34738.jpg'}
                     style={styles.progressPhotos}
                 />
 
@@ -343,6 +362,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F5F5F5',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     scrollView: {
         flex: 1,

@@ -4,8 +4,8 @@ import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
 
 interface ProgressPhotosProps {
-    initialPhoto?: { filePath: string };
-    latestPhoto?: { filePath: string };
+    initialPhoto?: string;
+    latestPhoto?: string;
     style?: any;
 }
 
@@ -23,7 +23,7 @@ const ProgressPhotos: React.FC<ProgressPhotosProps> = ({
                     <Text style={styles.photoLabel}>Initial Photo</Text>
                     <View style={styles.imageContainer}>
                         {initialPhoto ? (
-                            <Image source={{ uri: initialPhoto.filePath ?? 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg' }} style={styles.image} resizeMode="cover" />
+                            <Image source={{ uri: initialPhoto ?? 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg' }} style={styles.image} resizeMode="cover" />
                         ) : (
                             <View style={styles.placeholderContainer}>
                                 <Text style={styles.placeholderText}>No Photo</Text>
@@ -36,7 +36,7 @@ const ProgressPhotos: React.FC<ProgressPhotosProps> = ({
                     <Text style={styles.photoLabel}>Latest Photo</Text>
                     <View style={styles.imageContainer}>
                         {latestPhoto ? (
-                            <Image source={{ uri: latestPhoto.filePath ?? 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg' }} style={styles.image} resizeMode="cover" />
+                            <Image source={{ uri: latestPhoto ?? 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg' }} style={styles.image} resizeMode="cover" />
                         ) : (
                             <View style={styles.placeholderContainer}>
                                 <Text style={styles.placeholderText}>No Photo</Text>

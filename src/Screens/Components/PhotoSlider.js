@@ -14,12 +14,12 @@ const PhotoSlider = ({ photos = [], style }) => {
     const defaultPhotos = [
         {
             id: 1,
-            image: { filePath: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg' },
+            filePath: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg',
             date: '09 September 2025'
         },
         {
             id: 2,
-            image: { filePath: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg' },
+            filePath: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg',
             date: '15 August 2025'
         },
     ];
@@ -29,7 +29,7 @@ const PhotoSlider = ({ photos = [], style }) => {
     const renderPhotoItem = ({ item }) => (
         <View style={styles.photoFrame}>
             <FastImage
-                source={{ uri: item.image.filePath }}
+                source={{ uri: item?.filePath }}
                 style={styles.photo}
                 resizeMode="cover"
             />

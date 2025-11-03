@@ -1,4 +1,5 @@
-import { localStorageHelper } from '../Common/localStorageHelper';
+import { getWeightLogs } from '../api/weightGoalApi';
+import { localStorageHelper, StorageKeys } from '../Common/localStorageHelper';
 import PhotoStorageService from './PhotoStorageService';
 
 const WEIGHT_DATA_KEY = 'WEIGHT_TRACKING_DATA';
@@ -9,8 +10,17 @@ class WeightTrackingService {
     // Get all weight entries
     async getWeightEntries() {
         try {
-            const data = await localStorageHelper.getArrayItemFromStorage(WEIGHT_DATA_KEY);
-            return data || [];
+            const userId = await localStorageHelper.getItemFromStorage(StorageKeys.USER_ID);
+            if (!userId) {
+                return [];
+            }
+
+            const response = await getWeightLogs(userId);
+            if (response?.success) {
+                return response?.data || [];
+            }
+            return [];
+
         } catch (error) {
             console.log('Error getting weight entries:', error);
             return [];
@@ -18,143 +28,143 @@ class WeightTrackingService {
     }
 
     // Add a new weight entry
-    async addWeightEntry(weightData) {
-        try {
-            const entries = await this.getWeightEntries();
-            let savedPhotos = [];
+    // async addWeightEntry(weightData) {
+    //     try {
+    //         const entries = await this.getWeightEntries();
+    //         let savedPhotos = [];
 
-            // Save photos if provided
-            if (weightData.photos && weightData.photos.length > 0) {
-                try {
-                    savedPhotos = await PhotoStorageService.saveMultiplePhotos(weightData.photos);
-                } catch (photoError) {
-                    console.log('Error saving photos:', photoError);
-                    // Continue without photos if photo saving fails
-                }
-            }
+    //         // Save photos if provided
+    //         if (weightData.photos && weightData.photos.length > 0) {
+    //             try {
+    //                 savedPhotos = await PhotoStorageService.saveMultiplePhotos(weightData.photos);
+    //             } catch (photoError) {
+    //                 console.log('Error saving photos:', photoError);
+    //                 // Continue without photos if photo saving fails
+    //             }
+    //         }
 
-            const newEntry = {
-                id: Date.now().toString(),
-                type: 'weight',
-                weight: weightData.weight,
-                date: weightData.date,
-                photos: savedPhotos,
-                createdAt: new Date().toISOString(),
-            };
+    //         const newEntry = {
+    //             id: Date.now().toString(),
+    //             type: 'weight',
+    //             weight: weightData.weight,
+    //             date: weightData.date,
+    //             photos: savedPhotos,
+    //             createdAt: new Date().toISOString(),
+    //         };
 
-            // Calculate weight change if there's a previous entry
-            if (entries.length > 0) {
-                const lastEntry = entries[0]; // Most recent entry
-                const change = weightData.weight - lastEntry.weight;
-                newEntry.change = change;
-                newEntry.changeType = change < 0 ? 'loss' : 'gain';
-            } else {
-                newEntry.change = 0;
-                newEntry.changeType = 'neutral';
-            }
+    //         // Calculate weight change if there's a previous entry
+    //         if (entries.length > 0) {
+    //             const lastEntry = entries[0]; // Most recent entry
+    //             const change = weightData.weight - lastEntry.weight;
+    //             newEntry.change = change;
+    //             newEntry.changeType = change < 0 ? 'loss' : 'gain';
+    //         } else {
+    //             newEntry.change = 0;
+    //             newEntry.changeType = 'neutral';
+    //         }
 
-            const updatedEntries = [newEntry, ...entries];
-            await localStorageHelper.setStorageArrayItem({
-                key: WEIGHT_DATA_KEY,
-                value: updatedEntries
-            });
+    //         const updatedEntries = [newEntry, ...entries];
+    //         await localStorageHelper.setStorageArrayItem({
+    //             key: WEIGHT_DATA_KEY,
+    //             value: updatedEntries
+    //         });
 
-            return newEntry;
-        } catch (error) {
-            console.log('Error adding weight entry:', error);
-            throw error;
-        }
-    }
+    //         return newEntry;
+    //     } catch (error) {
+    //         console.log('Error adding weight entry:', error);
+    //         throw error;
+    //     }
+    // }
 
     // Add a photo entry
-    async addPhotoEntry(photoData) {
-        try {
-            const entries = await this.getWeightEntries();
-            let savedPhoto = null;
+    // async addPhotoEntry(photoData) {
+    //     try {
+    //         const entries = await this.getWeightEntries();
+    //         let savedPhoto = null;
 
-            // Save photo if provided
-            if (photoData.image) {
-                try {
-                    const savedPhotos = await PhotoStorageService.saveMultiplePhotos([photoData.image]);
-                    savedPhoto = savedPhotos[0];
-                } catch (photoError) {
-                    console.log('Error saving photo:', photoError);
-                    throw photoError;
-                }
-            }
+    //         // Save photo if provided
+    //         if (photoData.image) {
+    //             try {
+    //                 const savedPhotos = await PhotoStorageService.saveMultiplePhotos([photoData.image]);
+    //                 savedPhoto = savedPhotos[0];
+    //             } catch (photoError) {
+    //                 console.log('Error saving photo:', photoError);
+    //                 throw photoError;
+    //             }
+    //         }
 
-            const newEntry = {
-                id: Date.now().toString(),
-                type: 'photo',
-                date: photoData.date,
-                image: savedPhoto,
-                createdAt: new Date().toISOString(),
-            };
+    //         const newEntry = {
+    //             id: Date.now().toString(),
+    //             type: 'photo',
+    //             date: photoData.date,
+    //             image: savedPhoto,
+    //             createdAt: new Date().toISOString(),
+    //         };
 
-            const updatedEntries = [newEntry, ...entries];
-            await localStorageHelper.setStorageArrayItem({
-                key: WEIGHT_DATA_KEY,
-                value: updatedEntries
-            });
+    //         const updatedEntries = [newEntry, ...entries];
+    //         await localStorageHelper.setStorageArrayItem({
+    //             key: WEIGHT_DATA_KEY,
+    //             value: updatedEntries
+    //         });
 
-            return newEntry;
-        } catch (error) {
-            console.log('Error adding photo entry:', error);
-            throw error;
-        }
-    }
+    //         return newEntry;
+    //     } catch (error) {
+    //         console.log('Error adding photo entry:', error);
+    //         throw error;
+    //     }
+    // }
 
     // Add Goal Weight in the local storage
-    async setGoalWeight(goalWeight) {
-        try {
-            await localStorageHelper.setStorageItem({
-                key: USER_GOAL_KEY,
-                value: goalWeight
-            });
-            return true;
-        }
-        catch (error) {
-            console.log('Error setting goal weight:', error);
-            throw error;
-        }
-    }
+    // async setGoalWeight(goalWeight) {
+    //     try {
+    //         await localStorageHelper.setStorageItem({
+    //             key: USER_GOAL_KEY,
+    //             value: goalWeight
+    //         });
+    //         return true;
+    //     }
+    //     catch (error) {
+    //         console.log('Error setting goal weight:', error);
+    //         throw error;
+    //     }
+    // }
 
 
     // Delete an entry
-    async deleteEntry(entryId) {
-        try {
-            const entries = await this.getWeightEntries();
-            const entryToDelete = entries.find(entry => entry.id === entryId);
+    // async deleteEntry(entryId) {
+    //     try {
+    //         const entries = await this.getWeightEntries();
+    //         const entryToDelete = entries.find(entry => entry.id === entryId);
 
-            if (entryToDelete) {
-                // Delete associated photos
-                if (entryToDelete.photos && entryToDelete.photos.length > 0) {
-                    const photoFileNames = entryToDelete.photos.map(photo => photo.fileName);
-                    await PhotoStorageService.deleteMultiplePhotos(photoFileNames);
-                }
+    //         if (entryToDelete) {
+    //             // Delete associated photos
+    //             if (entryToDelete.photos && entryToDelete.photos.length > 0) {
+    //                 const photoFileNames = entryToDelete.photos.map(photo => photo.fileName);
+    //                 await PhotoStorageService.deleteMultiplePhotos(photoFileNames);
+    //             }
 
-                if (entryToDelete.type === 'photo' && entryToDelete.image && entryToDelete.image.fileName) {
-                    await PhotoStorageService.deletePhoto(entryToDelete.image.fileName);
-                }
-            }
+    //             if (entryToDelete.type === 'photo' && entryToDelete.image && entryToDelete.image.fileName) {
+    //                 await PhotoStorageService.deletePhoto(entryToDelete.image.fileName);
+    //             }
+    //         }
 
-            const updatedEntries = entries.filter(entry => entry.id !== entryId);
-            await localStorageHelper.setStorageArrayItem({
-                key: WEIGHT_DATA_KEY,
-                value: updatedEntries
-            });
-            return true;
-        } catch (error) {
-            console.log('Error deleting entry:', error);
-            throw error;
-        }
-    }
+    //         const updatedEntries = entries.filter(entry => entry.id !== entryId);
+    //         await localStorageHelper.setStorageArrayItem({
+    //             key: WEIGHT_DATA_KEY,
+    //             value: updatedEntries
+    //         });
+    //         return true;
+    //     } catch (error) {
+    //         console.log('Error deleting entry:', error);
+    //         throw error;
+    //     }
+    // }
 
     // Get current weight (most recent entry)
-    async getCurrentWeight() {
+    async getCurrentWeight(weightLogs) {
         try {
-            const entries = await this.getWeightEntries();
-            const weightEntries = entries.filter(entry => entry.type === 'weight');
+            const entries = weightLogs;
+            const weightEntries = entries.filter(entry => entry.type === 'weight' || entry.type === 'weightwithphoto');
             return weightEntries.length > 0 ? weightEntries[0].weight : null;
         } catch (error) {
             console.log('Error getting current weight:', error);
@@ -163,10 +173,10 @@ class WeightTrackingService {
     }
 
     // Get starting weight (first entry)
-    async getStartingWeight() {
+    async getStartingWeight(weightLogs = []) {
         try {
-            const entries = await this.getWeightEntries();
-            const weightEntries = entries.filter(entry => entry.type === 'weight');
+            const entries = weightLogs;
+            const weightEntries = entries.filter(entry => entry.type === 'weight' || entry.type === 'weightwithphoto');
             return weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weight : null;
         } catch (error) {
             console.log('Error getting starting weight:', error);
@@ -175,10 +185,10 @@ class WeightTrackingService {
     }
 
     // Get weight lost
-    async getWeightLost() {
+    async getWeightLost(weightLogs = []) {
         try {
-            const currentWeight = await this.getCurrentWeight();
-            const startingWeight = await this.getStartingWeight();
+            const currentWeight = await this.getCurrentWeight(weightLogs);
+            const startingWeight = await this.getStartingWeight(weightLogs);
 
             if (currentWeight && startingWeight) {
                 return startingWeight - currentWeight;
@@ -191,10 +201,10 @@ class WeightTrackingService {
     }
 
     // Get weight lost in last N days
-    async getWeightLostInDays(days) {
+    async getWeightLostInDays(days, weightLogs = []) {
         try {
-            const entries = await this.getWeightEntries();
-            const weightEntries = entries.filter(entry => entry.type === 'weight');
+            const entries = weightLogs;
+            const weightEntries = entries.filter(entry => entry.type === 'weight' || entry.type === 'weightwithphoto');
 
             if (weightEntries.length === 0) return 0;
 
@@ -219,7 +229,7 @@ class WeightTrackingService {
     }
 
     // Set user goal weight
-    async setGoalWeight(goalWeight) {
+    async setGoalWeight(goalWeight, weightLogs = []) {
         try {
             await localStorageHelper.setStorageItem({
                 key: USER_GOAL_KEY,
@@ -244,10 +254,10 @@ class WeightTrackingService {
     }
 
     // Get weight entries for chart data
-    async getChartData() {
+    async getChartData(weightLogs) {
         try {
-            const entries = await this.getWeightEntries();
-            const weightEntries = entries.filter(entry => entry.type === 'weight');
+            const entries = weightLogs;
+            const weightEntries = entries.filter(entry => entry.type === 'weight' || entry.type === 'weightwithphoto');
 
             // Group by date and get the latest entry for each date
             const groupedByDate = weightEntries.reduce((acc, entry) => {
@@ -280,11 +290,14 @@ class WeightTrackingService {
     }
 
     // Get recent photos
-    async getRecentPhotos() {
+    async getRecentPhotos(weightLogs = []) {
         try {
-            const entries = await this.getWeightEntries();
-            const photoEntries = entries.filter(entry => entry.type === 'photo');
-            return photoEntries.slice(0, 10); // Get last 10 photos
+            const photoEntries = weightLogs
+                .filter(entry => entry.type === 'photo' || entry.type === 'weightwithphoto')
+                .flatMap(entry => entry.photos || []); // Flatten all photos
+
+            // Get last 10 (most recent) photos
+            return photoEntries.slice(0, 10);
         } catch (error) {
             console.log('Error getting recent photos:', error);
             return [];
@@ -292,18 +305,18 @@ class WeightTrackingService {
     }
 
     // Get weight statistics
-    async getWeightStatistics() {
+    async getWeightStatistics(weightLogs) {
         try {
-            const currentWeight = await this.getCurrentWeight();
-            const startingWeight = await this.getStartingWeight();
+            const currentWeight = await this.getCurrentWeight(weightLogs);
+            const startingWeight = await this.getStartingWeight(weightLogs);
             const goalWeight = await this.getGoalWeight();
-            const weightLost = await this.getWeightLost();
-            const weightLost30Days = await this.getWeightLostInDays(30);
-            const weightLost90Days = await this.getWeightLostInDays(90);
+            const weightLost = await this.getWeightLost(weightLogs);
+            const weightLost30Days = await this.getWeightLostInDays(30, weightLogs);
+            const weightLost90Days = await this.getWeightLostInDays(90, weightLogs);
 
             return {
-                currentWeight: currentWeight || 0,
-                startingWeight: startingWeight || 0,
+                currentWeight: parseInt(currentWeight) || 0,
+                startingWeight: parseInt(startingWeight) || 0,
                 goalWeight: goalWeight || 0,
                 weightLost: weightLost,
                 weightLost30Days: weightLost30Days,

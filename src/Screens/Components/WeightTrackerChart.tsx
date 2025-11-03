@@ -34,7 +34,7 @@ const WeightTrackerChart: React.FC<WeightTrackerChartProps> = ({
 
   const chartData = defaultData;
 
-  console.log('chartData', chartData)
+  // console.log('chartData', chartData)
 
   useEffect(() => {
     const updateDimensions = () => {

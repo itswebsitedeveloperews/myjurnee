@@ -1,6 +1,7 @@
 import { StorageKeys, localStorageHelper } from '../../Common/localStorageHelper.js';
 import { isFunction } from '../../Utils/Utils.js';
 import {
+  deleteWeightLog,
   getWeightLogs,
   saveWeightProgress,
   setWeightGoal,
@@ -70,6 +71,30 @@ export const setWeightGoalProgessAction = ({ payload, onSuccess, onFailure }) =>
               onSuccess();
             }
             // dispatch(onSetWeightGoalSuccess(response?.data || {}));
+          }
+        })
+        .catch(err => {
+          console.log('----', err.response.data);
+          if (isFunction(onFailure)) {
+            onFailure();
+          }
+        });
+    } catch (error) {
+      console.log('Error!', error);
+    }
+  };
+};
+
+export const deleteWeightLogAction = ({ logId, onSuccess, onFailure }) => {
+  return async dispatch => {
+    try {
+      deleteWeightLog(logId)
+        .then(response => {
+          console.log('delete weight logs response action---', response);
+          if (response?.success) {
+            if (isFunction(onSuccess)) {
+              onSuccess();
+            }
           }
         })
         .catch(err => {

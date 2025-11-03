@@ -8,3 +8,6 @@ export const setWeightGoal = data =>
 
 export const saveWeightProgress = data =>
     userRawFetch.post(`wp-json/mobile/v1/submit-progress`, data).then(extractData);
+
+export const deleteWeightLog = (id) =>
+    userAuthFetch.post(`wp-json/mobile/v1/progress/delete?id=${id}`).then(extractData);
