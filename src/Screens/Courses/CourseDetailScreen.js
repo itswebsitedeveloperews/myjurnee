@@ -17,7 +17,7 @@ import RenderHtml from 'react-native-render-html';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../Common/Constants/colors';
 import LinearGradient from 'react-native-linear-gradient';
-import { windowWidth } from '../../Utils/Dimentions';
+import { windowHeight, windowWidth } from '../../Utils/Dimentions';
 import INavBar from '../Components/INavBar';
 import { FONTS } from '../../Common/Constants/fonts';
 import { getCourseDetailAction } from '../../redux/cources/courceActions';
@@ -212,7 +212,7 @@ const CourseDetailScreen = (props) => {
                     start={{ x: 0, y: 1 }}
                     end={{ x: 0, y: 0 }}
                 />
-                <View style={{ height: 50 }} />
+                <View style={{ height: 30 }} />
                 <Text style={styles.courseTitle} numberOfLines={5}>
                     {courseData.title || ''}
                 </Text>
@@ -228,7 +228,7 @@ const CourseDetailScreen = (props) => {
                 showsVerticalScrollIndicator={false}
                 scrollEventThrottle={16}
             >
-                <View style={{ height: 290 }} />
+                <View style={{ height: windowHeight / 2.9 }} />
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>COURSE INCLUDES</Text>
                     <View style={styles.includesRow}>

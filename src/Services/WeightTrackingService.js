@@ -243,9 +243,9 @@ class WeightTrackingService {
     }
 
     // Get user goal weight
-    async getGoalWeight() {
+    async getGoalWeight(goalWeightData) {
         try {
-            const goalWeight = await localStorageHelper.getItemFromStorage(USER_GOAL_KEY);
+            const goalWeight = goalWeightData?.goal_weight || 0;
             return goalWeight ? parseFloat(goalWeight) : null;
         } catch (error) {
             console.log('Error getting goal weight:', error);
@@ -305,11 +305,11 @@ class WeightTrackingService {
     }
 
     // Get weight statistics
-    async getWeightStatistics(weightLogs) {
+    async getWeightStatistics(weightLogs, goalWeightData) {
         try {
             const currentWeight = await this.getCurrentWeight(weightLogs);
             const startingWeight = await this.getStartingWeight(weightLogs);
-            const goalWeight = await this.getGoalWeight();
+            const goalWeight = await this.getGoalWeight(goalWeightData);
             const weightLost = await this.getWeightLost(weightLogs);
             const weightLost30Days = await this.getWeightLostInDays(30, weightLogs);
             const weightLost90Days = await this.getWeightLostInDays(90, weightLogs);

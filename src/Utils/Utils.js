@@ -60,8 +60,37 @@ export const getFullWeekDatesArray = () => {
   return labels;
 };
 
-export function formatDate(dateString) {
-  const date = new Date(dateString.replace(' ', 'T')); // make it ISO compatible
-  const options = { year: 'numeric', month: 'short', day: 'numeric' };
-  return date.toLocaleDateString('en-US', options);
+export function formatDate(dateInput) {
+  if (!dateInput) return "";
+
+  let date;
+
+  if (dateInput instanceof Date) {
+    date = dateInput;
+  } else if (typeof dateInput === "string") {
+    // Replace the space with 'T' to make it ISO-compliant
+    const isoString = dateInput.replace(" ", "T");
+    date = new Date(isoString);
+  } else {
+    date = new Date(dateInput);
+  }
+
+  // Check for invalid date
+  if (isNaN(date.getTime())) return "";
+
+  // Format as "22nd September 2025"
+  const day = date.getDate();
+  const month = date.toLocaleString("en-GB", { month: "long" });
+  const year = date.getFullYear();
+
+  const suffix =
+    day % 10 === 1 && day !== 11
+      ? "st"
+      : day % 10 === 2 && day !== 12
+        ? "nd"
+        : day % 10 === 3 && day !== 13
+          ? "rd"
+          : "th";
+
+  return `${day}${suffix} ${month} ${year}`;
 }
