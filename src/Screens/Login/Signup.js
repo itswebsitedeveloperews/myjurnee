@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, ImageBackground, StyleSheet, Platform, Alert } from 'react-native'
+import { View, Text, ImageBackground, StyleSheet, Platform, Alert, ScrollView, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from 'react-native'
 import { IMAGES } from '../../Common/Constants/images';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { safeAreaStyle } from '../../Common/CommonStyles';
@@ -17,7 +17,9 @@ const Signup = props => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [confirmPassword, setConfirmPassword] = useState('');
     const dispatch = useDispatch();
 
     const validateEmail = (email) => {
@@ -41,16 +43,19 @@ const Signup = props => {
         } else if (password.length < 6) {
             Alert.alert('Error', 'Password must be at least 6 characters long');
             return;
+        } else if (confirmPassword.trim() !== password.trim()) {
+            Alert.alert('Error', 'Passwords do not match');
+            return;
         }
 
-        setIsLoading(true);
+        setLoading(true);
 
         dispatch(RegisterUser({
             username: username,
             email: email,
             password: password,
             onSuccess: (response) => {
-                setIsLoading(false);
+                setLoading(false);
                 Alert.alert('Success', 'Account created successfully!', [
                     {
                         text: 'OK',
@@ -59,102 +64,201 @@ const Signup = props => {
                 ]);
             },
             onFailure: (errorMessage) => {
-                setIsLoading(false);
+                setLoading(false);
                 Alert.alert('Registration Failed', errorMessage || 'Something went wrong. Please try again.');
             }
         }));
     };
 
     return (
-        <SafeAreaView style={safeAreaStyle}>
-            <FastImage source={IMAGES.LOGIN_BG_IMAGE} style={styles.backgroundImage} resizeMode="cover" />
+        <SafeAreaView style={styles.safeArea}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContainer}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                automaticallyAdjustKeyboardInsets={true}
+            >
+                <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                    <View style={styles.container}>
+                        <View style={styles.backButtonContainer}>
+                            <INavBar onBackPress={() => props.navigation.goBack()} />
+                        </View>
+                        {/* Content */}
+                        <View style={styles.contentContainer}>
+                            {/* Logo and Tagline */}
+                            <View style={styles.logoContainer}>
+                                <FastImage
+                                    source={IMAGES.WHITE_LOGO}
+                                    style={styles.logo}
+                                    resizeMode="contain"
+                                />
+                            </View>
 
-            <View style={{ paddingHorizontal: 20, }}>
-                <INavBar title="" onBackPress={() => props.navigation.goBack()} />
-            </View>
+                            {/* Welcome Message */}
+                            <Text style={styles.welcomeTitle}>{`Hey There!  Let's Get\nYou Onboard!`}</Text>
 
-            <View style={styles.titleContainer}>
-                <Text style={styles.title}>Create an account</Text>
-            </View>
-            <View style={styles.contentContainer}>
-                <ITextField
-                    placeholder="Username"
-                    value={username}
-                    onChangeText={text => setUsername(text)}
-                    mainViewStyle={styles.inputField}
-                    leftIcon={IMAGES.IC_USER_PROFILE}
-                />
-                <ITextField
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={text => setEmail(text)}
-                    mainViewStyle={styles.inputField}
-                    leftIcon={IMAGES.IC_USER_PROFILE}
-                />
-                <ITextField
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={text => setPassword(text)}
-                    mainViewStyle={styles.inputField}
-                    leftIcon={IMAGES.IC_LOCK}
-                />
-            </View>
+                            {/* Input Fields */}
+                            <View style={styles.inputContainer}>
+                                <ITextField
+                                    placeholder="Enter Username"
+                                    value={username}
+                                    onChangeText={setUsername}
+                                    keyboardType="default"
+                                    autoCapitalize="none"
+                                    backgroundColor={COLORS.darkGray}
+                                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                                    mainViewStyle={styles.inputField}
+                                />
+                                <ITextField
+                                    placeholder="Enter your email"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    backgroundColor={COLORS.darkGray}
+                                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                                    mainViewStyle={styles.inputField}
+                                />
 
-            <View style={styles.buttonContainer}>
-                <IButton
-                    title={isLoading ? "Creating Account..." : "Create Account"}
-                    onPress={onSignupClick}
-                    mainViewStyle={styles.signupButton}
-                    loading={isLoading}
-                />
-            </View>
+                                <ITextField
+                                    placeholder="Enter your password"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry={!showPassword}
+                                    rightIcon={showPassword ? IMAGES.IC_EYE : IMAGES.IC_EYE_OFF}
+                                    onRightIconPress={() => setShowPassword(!showPassword)}
+                                    backgroundColor={COLORS.darkGray}
+                                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                                    mainViewStyle={[styles.inputField]}
+                                />
+                                <ITextField
+                                    placeholder="Confirm password"
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                    secureTextEntry={!showPassword}
+                                    rightIcon={showPassword ? IMAGES.IC_EYE : IMAGES.IC_EYE_OFF}
+                                    onRightIconPress={() => setShowPassword(!showPassword)}
+                                    backgroundColor={COLORS.darkGray}
+                                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                                    mainViewStyle={[styles.inputField, styles.passwordField]}
+                                />
+
+                            </View>
+
+                            {/* Login Button */}
+                            <View style={styles.buttonContainer}>
+                                <IButton
+                                    title="Signup"
+                                    onPress={onSignupClick}
+                                    loading={loading}
+                                    mainViewStyle={styles.loginButton}
+                                />
+                            </View>
+                            <View style={{ height: '9%' }} />
+                            {/* Register Link */}
+                            <View style={styles.registerContainer}>
+                                <Text style={styles.registerText}>
+                                    Already have an account?<Text style={styles.registerLink} onPress={() => { props.navigation.navigate('Login') }}> Login Now</Text>
+                                </Text>
+                            </View>
+
+                        </View>
+
+                    </View>
+                </TouchableWithoutFeedback>
+            </ScrollView>
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: COLORS.black,
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        minHeight: '100%',
+    },
     container: {
         flex: 1,
     },
-    backgroundImage: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        // width: '100%',
-        // height: '100%',
+    backButtonContainer: {
+        paddingHorizontal: 16
+
     },
-    titleContainer: {
-        paddingHorizontal: 20,
-        marginTop: 20,
+    backButton: {
+        padding: 16,
+        marginTop: 8,
+        marginLeft: 8,
+        alignSelf: 'flex-start',
     },
-    title: {
-        fontFamily: FONTS.OUTFIT_MEDIUM,
-        fontSize: 35,
-        color: COLORS.textColor,
+    backIcon: {
+        height: 24,
+        width: 24,
     },
     contentContainer: {
         flex: 1,
-        maxHeight: windowHeight * 0.3,
-        paddingHorizontal: 20,
-        paddingVertical: 40,
+        paddingHorizontal: 30,
+        paddingTop: 20,
+    },
+    logoContainer: {
+        alignItems: 'center',
+        marginTop: 25,
+        marginBottom: 60,
+    },
+    logo: {
+        height: 80,
+        width: 200,
+    },
+    welcomeTitle: {
+        fontFamily: FONTS.OUTFIT_BOLD,
+        fontSize: 24,
+        color: COLORS.white,
+        marginBottom: 30,
+        lineHeight: 32,
+    },
+    inputContainer: {
+        marginBottom: 24,
     },
     inputField: {
-        flex: 1,
-        maxHeight: 48,
         marginBottom: 16,
-        backgroundColor: COLORS.white,
-        borderWidth: 0
+        backgroundColor: COLORS.darkGray,
+        borderWidth: 1,
+    },
+    passwordField: {
+        marginBottom: 8,
+    },
+    forgotPasswordContainer: {
+        alignSelf: 'flex-end',
+        marginTop: 9,
+        // marginBottom: 15,
+    },
+    forgotPasswordText: {
+        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontSize: 12,
+        color: COLORS.white,
     },
     buttonContainer: {
-        paddingHorizontal: 20,
-        marginTop: 0,
+        marginBottom: 0,
     },
-    signupButton: {
-        backgroundColor: '#8B5CF6',
-        borderRadius: 10,
-        height: 48,
+    loginButton: {
+    },
+    registerContainer: {
+        alignItems: 'center',
+        // marginTop: 20,
+        // backgroundColor: 'red',
+
+    },
+    registerText: {
+        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontSize: 14,
+        color: COLORS.white,
+    },
+    registerLink: {
+        fontFamily: FONTS.OUTFIT_MEDIUM,
+        color: COLORS.purple,
     },
 });
 export default Signup;

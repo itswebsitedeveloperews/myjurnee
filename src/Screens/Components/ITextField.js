@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
 import { IMAGES } from '../../Common/Constants/images';
@@ -21,9 +21,18 @@ const ITextField = ({
   onRightIconPress,
   secureTextEntry = false,
   placeholderTextColor = COLORS.textColor64,
+  backgroundColor,
 }) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
-    <View style={[styles.container, mainViewStyle]}>
+    <View style={[
+      styles.container,
+      isFocused && styles.containerFocused,
+      { borderColor: isFocused ? COLORS.purple : COLORS.textColor64 },
+      backgroundColor && { backgroundColor },
+      mainViewStyle
+    ]}>
       {leftIcon && (
         <View style={styles.leftIconContainer}>
           <FastImage
@@ -34,7 +43,11 @@ const ITextField = ({
         </View>
       )}
       <TextInput
-        style={[styles.inputStyle, leftIcon && styles.inputWithLeftIcon]}
+        style={[
+          styles.inputStyle,
+          leftIcon && styles.inputWithLeftIcon,
+          backgroundColor && styles.inputDark
+        ]}
         value={value}
         onChangeText={text => onChangeText(text)}
         numberOfLines={numberOfLines}
@@ -46,6 +59,8 @@ const ITextField = ({
         maxLength={maxLength}
         onSubmitEditing={onSubmitEditing}
         multiline={multiline}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       />
       {rightIcon && (
         <TouchableOpacity
@@ -68,13 +83,17 @@ export default ITextField;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: 48,
+    height: 56,
     borderColor: COLORS.textColor64,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 15,
     backgroundColor: COLORS.white,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  containerFocused: {
+    borderColor: COLORS.purple,
+    borderWidth: 1,
   },
   inputStyle: {
     flex: 1,
@@ -82,6 +101,9 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.OUTFIT_REGULAR,
     fontSize: 16,
     color: COLORS.textColor,
+  },
+  inputDark: {
+    color: COLORS.white,
   },
   inputWithLeftIcon: {
     paddingLeft: 8,

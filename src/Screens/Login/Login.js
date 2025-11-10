@@ -7,14 +7,11 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  ImageBackground,
-  Image,
   ScrollView,
   Alert,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import FastImage from 'react-native-fast-image';
-import { safeAreaStyle } from '../../Common/CommonStyles';
 import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
 import { IMAGES } from '../../Common/Constants/images';
@@ -57,10 +54,6 @@ const Login = props => {
     }));
   };
 
-  const onContinueWithoutLogin = () => {
-    // Navigate to dashboard without login
-    props.navigation.replace('DashboardStack');
-  };
 
   const onSignUp = () => {
     // Navigate to sign up screen
@@ -73,7 +66,7 @@ const Login = props => {
   };
 
   return (
-    <ImageBackground source={IMAGES.LOGIN_BG_IMAGE} style={{ flex: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
@@ -88,33 +81,37 @@ const Login = props => {
               {/* Logo and Tagline */}
               <View style={styles.logoContainer}>
                 <FastImage
-                  source={IMAGES.HOME_SCREEN_LOGO_V1}
+                  source={IMAGES.WHITE_LOGO}
                   style={styles.logo}
                   resizeMode="contain"
                 />
               </View>
 
-              {/* Sign In Title */}
-              <Text style={styles.signInTitle}>Sign in</Text>
+              {/* Welcome Message */}
+              <Text style={styles.welcomeTitle}>{`Welcome Back! Glad To\nSee You, Again!`}</Text>
 
               {/* Input Fields */}
               <View style={styles.inputContainer}>
                 <ITextField
-                  placeholder="Username or email"
+                  placeholder="Enter your email"
                   value={username}
                   onChangeText={setUsername}
-                  leftIcon={IMAGES.IC_USER_PROFILE}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  backgroundColor={COLORS.darkGray}
+                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
                   mainViewStyle={styles.inputField}
                 />
 
                 <ITextField
-                  placeholder="Password"
+                  placeholder="Enter your password"
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
-                  leftIcon={IMAGES.IC_LOCK}
                   rightIcon={showPassword ? IMAGES.IC_EYE : IMAGES.IC_EYE_OFF}
                   onRightIconPress={() => setShowPassword(!showPassword)}
+                  backgroundColor={COLORS.darkGray}
+                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
                   mainViewStyle={[styles.inputField, styles.passwordField]}
                 />
 
@@ -132,149 +129,107 @@ const Login = props => {
                   mainViewStyle={styles.loginButton}
                 />
               </View>
-
-              {/* Continue without login */}
-              <TouchableOpacity onPress={onContinueWithoutLogin} style={styles.continueWithoutLoginContainer}>
-                <FastImage
-                  source={IMAGES.IC_USER_PROFILE}
-                  style={styles.continueIcon}
-                  resizeMode="contain"
-                />
-                <Text style={styles.continueWithoutLoginText}>Continue without logging in</Text>
-                <Image
-                  source={IMAGES.IC_ARROW_RIGHT_CHEVRON}
-                  style={styles.continueArrow}
-                  resizeMode="contain"
-                  tintColor={COLORS.textColor}
-                />
-              </TouchableOpacity>
-
-
-              {/* Sign Up Link */}
-              <View style={styles.signUpContainer}>
-                <Text style={styles.signUpText}>
-                  Don't have an account? <Text style={styles.signUpLink} onPress={onSignUp}>Sign Up →</Text>
+              <View style={{ height: '22%' }} />
+              {/* Register Link */}
+              <View style={styles.registerContainer}>
+                <Text style={styles.registerText}>
+                  Don't have an account? <Text style={styles.registerLink} onPress={onSignUp}>Register Now</Text>
                 </Text>
               </View>
+
             </View>
+
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
-    </ImageBackground>
+    </SafeAreaView>
   );
 };
 
 export default Login;
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.black,
+  },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
     minHeight: '100%',
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
   },
-  backgroundImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
+  backButton: {
+    padding: 16,
+    marginTop: 8,
+    marginLeft: 8,
+    alignSelf: 'flex-start',
+  },
+  backIcon: {
+    height: 24,
+    width: 24,
   },
   contentContainer: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 40,
-    // justifyContent: 'center',
+    paddingHorizontal: 30,
+    paddingTop: 20,
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 20,
-    marginTop: 90,
+    marginTop: 60,
+    marginBottom: 60,
   },
   logo: {
-    height: 60,
+    height: 80,
     width: 200,
   },
-  tagline: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
-    fontSize: 14,
-    color: COLORS.textColor,
-    marginTop: 8,
-  },
-  signInTitle: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
-    fontSize: 30,
-    marginTop: 30,
-    color: COLORS.textColor,
-    textAlign: 'center',
-    marginBottom: 40,
+  welcomeTitle: {
+    fontFamily: FONTS.OUTFIT_BOLD,
+    fontSize: 24,
+    color: COLORS.white,
+    marginBottom: 30,
+    lineHeight: 32,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   inputField: {
     marginBottom: 16,
-    backgroundColor: COLORS.white,
-    borderWidth: 0
+    backgroundColor: COLORS.darkGray,
+    borderWidth: 1,
   },
   passwordField: {
     marginBottom: 8,
   },
   forgotPasswordContainer: {
     alignSelf: 'flex-end',
-    marginBottom: 20,
+    marginTop: 9,
+    // marginBottom: 15,
   },
   forgotPasswordText: {
     fontFamily: FONTS.OUTFIT_REGULAR,
-    fontSize: 14,
-    color: COLORS.textColor64,
+    fontSize: 12,
+    color: COLORS.white,
   },
   buttonContainer: {
-    marginBottom: 20,
+    marginBottom: 0,
   },
   loginButton: {
-    backgroundColor: '#8B5CF6', // Purple color from design
-    borderRadius: 10,
-    height: 48,
   },
-  continueWithoutLoginContainer: {
-    flexDirection: 'row',
+  registerContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 30,
-    paddingVertical: 12,
+    // marginTop: 20,
+    // backgroundColor: 'red',
+
   },
-  continueIcon: {
-    height: 20,
-    width: 20,
-    marginRight: 8,
-  },
-  continueWithoutLoginText: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
-    fontSize: 16,
-    color: COLORS.textColor,
-    marginRight: 8,
-  },
-  continueArrow: {
-    height: 16,
-    width: 16,
-  },
-  signUpContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  signUpText: {
+  registerText: {
     fontFamily: FONTS.OUTFIT_REGULAR,
     fontSize: 14,
-    color: COLORS.textColor,
+    color: COLORS.white,
   },
-  signUpLink: {
+  registerLink: {
     fontFamily: FONTS.OUTFIT_MEDIUM,
-    color: COLORS.textColor,
+    color: COLORS.purple,
   },
 });

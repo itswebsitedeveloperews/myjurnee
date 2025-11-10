@@ -224,7 +224,8 @@ const WeightTrackerScreen = ({ navigation }) => {
         <SafeAreaView style={safeAreaStyle} edges={['top']} >
             <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
             <View style={{ paddingHorizontal: 20 }}>
-                <INavBar title="Weight Tracker" EmptyBackButton={true} />
+                {/* <INavBar title="Weight Tracker" EmptyBackButton={true} /> */}
+                <Text style={styles.headerTitle}>Weight Tracker</Text>
                 {!isAuthenticated && (
                     <View style={styles.demoBanner}>
                         <Text style={styles.demoText}>📊 Demo Data - Login to track your progress</Text>
@@ -336,6 +337,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F5F5F5',
+    },
+    headerTitle: {
+        fontSize: 28,
+        fontFamily: FONTS.OUTFIT_BOLD,
+        color: COLORS.textColor,
     },
     loadingContainer: {
         flex: 1,

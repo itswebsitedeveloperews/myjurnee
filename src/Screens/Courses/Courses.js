@@ -49,8 +49,6 @@ const CoursesScreen = ({ navigation }) => {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
         });
     };
 
@@ -224,7 +222,6 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     header: {
-        paddingTop: 10,
         paddingHorizontal: 20,
         paddingBottom: 20,
     },

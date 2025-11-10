@@ -13,9 +13,18 @@ const Splash = props => {
 
     setTimeout(() => {
       localStorageHelper
-        .getItemsFromStorage([StorageKeys.IS_LOGGED, StorageKeys.USER_ID])
+        .getItemsFromStorage([StorageKeys.IS_LOGGED, StorageKeys.USER_ID, StorageKeys.ONBOARDING_SHOWN])
         .then(resp => {
           console.log('resp', resp);
+          const onboardingShown = resp[StorageKeys.ONBOARDING_SHOWN];
+
+          // Check if onboarding has been shown
+          if (onboardingShown !== 'true') {
+            props.navigation.replace('Onboarding');
+            return;
+          }
+
+          // Proceed with normal flow
           let loginPreserved = resp[StorageKeys.IS_LOGGED];
 
           if (loginPreserved == 'true') {

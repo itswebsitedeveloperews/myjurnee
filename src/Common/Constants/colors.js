@@ -13,4 +13,8 @@ export const COLORS = {
   grayText: '#313641',
   pr_lavender: '#C5D0F0',
   profile_bg: '#E8E0FF', // Light purple background for profile screen
+  light_purple: '#c7d2fe',
+  grayBtn: '#d9d9d9',
+  purple: '#8B5CF6', // Purple color for buttons and active states
+  darkGray: '#1A1A1A', // Dark gray for input fields
 };

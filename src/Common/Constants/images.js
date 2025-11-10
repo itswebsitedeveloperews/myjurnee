@@ -5,22 +5,19 @@ export const IMAGES = {
   DELETE_ICON: require('../../assets/images_new/delete.png'),
   LOGIN_BG_IMAGE: require('../../assets/images_new/login_background_img.png'),
   HOME_SCREEN_LOGO_V1: require('../../assets/images_new/home_screen_logo_v1.png'),
+  WHITE_LOGO: require('../../assets/images_new/white_logo.png'),
 
+  IC_EYE_OFF: require('../../assets/images_new/eye_off.png'), // Using eye as eye_off placeholder
+  IC_EYE: require('../../assets/images_new/eye.png'),
   //Onboarding image
   IC_ONBOARDING_TOP: require('../../assets/images/onboardingTop.png'),
-
-  //Agency Purchase Plan
-  PAYMENT_1: require('../../assets/images/payment1.png'),
-  PAYMENT_2: require('../../assets/images/payment2.png'),
-  PAYMENT_3: require('../../assets/images/payment3.png'),
-
-  DIAMOND_1: require('../../assets/images/diamond1.png'),
-  DIAMOND_2: require('../../assets/images/diamond2.png'),
-  DIAMOND_3: require('../../assets/images/diamond3.png'),
+  ONBOARDING_1: require('../../assets/images_new/onboarding_1.png'),
+  ONBOARDING_2: require('../../assets/images_new/onboarding_2.png'),
+  ONBOARDING_3: require('../../assets/images_new/onboarding_3.png'),
+  IC_ARROW_LEFT: require('../../assets/images_new/Arrow_Left.png'),
 
   //ICONS
   IC_ARROW_RIGHT: require('../../assets/images/arrow_right.png'),
-  IC_ARROW_LEFT: require('../../assets/images/arrow_left.png'),
   IC_ARROW_DOWN: require('../../assets/images/arrow_down.png'),
   IC_CHECK: require('../../assets/images/check.png'),
   IC_PLUS: require('../../assets/images/plus.png'),
@@ -35,7 +32,7 @@ export const IMAGES = {
   IC_FILE: require('../../assets/images/file_text.png'),
   IC_BELL: require('../../assets/images/bell.png'),
   IC_STAR: require('../../assets/images/star.png'),
-  IC_EYE: require('../../assets/images/eye.png'),
+
   IC_VERIFY: require('../../assets/images/verified.png'),
   IC_DOWNLOAD: require('../../assets/images/download.png'),
   IC_CALL: require('../../assets/images/phone.png'),
@@ -62,7 +59,7 @@ export const IMAGES = {
   // Login screen icons
   IC_USER_PROFILE: require('../../assets/images/user.png'),
   IC_LOCK: require('../../assets/images/briefcase.png'), // Using briefcase as lock placeholder
-  IC_EYE_OFF: require('../../assets/images/eye.png'), // Using eye as eye_off placeholder
+
   IC_ARROW_RIGHT_CHEVRON: require('../../assets/images/arrow_right.png'),
 
   // Profile screen icons

@@ -35,16 +35,16 @@ export default IButton;
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    backgroundColor: COLORS.pr_blue,
-    height: 48,
+    backgroundColor: COLORS.purple,
+    height: 58,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 50,
+    borderRadius: 15,
   },
   title: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.OUTFIT_SEMIBOLD,
     color: COLORS.white,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 22,
   },
 });

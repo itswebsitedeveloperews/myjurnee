@@ -17,7 +17,7 @@ export const getCourseAction = ({ onSuccess, onFailure }) => {
           // console.log('course response action---', response);
           if (response) {
             if (isFunction(onSuccess)) {
-              onSuccess();
+              onSuccess(response);
             }
             dispatch(onCourseSuccess(response));
           }

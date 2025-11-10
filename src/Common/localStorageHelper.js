@@ -12,6 +12,7 @@ export const StorageKeys = {
   NAME: 'NAME',
   IS_LOGGED: 'IS_LOGGED',
   FIRST_TIME_LOGIN: 'FIRST_TIME_LOGIN',
+  ONBOARDING_SHOWN: 'ONBOARDING_SHOWN',
 };
 
 class LocalStorageHelper {
