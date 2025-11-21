@@ -75,12 +75,19 @@ const WeightTrackerScreen = ({ navigation }) => {
         try {
             setLoading(true);
 
-            const response = await getWeightLogs(userId);
-            const goalWeightResponse = await getGoalWeight(userId);
-            if (response?.success) {
-                setWeightLogs(response?.data || []);
-                await handleStatistics(response?.data || [], goalWeightResponse?.data);
-            }
+            localStorageHelper
+                .getItemFromStorage(StorageKeys.USER_ID)
+                .then(async userId => {
+                    if (!userId) {
+                        return;
+                    }
+                    const response = await getWeightLogs(userId);
+                    const goalWeightResponse = await getGoalWeight(userId);
+                    if (response?.success) {
+                        setWeightLogs(response?.data || []);
+                        await handleStatistics(response?.data || [], goalWeightResponse?.data);
+                    }
+                });
         } catch (error) {
             console.log('Error loading weight data:', error);
         } finally {

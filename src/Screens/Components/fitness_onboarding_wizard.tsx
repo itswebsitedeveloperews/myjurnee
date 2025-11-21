@@ -20,11 +20,15 @@ import AnimatedReanimated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 import { FONTS } from '../../Common/Constants/fonts';
 import { COLORS } from '../../Common/Constants/colors';
 import BoxCarousel from './BoxCarousel';
 import FastImage from 'react-native-fast-image';
 import { IMAGES } from '../../Common/Constants/images';
+import { setUserFitnessDetails } from '../../api/profileApi';
+import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 
 const AnimatedFlatList = AnimatedReanimated.createAnimatedComponent(FlatList<number>);
 
@@ -47,6 +51,8 @@ export type FitnessOnboardingWizardProps = {
   initialValues?: Partial<FitnessOnboardingValues>;
   /** Optional: label for the primary button */
   nextLabel?: string;
+  /** Optional: screen name to navigate to after completion (default: 'Login') */
+  navigateToAfterComplete?: string;
 };
 
 // ---- Reducer ----
@@ -180,7 +186,12 @@ export default function FitnessOnboardingWizard({
   onClose,
   initialValues: init,
   nextLabel = 'Next',
+  navigateToAfterComplete: navigateToProp = 'Login',
 }: FitnessOnboardingWizardProps) {
+  const navigation = useNavigation();
+  const route = useRoute();
+  // Get navigateToAfterComplete from route params or props (route params take precedence)
+  const navigateToAfterComplete = (route.params as any)?.navigateToAfterComplete || navigateToProp;
   const [state, dispatch] = useReducer(reducer, { ...initialState, ...init });
   const steps: Array<'gender' | 'age' | 'currentWeight' | 'goalWeight'> = useMemo(
     () => ['gender', 'age', 'currentWeight', 'goalWeight'],
@@ -189,11 +200,17 @@ export default function FitnessOnboardingWizard({
 
   // Simple step navigation without animations for better performance
   const [index, setIndex] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const goNext = useCallback(() => {
     if (index < steps.length - 1) {
       setIndex(index + 1);
     } else {
+      // Finish - submit data to API
+      if (isSubmitting) return; // Prevent multiple submissions
+
+      setIsSubmitting(true);
+
       // Log all selected values when user finishes
       console.log('=== Fitness Onboarding Completed ===');
       console.log('Selected Values:', {
@@ -205,9 +222,103 @@ export default function FitnessOnboardingWizard({
       });
       console.log('Full State:', state);
       console.log('===================================');
-      onComplete?.(state);
+
+      // Get user_id from storage and call API
+      localStorageHelper
+        .getItemFromStorage(StorageKeys.USER_ID)
+        .then(userId => {
+          if (!userId) {
+            console.error('User ID not found');
+            setIsSubmitting(false);
+            // Navigate to specified screen even if user_id is not found
+            if (navigateToAfterComplete === 'Home') {
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              } else {
+                (navigation as any).navigate('DashboardBottomTab');
+              }
+            } else {
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: navigateToAfterComplete }],
+                })
+              );
+            }
+            return;
+          }
+
+          // Call API to save user fitness details
+          setUserFitnessDetails(
+            userId,
+            state.gender || '',
+            state.age || 0,
+            state.currentWeight || 0,
+            state.goalWeight || 0
+          )
+            .then(response => {
+              console.log('User fitness details saved successfully:', response);
+              setIsSubmitting(false);
+              // Navigate to specified screen after successful API call
+              if (navigateToAfterComplete === 'Home') {
+                // Navigate back to DashboardBottomTab (which shows Home tab)
+                if (navigation.canGoBack()) {
+                  navigation.goBack();
+                } else {
+                  // Fallback: navigate to DashboardBottomTab
+                  (navigation as any).navigate('DashboardBottomTab');
+                }
+              } else {
+                // Otherwise, reset navigation stack to the specified screen
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: navigateToAfterComplete }],
+                  })
+                );
+              }
+            })
+            .catch(error => {
+              console.error('Error saving user fitness details:', error);
+              setIsSubmitting(false);
+              // Still navigate even if API fails
+              if (navigateToAfterComplete === 'Home') {
+                if (navigation.canGoBack()) {
+                  navigation.goBack();
+                } else {
+                  (navigation as any).navigate('DashboardBottomTab');
+                }
+              } else {
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: navigateToAfterComplete }],
+                  })
+                );
+              }
+            });
+        })
+        .catch(error => {
+          console.error('Error getting user ID:', error);
+          setIsSubmitting(false);
+          // Navigate to specified screen even if there's an error
+          if (navigateToAfterComplete === 'Home') {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              (navigation as any).navigate('DashboardBottomTab');
+            }
+          } else {
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: navigateToAfterComplete }],
+              })
+            );
+          }
+        });
     }
-  }, [index, steps.length, onComplete, state]);
+  }, [index, steps.length, state, isSubmitting, navigation, navigateToAfterComplete]);
 
   const goPrev = useCallback(() => {
     if (index > 0) {
@@ -275,11 +386,14 @@ export default function FitnessOnboardingWizard({
 
   return (
     <SafeAreaView style={[styles.container]}>
-      <View style={styles.backButtonContainer}>
-        <Pressable onPress={goPrev} style={[styles.backBtn]}>
-          <Text style={styles.backArrow}>{I18nManager.isRTL ? '→' : '←'}</Text>
-        </Pressable>
-      </View>
+      {/* Only show back button if not on first step (Gender) */}
+      {index > 0 && (
+        <View style={styles.backButtonContainer}>
+          <Pressable onPress={goPrev} style={[styles.backBtn]}>
+            <Text style={styles.backArrow}>{I18nManager.isRTL ? '→' : '←'}</Text>
+          </Pressable>
+        </View>
+      )}
       <View style={styles.header}>
         <StepHeader step={steps[index]} />
       </View>
@@ -293,15 +407,21 @@ export default function FitnessOnboardingWizard({
 
         <TouchableOpacity
           activeOpacity={0.8}
-          disabled={!canProceed}
+          disabled={!canProceed || isSubmitting}
           onPress={goNext}
           style={[
             styles.nextBtn,
             // { backgroundColor: accentColor },
-            { backgroundColor: canProceed ? accentColor : '#3F3F46', },
+            { backgroundColor: canProceed && !isSubmitting ? accentColor : '#3F3F46', },
           ]}
         >
-          <Text style={styles.nextText}>{index === steps.length - 1 ? 'Finish' : nextLabel}</Text>
+          <Text style={styles.nextText}>
+            {isSubmitting
+              ? 'Saving...'
+              : index === steps.length - 1
+                ? 'Finish'
+                : nextLabel}
+          </Text>
           {/* <Text style={styles.nextArrow}>{I18nManager.isRTL ? '←' : '→'}</Text> */}
         </TouchableOpacity>
       </View>

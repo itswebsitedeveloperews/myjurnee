@@ -23,6 +23,7 @@ import CoursesGrid from '../Components/CoursesGrid'
 import { IMAGES } from '../../Common/Constants/images';
 import { getCourseAction } from '../../redux/cources/courceActions';
 import IButton from '../Components/IButton';
+import { getUserFitnessDetails } from '../../api/profileApi';
 
 const games = [
     {
@@ -69,11 +70,19 @@ const Home = props => {
     const [loading, setLoading] = useState(false);
     const [userChar, setUserChar] = useState('');
     const [courses, setCourses] = useState([]);
+    const [checkingOnboarding, setCheckingOnboarding] = useState(true);
     const dispatch = useDispatch();
 
     useEffect(() => {
         checkAuthentication();
     }, [])
+
+    useEffect(() => {
+        // Check onboarding status after authentication check
+        if (isAuthenticated) {
+            checkOnboardingStatus();
+        }
+    }, [isAuthenticated])
 
     useEffect(() => {
         setLoading(true);
@@ -133,6 +142,91 @@ const Home = props => {
                 const charOfName = getInitial(userName);
                 setUserChar(charOfName);
             });
+    }
+
+    const checkOnboardingStatus = async () => {
+        try {
+            setCheckingOnboarding(true);
+            const userId = await localStorageHelper.getItemFromStorage(StorageKeys.USER_ID);
+
+            if (!userId) {
+                console.log('User ID not found, skipping onboarding check');
+                setCheckingOnboarding(false);
+                return;
+            }
+
+            // Create a timeout promise to prevent hanging on slow/blocked requests
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => {
+                    reject(new Error('Request timeout'));
+                }, 10000); // 10 second timeout
+            });
+
+            // Call API to get user fitness details with timeout
+            Promise.race([
+                getUserFitnessDetails(userId),
+                timeoutPromise
+            ])
+                .then(response => {
+                    setCheckingOnboarding(false);
+                    console.log('User fitness details:', response);
+
+                    if (response?.success && response?.data) {
+                        const { gender, age, current_weight, goal_weight } = response.data;
+
+                        // Check if onboarding is incomplete (any field is null)
+                        if (!gender || !age || current_weight === null || goal_weight === null) {
+                            console.log('Onboarding incomplete, navigating to wizard');
+                            // Navigate to fitness onboarding wizard in parent DashboardStack
+                            // Get parent navigator (DashboardStack) to navigate to wizard
+                            const parent = props.navigation.getParent();
+                            if (parent) {
+                                parent.navigate('FitnessOnboardingWizard', {
+                                    navigateToAfterComplete: 'Home'
+                                });
+                            } else {
+                                // Fallback: try direct navigation (should work in React Navigation v6)
+                                props.navigation.navigate('FitnessOnboardingWizard', {
+                                    navigateToAfterComplete: 'Home'
+                                });
+                            }
+                        } else {
+                            console.log('Onboarding already completed');
+                        }
+                    }
+                })
+                .catch(error => {
+                    setCheckingOnboarding(false);
+                    // Handle different error types with detailed logging
+                    if (error?.response) {
+                        // Server responded with error status
+                        console.error('API Error Response:', {
+                            status: error.response.status,
+                            statusText: error.response.statusText,
+                            data: error.response.data,
+                            url: error.config?.url,
+                        });
+                    } else if (error?.request) {
+                        // Request was made but no response received
+                        console.error('API Request Error (no response):', {
+                            message: error.message,
+                            url: error.config?.url,
+                        });
+                    } else {
+                        // Error setting up the request
+                        console.error('API Setup Error:', error.message || error);
+                    }
+
+                    // Handle specific error cases
+                    if (error?.response?.status === 522 || error?.message === 'Request timeout') {
+                        console.warn('Onboarding check timed out or server error (522). Allowing user to continue.');
+                    }
+                    // Don't block user if API fails - allow normal app usage
+                });
+        } catch (error) {
+            setCheckingOnboarding(false);
+            console.error('Error in checkOnboardingStatus:', error);
+        }
     }
 
     const onViewMoreClick = () => {

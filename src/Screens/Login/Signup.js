@@ -12,6 +12,7 @@ import { windowHeight } from '../../Utils/Dimentions';
 import IButton from '../Components/IButton';
 import { useDispatch } from 'react-redux';
 import { RegisterUser } from '../../redux/auth/authActions';
+import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 
 const Signup = props => {
     const [username, setUsername] = useState('');
@@ -56,12 +57,24 @@ const Signup = props => {
             password: password,
             onSuccess: (response) => {
                 setLoading(false);
-                Alert.alert('Success', 'Account created successfully!', [
-                    {
-                        text: 'OK',
-                        onPress: () => props.navigation.navigate('Login')
-                    }
-                ]);
+                // Save user_id to storage for the fitness onboarding wizard
+                if (response?.id) {
+                    localStorageHelper
+                        .setStorageItem({ key: StorageKeys.USER_ID, value: String(response.id) })
+                        .then(() => {
+                            console.log('User ID saved to storage:', response.id);
+                            // Navigate to fitness onboarding wizard after successful signup
+                            props.navigation.replace('FitnessOnboardingWizard');
+                        })
+                        .catch(error => {
+                            console.error('Error saving user ID:', error);
+                            // Still navigate even if storage fails
+                            props.navigation.replace('FitnessOnboardingWizard');
+                        });
+                } else {
+                    // If no user_id in response, still navigate (wizard will handle it)
+                    props.navigation.replace('FitnessOnboardingWizard');
+                }
             },
             onFailure: (errorMessage) => {
                 setLoading(false);

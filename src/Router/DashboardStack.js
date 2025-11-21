@@ -7,6 +7,7 @@ import SimpleTabBar from '../Components/SimpleTabBar';
 import Profile from '../Screens/More/Profile';
 import CoursesStack from './CoursesStack';
 import WeightTrackerStack from './WeightTrackerStack';
+import FitnessOnboardingWizard from '../Screens/Components/fitness_onboarding_wizard';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -60,6 +61,7 @@ const DashboardStack = props => {
       initialRouteName={'DashboardBottomTab'}
     >
       <Stack.Screen name="DashboardBottomTab" component={DashboardBottomTab} />
+      <Stack.Screen name="FitnessOnboardingWizard" component={FitnessOnboardingWizard} />
     </Stack.Navigator>
   );
 };
