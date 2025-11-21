@@ -1,16 +1,16 @@
 import React from 'react';
-import {Platform, StyleSheet, Text, TextInput, View} from 'react-native';
+import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {COLORS} from '../../Common/Constants/colors';
-import {FONTS} from '../../Common/Constants/fonts';
-import {IMAGES} from '../../Common/Constants/images';
+import { COLORS } from '../../Common/Constants/colors';
+import { FONTS } from '../../Common/Constants/fonts';
+import { IMAGES } from '../../Common/Constants/images';
 
-const ISearchBar = ({value, onChangeText = () => {}}) => {
+const ISearchBar = ({ value, onChangeText = () => { }, searchIcon, placeholder = 'Search here', containerStyle }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <FastImage
-        source={IMAGES.IC_SEARCH}
-        style={{height: 24, width: 24}}
+        source={searchIcon || IMAGES.IC_SEARCH}
+        style={{ height: 24, width: 24 }}
         resizeMode="contain"
       />
 
@@ -18,7 +18,7 @@ const ISearchBar = ({value, onChangeText = () => {}}) => {
         value={value}
         onChangeText={text => onChangeText(text)}
         style={styles.inputStyle}
-        placeholder={'Search here'}
+        placeholder={placeholder}
         placeholderTextColor={COLORS.textColor44}
       />
     </View>
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   inputStyle: {
     flex: 1,
     paddingLeft: 10,
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: FONTS.OUTFIT_REGULAR,
     color: COLORS.textColor,
   },

@@ -1,123 +1,216 @@
 // CoursesGrid.js
 
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList, Dimensions, Image } from 'react-native';
 import { COLORS } from '../../Common/Constants/colors';
+import { FONTS } from '../../Common/Constants/fonts';
 import FastImage from 'react-native-fast-image';
+import { windowHeight } from '../../Utils/Dimentions';
+
+const { width: windowWidth } = Dimensions.get('window');
+const CARD_WIDTH = windowWidth * 0.65;
+const CARD_MARGIN = 12;
 
 export default function CoursesGrid({ items = [], loading = false, onCardPress = () => { } }) {
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}>
         <ActivityIndicator color={COLORS.black} size={'small'} />
       </View>
     )
   }
 
+  const renderCourseCard = ({ item, index }) => {
+    // Generate gradient colors based on index - deep purple to pinkish-purple
+    // const gradientColors = [
+    //   ['#6B46C1', '#A855F7', '#EC4899'], // Deep purple to pink
+    //   ['#7C3AED', '#A855F7', '#F472B6'], // Purple to pink
+    //   ['#5B21B6', '#9333EA', '#EC4899'], // Dark purple to pink
+    //   ['#6B46C1', '#C084FC', '#F472B6'], // Purple to light pink
+    // ];
+
+    // const colors = gradientColors[index % gradientColors.length];
+
+    // Mock data for videos and classes (you can replace with actual data from API)
+    // const videosCount = 75;
+    // const classesCount = 35;
+
+    // Extract course name and instructor (you can get this from API)
+    // const courseName = item.courseName || 'Juri';
+    // const instructor = item.instructor || 'Shak';
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => onCardPress(item)}
+        style={[styles.card, { marginLeft: index === 0 ? 20 : CARD_MARGIN }]}
+      >
+        {/* Gradient Header Section */}
+        <View style={styles.courseIconContainer}>
+          <FastImage source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg' }} style={styles.courseIcon} resizeMode="stretch" />
+        </View>
+
+        {/* Course Details Section */}
+        <View style={styles.detailsContainer}>
+          {/* Course Title */}
+          <Text style={styles.courseTitle} numberOfLines={2}>
+            {item.title || ''}
+          </Text>
+
+          {/* Course Description */}
+          <Text style={styles.courseDescription} numberOfLines={1}>
+            {item.subtitle || ''}
+          </Text>
+
+          {/* View Button */}
+          <TouchableOpacity
+            style={styles.viewButton}
+            activeOpacity={0.8}
+            onPress={() => onCardPress(item)}
+          >
+            <Text style={styles.viewButtonText}>View</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
-
     <View style={styles.container}>
-      {items.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          activeOpacity={0.9}
-          onPress={() => onCardPress(item)}
-          style={[styles.card, { backgroundColor: item.bgColor }]}
-        >
-          {/* Rank watermark */}
-          <Text style={styles.rank}>{item.rank}</Text>
-
-          {/* Game icon */}
-          <View style={styles.iconWrap}>
-            <FastImage source={item.icon} style={styles.icon} resizeMode="contain" />
-          </View>
-
-          {/* Texts */}
-          <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
-          <Text style={styles.subtitle} numberOfLines={1}>{item.subtitle}</Text>
-
-          {/* CTA */}
-          <View style={styles.ctaWrap}>
-            <Text style={styles.ctaText}>{item.cta}</Text>
-          </View>
-        </TouchableOpacity>
-      ))}
+      <FlatList
+        data={items}
+        renderItem={renderCourseCard}
+        keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+        // snapToInterval={CARD_WIDTH + CARD_MARGIN * 2}
+        decelerationRate="fast"
+        snapToAlignment="start"
+      />
     </View>
   );
 }
 
-const CARD_RADIUS = 22;
-
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    marginTop: 10,
+  },
+  listContent: {
+    paddingRight: 20,
+  },
+  courseIcon: {
+    width: '100%',
+    height: windowHeight * 0.17,
+
   },
   card: {
-    width: '48%',
-    borderRadius: CARD_RADIUS,
-    padding: 16,
-    height: 240,
-    marginBottom: 16,
+    width: CARD_WIDTH,
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
     overflow: 'hidden',
-
-    // shadow
+    marginRight: CARD_MARGIN,
     shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 5,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
-  rank: {
-    position: 'absolute',
-    top: 10,
-    left: 14,
-    fontSize: 86,
-    fontWeight: '800',
-    color: 'rgba(216, 27, 27, 0.21)',
-    letterSpacing: -3,
+  courseIconContainer: {
+    flex: 1,
+    backgroundColor: 'red',
+    margin: 14,
+
   },
-  iconWrap: {
-    width: 82,
-    height: 82,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    alignItems: 'center',
+  gradient: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 16,
+    justifyContent: 'space-between',
+    position: 'relative',
+  },
+  categoryTitle: {
+    fontSize: 15,
+    fontFamily: FONTS.OUTFIT_BOLD,
+    color: COLORS.white,
+    textAlign: 'center',
+    letterSpacing: 2,
+    marginTop: 0,
+    textTransform: 'uppercase',
+  },
+  courseInfoContainer: {
+    flex: 1,
     justifyContent: 'center',
-    marginTop: 8,
-    marginBottom: 12,
-    overflow: 'hidden',
+    alignItems: 'center',
+    marginVertical: 16,
+    paddingVertical: 20,
   },
-  icon: {
-    width: '94%',
-    height: '94%',
-    borderRadius: 14,
+  courseName: {
+    fontSize: 56,
+    fontFamily: FONTS.OUTFIT_BLACK,
+    color: COLORS.black,
+    textAlign: 'center',
+    marginBottom: 6,
+    lineHeight: 64,
   },
-  title: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+  instructorName: {
+    fontSize: 13,
+    fontFamily: FONTS.OUTFIT_REGULAR,
+    color: COLORS.white,
+    textAlign: 'center',
+  },
+  badgesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
     marginBottom: 4,
   },
-  subtitle: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  ctaWrap: {
-    marginTop: 12,
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.9)',
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EC4899', // Pinkish-purple solid color
+    paddingHorizontal: 12,
     paddingVertical: 8,
-    paddingHorizontal: 18,
-    borderRadius: 999,
+    borderRadius: 12,
+    gap: 6,
   },
-  ctaText: {
-    color: '#111',
-    fontWeight: '700',
+  badgeIcon: {
+    width: 14,
+    height: 14,
+    tintColor: COLORS.white,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontFamily: FONTS.OUTFIT_MEDIUM,
+    color: COLORS.white,
+  },
+  detailsContainer: {
+    padding: 16,
+  },
+  courseTitle: {
+    fontSize: 16,
+    fontFamily: FONTS.OUTFIT_SEMIBOLD,
+    color: COLORS.black,
+    marginBottom: 10,
+  },
+  courseDescription: {
+    fontSize: 12,
+    fontFamily: FONTS.OUTFIT_REGULAR,
+    color: COLORS.black,
+    marginBottom: 12,
+    lineHeight: 18
+  },
+  viewButton: {
+    width: '100%',
+    backgroundColor: '#5E3BB9',
+    borderRadius: 5,
+    paddingVertical: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  viewButtonText: {
     fontSize: 14,
+    fontFamily: FONTS.OUTFIT_SEMIBOLD,
+    color: COLORS.white,
   },
 });

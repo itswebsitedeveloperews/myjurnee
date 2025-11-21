@@ -12,6 +12,10 @@ export const IMAGES = {
 
   IC_MALE: require('../../assets/images_new/male.png'),
   IC_FEMALE: require('../../assets/images_new/female.png'),
+  IC_BELL: require('../../assets/images_new/bell.png'),
+  IC_FILTER: require('../../assets/images_new/filter.png'),
+  IC_SEARCH: require('../../assets/images/search.png'),
+  IC_GRAY_SEARCH: require('../../assets/images_new/gray_search.png'),
   //Onboarding image
   IC_ONBOARDING_TOP: require('../../assets/images/onboardingTop.png'),
   ONBOARDING_1: require('../../assets/images_new/onboarding_1.png'),
@@ -29,11 +33,10 @@ export const IMAGES = {
   IC_AGENCY: require('../../assets/images/ic_Agency.png'),
   IC_ARCHITECT: require('../../assets/images/ic_architect.png'),
   IC_USER: require('../../assets/images/user.png'),
-  IC_SEARCH: require('../../assets/images/search.png'),
+
   IC_LOCATION: require('../../assets/images/location.png'),
   IC_HOME: require('../../assets/images/home.png'),
   IC_FILE: require('../../assets/images/file_text.png'),
-  IC_BELL: require('../../assets/images/bell.png'),
   IC_STAR: require('../../assets/images/star.png'),
 
   IC_VERIFY: require('../../assets/images/verified.png'),

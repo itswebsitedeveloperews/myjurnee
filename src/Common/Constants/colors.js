@@ -3,6 +3,8 @@ export const COLORS = {
   black: '#000000',
   onBoardingBG: '#EDCDB6',
   textColor: '#101623',
+  titleColor: '#2C2C2C',
+  subTitleColor: '#8C8C8C',
   textColor64: 'rgba(16, 22, 35, 0.64)',
   textColor14: 'rgba(16, 22, 35, 0.14)',
   textColor44: 'rgba(16, 22, 35, 0.44)',
@@ -17,4 +19,5 @@ export const COLORS = {
   grayBtn: '#d9d9d9',
   purple: '#8B5CF6', // Purple color for buttons and active states
   darkGray: '#1A1A1A', // Dark gray for input fields
+  bg_color: '#F4F8FF',
 };

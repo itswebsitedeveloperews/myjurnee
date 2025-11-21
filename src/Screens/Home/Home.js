@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
     FlatList,
+    Image,
     ImageBackground,
     RefreshControl,
     ScrollView,
@@ -24,6 +25,7 @@ import { IMAGES } from '../../Common/Constants/images';
 import { getCourseAction } from '../../redux/cources/courceActions';
 import IButton from '../Components/IButton';
 import { getUserFitnessDetails } from '../../api/profileApi';
+import ISearchBar from '../Components/ISearchBar';
 
 const games = [
     {
@@ -71,6 +73,7 @@ const Home = props => {
     const [userChar, setUserChar] = useState('');
     const [courses, setCourses] = useState([]);
     const [checkingOnboarding, setCheckingOnboarding] = useState(true);
+    const [searchValue, setSearchValue] = useState('');
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -101,6 +104,10 @@ const Home = props => {
     const transformCoursesToCards = (courses) => {
         const bgColors = ['#5E3BB9', '#C7463A', '#7A8593', '#D3792F'];
 
+        // Sample course names and instructors for display
+        const courseNames = ['Juri', 'Lingo', 'Speak', 'Talk'];
+        const instructors = ['Shak', 'Alex', 'Maria', 'John'];
+
         const finalData = courses
             .slice(0, 4) // take first 4 only
             .map((course, index) => ({
@@ -112,6 +119,8 @@ const Home = props => {
                 icon: IMAGES.HOME_SCREEN_LOGO_V1, // your static or course-based image
                 bgColor: bgColors[index % bgColors.length],
                 permalink: course.permalink, // if you need navigation later
+                courseName: courseNames[index % courseNames.length], // For display in gradient
+                instructor: course.author || instructors[index % instructors.length], // Use author if available
             }));
 
         setCourses(finalData);
@@ -139,8 +148,8 @@ const Home = props => {
             .getItemsFromStorage([StorageKeys.USER_NAME])
             .then(resp => {
                 let userName = resp[StorageKeys.USER_NAME];
-                const charOfName = getInitial(userName);
-                setUserChar(charOfName);
+                // const charOfName = getInitial(userName);
+                setUserChar(userName);
             });
     }
 
@@ -238,44 +247,56 @@ const Home = props => {
     }
 
     return (
-        <SafeAreaView style={{ ...safeAreaStyle, backgroundColor: COLORS.light_purple }} edges={['top']}>
+        <SafeAreaView style={{ ...safeAreaStyle, backgroundColor: COLORS.bg_color }} edges={['top']}>
             <ScrollView style={{ flex: 1, }}>
                 {/* Header View */}
                 <View style={styles.headerContainer}>
-                    <Text style={styles.headerTitle}>Home</Text>
-                    {isAuthenticated && <TouchableOpacity style={styles.profileIcon}>
-                        <Text style={styles.userNameText}>{userChar}</Text>
-                    </TouchableOpacity>}
+                    <View>
+                        <Text style={styles.headerTitle}>Hi, {userChar}</Text>
+                        <Text style={styles.headerSubTitle}>Find your lessons today!</Text>
+                    </View>
+                    <View style={{ justifyContent: 'center' }}>
+                        <TouchableOpacity style={styles.bellButton}>
+                            <FastImage source={IMAGES.IC_BELL} style={styles.bellIcon} />
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
-                {/* Logo container */}
-                <View style={styles.logoContainer}>
-                    <FastImage
-                        source={IMAGES.HOME_SCREEN_LOGO_V1}
-                        style={styles.logo}
-                        resizeMode="contain"
-                    />
-                </View>
-                <View style={styles.subTitleContainer}>
-                    <Text style={styles.subTitleText}>Eat smart.{'\n'}Think smarter.</Text>
-                    <Text style={styles.subText1}>Rewire your brain for success</Text>
-                </View>
-                <View style={{ flex: 1, marginTop: 30 }}>
-                    {/* <Text style={{ ...styles.headerTitle, fontSize: 20 }}>{`Courses`}</Text> */}
-                    <Text style={styles.subHeaderTitle}>{`Top featured courses`}</Text>
-                    <CoursesGrid items={courses} loading={loading} onCardPress={(item) => onCourseClick(item)} />
-                    <TouchableOpacity onPress={() => onViewMoreClick()} style={styles.viewMoreBtn} activeOpacity={0.5}>
-                        <Text style={styles.viewMoreText}>View more</Text>
+                {/* Search Bar and Filter Button */}
+                <View style={styles.searchContainer}>
+                    <View style={styles.searchBarWrapper}>
+                        <ISearchBar
+                            value={searchValue}
+                            onChangeText={setSearchValue}
+                            searchIcon={IMAGES.IC_GRAY_SEARCH}
+                            placeholder="Search now..."
+                            containerStyle={styles.searchBarStyle}
+                        />
+                    </View>
+                    <TouchableOpacity style={styles.filterButton} activeOpacity={0.7}>
+                        <Image source={IMAGES.IC_FILTER} style={styles.filterIcon} resizeMode="contain" />
                     </TouchableOpacity>
                 </View>
-                <View style={{ height: 30 }} />
+
+
+                <View style={{ flex: 1, marginTop: 30 }}>
+                    {/* <Text style={{ ...styles.headerTitle, fontSize: 20 }}>{`Courses`}</Text> */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={styles.subHeaderTitle}>{`Top featured courses`}</Text>
+                        <TouchableOpacity onPress={() => onViewMoreClick()} style={styles.viewMoreBtn} activeOpacity={0.5}>
+                            <Text style={styles.viewMoreBtnText}>View more</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <CoursesGrid items={courses} loading={loading} onCardPress={(item) => onCourseClick(item)} />
+                </View>
+                {/* <View style={{ height: 30 }} />
                 <Text style={styles.subHeaderTitle}>{`Lasting weight-loss`}</Text>
                 <LastingWeightsComponent />
-                {/* <View style={{ height: 100 }} /> */}
+                {/* <View style={{ height: 100 }} /> 
 
-                {/* Contact US */}
+                
                 <View style={{ height: 30 }} />
-                <Text style={{ ...styles.subHeaderTitle }}>{`Contact us`}</Text>
+                <Text style={{ ...styles.subHeaderTitle }}>{`Contact us`}</Text> */}
 
             </ScrollView>
         </SafeAreaView>
@@ -287,20 +308,36 @@ export default Home;
 const styles = StyleSheet.create({
     headerContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginTop: 5,
+        paddingHorizontal: 15
     },
     headerTitle: {
-        fontSize: 28,
+        fontSize: 24,
         fontFamily: FONTS.OUTFIT_BOLD,
-        color: COLORS.textColor,
-        paddingHorizontal: 20
+        color: COLORS.titleColor,
+    },
+    headerSubTitle: {
+        fontSize: 16,
+        fontFamily: FONTS.OUTFIT_REGULAR,
+        color: COLORS.subTitleColor,
+        marginTop: 3
     },
     subHeaderTitle: {
-        fontSize: 28,
-        fontFamily: FONTS.OUTFIT_BOLD,
-        color: COLORS.textColor,
+        fontSize: 20,
+        fontFamily: FONTS.OUTFIT_SEMIBOLD,
+        color: COLORS.black,
         paddingHorizontal: 20,
         marginBottom: 10
+    },
+    viewMoreBtnText: {
+        fontSize: 16,
+        textDecorationLine: 'underline',
+        fontFamily: FONTS.OUTFIT_SEMIBOLD,
+        color: COLORS.black,
+        marginRight: 10
+        // paddingHorizontal: 20,
+        // marginBottom: 10
     },
     profileIcon: {
         backgroundColor: '#a855f7',
@@ -325,6 +362,11 @@ const styles = StyleSheet.create({
         height: 60,
         width: 200,
     },
+    viewMoreBtn: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingBottom: 8,
+    },
     subTitleContainer: {
         justifyContent: 'center',
         alignItems: 'center'
@@ -342,19 +384,47 @@ const styles = StyleSheet.create({
         fontSize: 22,
         textAlign: 'center'
     },
-    viewMoreBtn: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        alignSelf: 'center',
-        padding: 10,
-        // backgroundColor: '#cc99ff',
-        backgroundColor: '#a855f7',
-        width: windowWidth / 3,
-        borderRadius: 10
-    },
+
     viewMoreText: {
         fontFamily: FONTS.OUTFIT_MEDIUM,
         fontSize: 18,
-        color: COLORS.white
+        color: COLORS.black
+    },
+    bellIcon: {
+        height: 20,
+        width: 22
+    },
+    bellButton: {
+        padding: 15, backgroundColor: COLORS.white, borderRadius: 14
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        marginTop: 22,
+        gap: 15
+    },
+    searchBarWrapper: {
+        flex: 1
+    },
+    searchBarStyle: {
+        backgroundColor: COLORS.white,
+        borderWidth: 0,
+        borderRadius: 14,
+        paddingVertical: 14,
+        paddingHorizontal: 18,
+    },
+    filterButton: {
+        width: 50,
+        height: 50,
+        backgroundColor: COLORS.purple,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    filterIcon: {
+        height: 20,
+        width: 20,
+        tintColor: COLORS.white
     }
 });
