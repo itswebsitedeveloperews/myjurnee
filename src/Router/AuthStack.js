@@ -17,7 +17,7 @@ const AuthStacks = () => {
       <AuthStack.Screen name="Login" component={Login} />
       <AuthStack.Screen name="Signup" component={Signup} />
       <AuthStack.Screen name="ForgotPassword" component={ForgotPassword} />
-      <AuthStack.Screen name="Onboarding" component={FitnessOnboardingWizard} />
+      <AuthStack.Screen name="FitnessOnboardingWizard" component={FitnessOnboardingWizard} />
     </AuthStack.Navigator>
   );
 };

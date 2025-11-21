@@ -62,7 +62,8 @@ const Login = props => {
 
   const onForgotPassword = () => {
     // Navigate to forgot password screen
-    props.navigation.navigate('ForgotPassword');
+    // props.navigation.navigate('ForgotPassword');
+    props.navigation.navigate('FitnessOnboardingWizard');
   };
 
   return (

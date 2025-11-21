@@ -8,9 +8,25 @@ import {
   Animated,
   Easing,
   I18nManager,
-  PanResponder,
-  LayoutChangeEvent,
+  Dimensions,
+  TouchableOpacity,
 } from 'react-native';
+import AnimatedReanimated, {
+  Extrapolate,
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+} from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { FONTS } from '../../Common/Constants/fonts';
+import { COLORS } from '../../Common/Constants/colors';
+import BoxCarousel from './BoxCarousel';
+import FastImage from 'react-native-fast-image';
+import { IMAGES } from '../../Common/Constants/images';
+
+const AnimatedFlatList = AnimatedReanimated.createAnimatedComponent(FlatList<number>);
 
 // ---- Types ----
 export type Gender = 'male' | 'female' | null;
@@ -51,17 +67,75 @@ type Action =
   | { type: 'reset'; payload?: Partial<FitnessOnboardingValues> };
 
 function reducer(state: FitnessOnboardingValues, action: Action): FitnessOnboardingValues {
+  let newState: FitnessOnboardingValues;
   switch (action.type) {
     case 'set_gender':
-      return { ...state, gender: action.gender };
+      newState = { ...state, gender: action.gender };
+      console.log('Reducer - set_gender:', action.gender, '->', newState);
+      return newState;
     case 'set_age':
-      return { ...state, age: action.age };
+      newState = { ...state, age: action.age };
+      console.log('Reducer - set_age:', action.age, '->', newState);
+      return newState;
     case 'set_current_weight':
-      return { ...state, currentWeight: action.value };
+      newState = { ...state, currentWeight: action.value };
+      console.log('Reducer - set_current_weight:', action.value, '->', newState);
+      return newState;
     case 'set_goal_weight':
-      return { ...state, goalWeight: action.value };
+      newState = { ...state, goalWeight: action.value };
+      console.log('Reducer - set_goal_weight:', action.value, '->', newState);
+      return newState;
     case 'set_unit':
-      return { ...state, unit: action.unit };
+      // Convert existing weight values from old unit to new unit
+      const oldUnit = state.unit;
+      const newUnit = action.unit;
+
+      // Convert currentWeight if it exists
+      let convertedCurrentWeight = state.currentWeight;
+      if (convertedCurrentWeight !== null) {
+        // First convert to kg, then to new unit
+        const weightInKg = convert.toKg(convertedCurrentWeight, oldUnit);
+        convertedCurrentWeight = convert.fromKg(weightInKg, newUnit);
+        // Round to match the step size in the weight array (1 for kg, 0.5 for lbs/st)
+        if (newUnit === 'kg') {
+          convertedCurrentWeight = Math.round(convertedCurrentWeight);
+        } else {
+          // Round to nearest 0.5 for lbs and st
+          convertedCurrentWeight = Math.round(convertedCurrentWeight * 2) / 2;
+        }
+      }
+
+      // Convert goalWeight if it exists
+      let convertedGoalWeight = state.goalWeight;
+      if (convertedGoalWeight !== null) {
+        // First convert to kg, then to new unit
+        const weightInKg = convert.toKg(convertedGoalWeight, oldUnit);
+        convertedGoalWeight = convert.fromKg(weightInKg, newUnit);
+        // Round to match the step size in the weight array (1 for kg, 0.5 for lbs/st)
+        if (newUnit === 'kg') {
+          convertedGoalWeight = Math.round(convertedGoalWeight);
+        } else {
+          // Round to nearest 0.5 for lbs and st
+          convertedGoalWeight = Math.round(convertedGoalWeight * 2) / 2;
+        }
+      }
+
+      newState = {
+        ...state,
+        unit: newUnit,
+        currentWeight: convertedCurrentWeight,
+        goalWeight: convertedGoalWeight,
+      };
+      console.log('Reducer - set_unit:', {
+        oldUnit,
+        newUnit,
+        oldCurrentWeight: state.currentWeight,
+        newCurrentWeight: convertedCurrentWeight,
+        oldGoalWeight: state.goalWeight,
+        newGoalWeight: convertedGoalWeight,
+        newState,
+      });
+      return newState;
     case 'reset':
       return { ...initialState, ...action.payload };
     default:
@@ -101,76 +175,45 @@ const convert = {
 
 // ---- Main Component ----
 export default function FitnessOnboardingWizard({
-  accentColor = '#9B5CF6',
+  accentColor = COLORS.purple,
   onComplete,
   onClose,
   initialValues: init,
   nextLabel = 'Next',
 }: FitnessOnboardingWizardProps) {
   const [state, dispatch] = useReducer(reducer, { ...initialState, ...init });
-  const steps: Array<'gender' | 'age' | 'currentWeight' | 'goalWeight' | 'unit'> = useMemo(
-    () => ['gender', 'age', 'currentWeight', 'goalWeight', 'unit'],
+  const steps: Array<'gender' | 'age' | 'currentWeight' | 'goalWeight'> = useMemo(
+    () => ['gender', 'age', 'currentWeight', 'goalWeight'],
     []
   );
 
-  // Smooth pager animation
-  const progress = useRef(new Animated.Value(0)).current; // 0..steps-1
+  // Simple step navigation without animations for better performance
   const [index, setIndex] = useState(0);
-
-  const animateTo = useCallback((to: number) => {
-    Animated.timing(progress, {
-      toValue: to,
-      duration: 320,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }, [progress]);
 
   const goNext = useCallback(() => {
     if (index < steps.length - 1) {
-      const to = index + 1;
-      setIndex(to);
-      animateTo(to);
-    } else onComplete?.(state);
-  }, [index, steps.length, animateTo, onComplete, state]);
+      setIndex(index + 1);
+    } else {
+      // Log all selected values when user finishes
+      console.log('=== Fitness Onboarding Completed ===');
+      console.log('Selected Values:', {
+        gender: state.gender,
+        age: state.age,
+        currentWeight: state.currentWeight,
+        goalWeight: state.goalWeight,
+        unit: state.unit,
+      });
+      console.log('Full State:', state);
+      console.log('===================================');
+      onComplete?.(state);
+    }
+  }, [index, steps.length, onComplete, state]);
 
   const goPrev = useCallback(() => {
     if (index > 0) {
-      const to = index - 1;
-      setIndex(to);
-      animateTo(to);
+      setIndex(index - 1);
     } else onClose?.();
-  }, [index, animateTo, onClose]);
-
-  const title = useMemo(() => {
-    switch (steps[index]) {
-      case 'gender':
-        return 'Tell us about yourself!';
-      case 'age':
-        return 'How old are you?';
-      case 'currentWeight':
-        return "What's your weight?";
-      case 'goalWeight':
-        return "What's your goal weight?";
-      case 'unit':
-        return "What's your weight unit?";
-    }
-  }, [index, steps]);
-
-  const subtitle = useMemo(() => {
-    switch (steps[index]) {
-      case 'gender':
-        return 'To give you a better experience we need to know your gender';
-      case 'age':
-        return 'This helps us create your personalized plan';
-      case 'currentWeight':
-        return 'You can always change this later';
-      case 'goalWeight':
-        return 'We will tailor a plan to your goal';
-      case 'unit':
-        return 'Choose how you prefer to see your weight';
-    }
-  }, [index, steps]);
+  }, [index, onClose]);
 
   const canProceed = useMemo(() => {
     const s = state;
@@ -183,148 +226,95 @@ export default function FitnessOnboardingWizard({
         return !!s.currentWeight;
       case 'goalWeight':
         return !!s.goalWeight;
-      case 'unit':
-        return !!s.unit;
     }
   }, [state, index, steps]);
 
-  // Render all steps and slide them based on progress for buttery transitions
-  const renderStep = (stepIndex: number) => {
-    const translate = Animated.subtract(Animated.multiply(progress, 1), stepIndex);
-    const tx = translate.interpolate({ inputRange: [-1, 0, 1], outputRange: [60, 0, -60] });
-    const opacity = translate.interpolate({ inputRange: [-1, -0.6, 0, 0.6, 1], outputRange: [0, 0.6, 1, 0.6, 0] });
-
+  // Render only the current step for better performance
+  const renderCurrentStep = useCallback(() => {
+    const currentStep = steps[index];
     return (
-      <Animated.View key={stepIndex} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, paddingHorizontal: 0, transform: [{ translateX: tx }], opacity }}>
-        <StepHeader step={steps[stepIndex]} />
-        {steps[stepIndex] === 'gender' && (
+      <View key={index} style={{ flex: 1, }}>
+        {/* <StepHeader step={currentStep} /> */}
+        {currentStep === 'gender' && (
           <GenderStep
             accentColor={accentColor}
             value={state.gender}
             onChange={(g) => dispatch({ type: 'set_gender', gender: g })}
           />
         )}
-        {steps[stepIndex] === 'age' && (
+        {currentStep === 'age' && (
           <AgeStep
             accentColor={accentColor}
             value={state.age}
             onChange={(n) => dispatch({ type: 'set_age', age: n })}
           />
         )}
-        {steps[stepIndex] === 'currentWeight' && (
-          <WeightRuler
+        {currentStep === 'currentWeight' && (
+          <WeightStep
             accentColor={accentColor}
             unit={state.unit}
-            value={state.currentWeight ?? 70}
+            value={state.currentWeight}
             onChange={(v) => dispatch({ type: 'set_current_weight', value: v })}
+            onUnitChange={(u) => dispatch({ type: 'set_unit', unit: u })}
+            title="Your Current Weight?"
           />
         )}
-        {steps[stepIndex] === 'goalWeight' && (
-          <WeightRuler
+        {currentStep === 'goalWeight' && (
+          <WeightStep
             accentColor={accentColor}
             unit={state.unit}
-            value={state.goalWeight ?? 70}
+            value={state.goalWeight}
             onChange={(v) => dispatch({ type: 'set_goal_weight', value: v })}
+            onUnitChange={(u) => dispatch({ type: 'set_unit', unit: u })}
+            title="Your Goal Weight?"
           />
         )}
-        {steps[stepIndex] === 'unit' && (
-          <UnitStep
-            accentColor={accentColor}
-            value={state.unit}
-            onChange={(u) => dispatch({ type: 'set_unit', unit: u })}
-          />
-        )}
-      </Animated.View>
+      </View>
     );
-  };
+  }, [index, steps, accentColor, state]);
 
   return (
-    <View style={[styles.container]}>
-      <View style={styles.header}>
-        <HeaderPager steps={steps} progress={progress} />
-      </View>
-
-      <View style={{ flex: 1, overflow: 'hidden' }}>
-        {steps.map((_, i) => renderStep(i))}
-      </View>
-
-      <View style={styles.footer}>
+    <SafeAreaView style={[styles.container]}>
+      <View style={styles.backButtonContainer}>
         <Pressable onPress={goPrev} style={[styles.backBtn]}>
           <Text style={styles.backArrow}>{I18nManager.isRTL ? '→' : '←'}</Text>
         </Pressable>
+      </View>
+      <View style={styles.header}>
+        <StepHeader step={steps[index]} />
+      </View>
 
-        <Pressable
+      <View style={{ flex: 1, }}>
+        {renderCurrentStep()}
+      </View>
+
+      <View style={styles.footer}>
+
+
+        <TouchableOpacity
+          activeOpacity={0.8}
           disabled={!canProceed}
           onPress={goNext}
-          style={({ pressed }) => [
+          style={[
             styles.nextBtn,
-            { backgroundColor: canProceed ? accentColor : '#3F3F46', opacity: pressed ? 0.9 : 1 },
+            // { backgroundColor: accentColor },
+            { backgroundColor: canProceed ? accentColor : '#3F3F46', },
           ]}
         >
           <Text style={styles.nextText}>{index === steps.length - 1 ? 'Finish' : nextLabel}</Text>
-          <Text style={styles.nextArrow}>{I18nManager.isRTL ? '←' : '→'}</Text>
-        </Pressable>
+          {/* <Text style={styles.nextArrow}>{I18nManager.isRTL ? '←' : '→'}</Text> */}
+        </TouchableOpacity>
       </View>
 
-      <ProgressDots count={steps.length} current={index} accentColor={accentColor} />
-    </View>
+      {/* <ProgressDots count={steps.length} current={index} accentColor={accentColor} /> */}
+    </SafeAreaView>
   );
 }
 
-// ---- Header Pager (animates the question/title too) ----
-function HeaderPager({ steps, progress }: { steps: Array<'gender' | 'age' | 'currentWeight' | 'goalWeight' | 'unit'>; progress: Animated.Value }) {
-  const renderHeader = (i: number) => {
-    const translate = Animated.subtract(Animated.multiply(progress, 1), i);
-    const tx = translate.interpolate({ inputRange: [-1, 0, 1], outputRange: [20, 0, -20] });
-    const opacity = translate.interpolate({ inputRange: [-1, -0.6, 0, 0.6, 1], outputRange: [0, 0.6, 1, 0.6, 0] });
+// Removed HeaderPager - using static header for better performance
 
-    const title = (() => {
-      switch (steps[i]) {
-        case 'gender':
-          return 'Tell us about yourself!';
-        case 'age':
-          return 'How old are you?';
-        case 'currentWeight':
-          return "What's your weight?";
-        case 'goalWeight':
-          return "What's your goal weight?";
-        case 'unit':
-          return "What's your weight unit?";
-      }
-    })();
-
-    const subtitle = (() => {
-      switch (steps[i]) {
-        case 'gender':
-          return 'To give you a better experience we need to know your gender';
-        case 'age':
-          return 'This helps us create your personalized plan';
-        case 'currentWeight':
-          return 'You can always change this later';
-        case 'goalWeight':
-          return 'We will tailor a plan to your goal';
-        case 'unit':
-          return 'Choose how you prefer to see your weight';
-      }
-    })();
-
-    return (
-      <Animated.View key={`h-${i}`} style={{ position: 'absolute', left: 0, right: 0, transform: [{ translateX: tx }], opacity }}>
-        <Text style={styles.h1}>{title}</Text>
-        <Text style={styles.sub}>{subtitle}</Text>
-      </Animated.View>
-    );
-  };
-
-  return (
-    <View style={{ height: 72, justifyContent: 'center' }}>
-      {steps.map((_, i) => renderHeader(i))}
-    </View>
-  );
-}
-
-// ---- Gender Step ----
-function GenderStep({
+// ---- Gender Step ---- (Optimized with React.memo)
+const GenderStep = React.memo(({
   value,
   onChange,
   accentColor,
@@ -332,266 +322,254 @@ function GenderStep({
   value: Gender;
   onChange: (g: Gender) => void;
   accentColor: string;
-}) {
-  const scaleMale = useRef(new Animated.Value(value === 'male' ? 1 : 0)).current;
-  const scaleFemale = useRef(new Animated.Value(value === 'female' ? 1 : 0)).current;
-
-  useEffect(() => {
-    Animated.spring(scaleMale, { toValue: value === 'male' ? 1 : 0, useNativeDriver: true }).start();
-    Animated.spring(scaleFemale, { toValue: value === 'female' ? 1 : 0, useNativeDriver: true }).start();
-  }, [value]);
-
-  const Item = (
-    { label, selected, onPress, symbol, scale }:
-      { label: string; selected: boolean; onPress: () => void; symbol: string; scale: Animated.Value }
-  ) => (
-    <Pressable onPress={onPress} style={{ alignItems: 'center', marginVertical: 12 }}>
-      <Animated.View
-        style={{
-          width: 160,
-          height: 160,
-          borderRadius: 160,
-          backgroundColor: selected ? accentColor : '#2D2D2D',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transform: [{ scale: scale.interpolate({ inputRange: [0, 1], outputRange: [1, 1.06] }) }],
-        }}
-      >
-        <Text style={{ fontSize: 56, color: 'white' }}>{symbol}</Text>
-      </Animated.View>
-      <Text style={{ color: '#E5E7EB', marginTop: 10, fontSize: 16 }}>{label}</Text>
-    </Pressable>
-  );
-
+}) => {
   return (
-    <View style={{ alignItems: 'center', marginTop: 8 }}>
-      <Item
-        label="Male"
-        symbol="♂"
-        selected={value === 'male'}
+    <View style={{ flex: 1, paddingHorizontal: 20, marginTop: 40 }}>
+      <Pressable
         onPress={() => onChange('male')}
-        scale={scaleMale}
-      />
-      <Item
-        label="Female"
-        symbol="♀"
-        selected={value === 'female'}
+        style={{ marginVertical: 12, width: '100%' }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 20,
+            height: 82,
+            borderRadius: 14,
+            borderWidth: 2,
+            borderColor: accentColor,
+            backgroundColor: value === 'male' ? accentColor : 'transparent',
+          }}
+        >
+          <Text style={{ color: value === 'male' ? '#FFFFFF' : '#E5E7EB', fontSize: 18, fontWeight: '600' }}>
+            Male
+          </Text>
+          {/* <Text style={{ fontSize: 40 }}>👨</Text> */}
+          <FastImage
+            source={IMAGES.IC_MALE}
+            style={{ width: 46, height: 46 }}
+            resizeMode="contain"
+          />
+        </View>
+      </Pressable>
+
+      <Pressable
         onPress={() => onChange('female')}
-        scale={scaleFemale}
-      />
+        style={{ marginVertical: 12, width: '100%' }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 20,
+            height: 82,
+            borderRadius: 14,
+            borderWidth: 2,
+            borderColor: accentColor,
+            backgroundColor: value === 'female' ? accentColor : 'transparent',
+          }}
+        >
+          <Text style={{ color: value === 'female' ? '#FFFFFF' : '#E5E7EB', fontSize: 18, fontWeight: '600' }}>
+            Female
+          </Text>
+          <FastImage
+            source={IMAGES.IC_FEMALE}
+            style={{ width: 46, height: 46 }}
+            resizeMode="contain"
+          />
+        </View>
+      </Pressable>
     </View>
   );
-}
+});
 
-// ---- Step Header (always visible with each slide) ----
-function StepHeader({ step }: { step: 'gender' | 'age' | 'currentWeight' | 'goalWeight' | 'unit' }) {
+// ---- Step Header (Optimized with React.memo) ----
+const StepHeader = React.memo(({ step }: { step: 'gender' | 'age' | 'currentWeight' | 'goalWeight' }) => {
   const title = (() => {
     switch (step) {
-      case 'gender': return 'Tell us about yourself!';
-      case 'age': return 'How old are you?';
-      case 'currentWeight': return "What's your weight?";
-      case 'goalWeight': return "What's your goal weight?";
-      case 'unit': return "What's your weight unit?";
+      case 'gender': return 'What Is Your Gender?';
+      case 'age': return 'What Is Your Age?';
+      case 'currentWeight': return 'Your Current Weight?';
+      case 'goalWeight': return 'Your Goal Weight?';
     }
   })();
 
   const subtitle = (() => {
     switch (step) {
-      case 'gender': return 'To give you a better experience we need to know your gender';
-      case 'age': return 'This helps us create your personalized plan';
-      case 'currentWeight': return 'You can always change this later';
-      case 'goalWeight': return 'We will tailor a plan to your goal';
-      case 'unit': return 'Choose how you prefer to see your weight';
+      case 'gender': return `Please Specify Your Gender For\nPersonalized Assistance.`;
+      case 'age': return `Please Specify Your Age For\nPersonalized Assistance.`;
+      case 'currentWeight': return `We'll Utilize This Data To Personalize\nA Diet Plan That Suits You Best.`;
+      case 'goalWeight': return `We'll Utilize This Data To Personalize\nA Diet Plan That Suits You Best.`;
     }
   })();
 
   return (
-    <View style={{ alignItems: 'center', marginBottom: 20 }}>
+    <View style={{ alignItems: 'center' }}>
       <Text style={styles.h1}>{title}</Text>
       <Text style={styles.sub}>{subtitle}</Text>
     </View>
   );
-}
+});
 
-// ---- Age Step (Wheel) ----
+// ---- Age Step (Horizontal Picker with Scaling) ----
 function AgeStep({ value, onChange, accentColor }: { value: number | null; onChange: (n: number) => void; accentColor: string }) {
-  const ages = useMemo(() => Array.from({ length: 83 }, (_, i) => i + 13), []); // 13..95
-  const ITEM_H = 44;
-  const listRef = useRef<FlatList<number>>(null);
-
-  useEffect(() => {
-    if (value != null) {
-      const idx = ages.indexOf(value);
-      if (idx >= 0) setTimeout(() => listRef.current?.scrollToIndex({ index: idx, animated: false }), 0);
-    }
-  }, []);
-
-  const onMomentumEnd = (e: any) => {
-    const y = e.nativeEvent.contentOffset.y;
-    const idx = Math.round(y / ITEM_H);
-    const selected = ages[clamp(idx, 0, ages.length - 1)];
-    onChange(selected);
-  };
-
-  const renderItem = ({ item }: { item: number }) => (
-    <View style={{ height: ITEM_H, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ color: '#9CA3AF', fontSize: 18 }}>{item}</Text>
-    </View>
-  );
+  const ages = useMemo(() => Array.from({ length: 83 }, (_, i) => ({ id: i + 13, text: String(i + 13) })), []);
 
   return (
-    <View style={{ flex: 1, alignItems: 'center' }}>
-      <View style={{ height: 220, width: '100%' }}>
-        <FlatList
-          ref={listRef}
-          data={ages}
-          keyExtractor={(i) => String(i)}
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={false}
-          snapToInterval={ITEM_H}
-          decelerationRate="fast"
-          onMomentumScrollEnd={onMomentumEnd}
-          contentContainerStyle={{ paddingVertical: 88 }}
-          getItemLayout={(_, i) => ({ index: i, length: ITEM_H, offset: ITEM_H * i })}
-        />
-        <View style={{ position: 'absolute', left: 24, right: 24, top: 88, height: ITEM_H, borderTopWidth: 2, borderBottomWidth: 2, borderColor: accentColor }} />
-      </View>
-      <Text style={{ color: 'white', fontSize: 24, marginTop: 16 }}>{value ?? '--'}</Text>
+    <View style={{ flex: 1, alignItems: 'center', paddingTop: 40 }}>
+      <BoxCarousel data={ages} onChange={onChange} value={value} />
     </View>
   );
 }
 
-// ---- Weight Ruler (smooth, scroll-based with snapping) ----
-function WeightRuler({
+// ---- Age Item Component ----
+function AgeItem({ index, item, transX, accentColor, isSelected }: { index: number; item: number; transX: any; accentColor: string; isSelected: boolean }) {
+  const ITEM_WIDTH = 80;
+  const udv = useDerivedValue(() => {
+    if (transX.value >= (index - 3) * ITEM_WIDTH && transX.value <= (index + 3) * ITEM_WIDTH) {
+      return transX.value;
+    } else if (transX.value < (index - 3) * ITEM_WIDTH) {
+      return null;
+    } else if (transX.value > (index + 3) * ITEM_WIDTH) {
+      return null;
+    }
+    return null;
+  });
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacityAnimation(udv, index, ITEM_WIDTH),
+      transform: [
+        {
+          scale: scaleAnimation(udv, index, ITEM_WIDTH),
+        },
+      ],
+    };
+  });
+
+  return (
+    <AnimatedReanimated.View
+      style={[
+        {
+          width: ITEM_WIDTH,
+          height: 100,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        animatedStyle,
+      ]}
+    >
+      <View
+        style={{
+          width: 60,
+          height: 60,
+          borderRadius: 12,
+          backgroundColor: isSelected ? accentColor : 'transparent',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{ color: 'white', fontSize: 24, fontWeight: '600' }}>{item}</Text>
+      </View>
+    </AnimatedReanimated.View>
+  );
+}
+
+const scaleAnimation = (udv: any, index: number, itemWidth: number) => {
+  'worklet';
+  return udv.value === null
+    ? 0.7
+    : interpolate(
+      udv.value,
+      [
+        (index - 2) * itemWidth,
+        (index - 1) * itemWidth,
+        index * itemWidth,
+        (index + 1) * itemWidth,
+        (index + 2) * itemWidth,
+      ],
+      [0.7, 0.85, 1.0, 0.85, 0.7],
+      Extrapolate.CLAMP,
+    );
+};
+
+const opacityAnimation = (udv: any, index: number, itemWidth: number) => {
+  'worklet';
+  return udv.value === null
+    ? 0.5
+    : interpolate(
+      udv.value,
+      [
+        (index - 3) * itemWidth,
+        (index - 2) * itemWidth,
+        (index - 1) * itemWidth,
+        index * itemWidth,
+        (index + 1) * itemWidth,
+        (index + 2) * itemWidth,
+        (index + 3) * itemWidth,
+      ],
+      [0, 0.5, 0.8, 1, 0.8, 0.5, 0],
+      Extrapolate.CLAMP,
+    );
+};
+
+// ---- Weight Step (with Unit Selector and Horizontal Picker) ----
+function WeightStep({
   unit,
   value,
   onChange,
+  onUnitChange,
   accentColor,
+  title,
 }: {
   unit: WeightUnit;
-  value: number;
+  value: number | null;
   onChange: (n: number) => void;
+  onUnitChange: (u: WeightUnit) => void;
   accentColor: string;
+  title: string;
 }) {
-  // unit precision & ranges
-  const step = unit === 'kg' ? 1 : 0.5;
-  const minKg = KG_MIN;
-  const maxKg = KG_MAX;
-  const min = convert.fromKg(minKg, unit);
-  const max = convert.fromKg(maxKg, unit);
-
-  const pxPerUnit = 14; // density of ticks
-  const majorEvery = unit === 'kg' ? 10 : 5; // major label spacing in unit
-
-  const scrollX = useRef(new Animated.Value(0)).current;
-  const listRef = useRef<any>(null);
-
-  // map value -> offset so the chosen value is centered
-  const totalUnits = Math.round((max - min) / step);
-  const snap = pxPerUnit * step;
-  const startOffset = (value - min) * pxPerUnit;
-
-  useEffect(() => {
-    // jump to initial without flash
-    setTimeout(() => listRef.current?.scrollTo({ x: startOffset, animated: false }), 0);
-  }, []);
-
-  const onEnd = (e: any) => {
-    const x = e.nativeEvent.contentOffset.x;
-    const snapped = Math.round(x / snap) * snap;
-    listRef.current?.scrollTo({ x: snapped, animated: true });
-    const next = min + snapped / pxPerUnit;
-    const rounded = unit === 'kg' ? Math.round(next) : Math.round(next * 2) / 2; // 0.5 for lbs/st
-    onChange(rounded);
-  };
-
-  // read current value for display
-  const valueFromScroll = Animated.divide(scrollX, pxPerUnit);
+  // Generate weight values based on unit - format to match age data structure
+  const weights = useMemo(() => {
+    const minKg = KG_MIN;
+    const maxKg = KG_MAX;
+    const min = convert.fromKg(minKg, unit);
+    const max = convert.fromKg(maxKg, unit);
+    const step = unit === 'kg' ? 1 : 0.5;
+    const values: Array<{ id: number; text: string }> = [];
+    for (let w = min; w <= max; w += step) {
+      const roundedValue = Math.round(w * (unit === 'kg' ? 1 : 2)) / (unit === 'kg' ? 1 : 2);
+      // Format text based on unit: kg shows whole numbers, lbs/st show decimals
+      const text = unit === 'kg' ? String(Math.round(roundedValue)) : roundedValue.toFixed(1);
+      values.push({ id: roundedValue, text });
+    }
+    return values;
+  }, [unit]);
 
   return (
-    <View style={{ flex: 1, alignItems: 'center' }}>
-      <Animated.Text style={{ color: 'white', fontSize: 56, marginTop: 8 }}>
-        {/** we won't animate the Text with derived value here; display props value for stability */}
-        {convert.format(value, unit)} <Text style={{ fontSize: 18, color: '#9CA3AF' }}>{unit}</Text>
-      </Animated.Text>
-
-      <View style={{ height: 160, width: '100%', justifyContent: 'flex-end' }}>
-        <Animated.ScrollView
-          ref={listRef}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          decelerationRate="fast"
-          snapToInterval={snap}
-          onMomentumScrollEnd={onEnd}
-          onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: true })}
-          scrollEventThrottle={16}
-          contentContainerStyle={{ paddingHorizontal: 24 }}
-        >
-          {Array.from({ length: totalUnits + 1 }).map((_, i) => {
-            const unitValue = min + i * step;
-            const isMajor = Math.round(unitValue) % majorEvery === 0;
-            const isMid = Math.round((unitValue * 10) % (majorEvery * 10 / 2)) === 0 && !isMajor; // halfway
-            const h = isMajor ? 60 : isMid ? 40 : 24;
-            return (
-              <View key={i} style={{ width: pxPerUnit * step, alignItems: 'center' }}>
-                <View style={{ width: 2, height: h, backgroundColor: isMajor ? accentColor : '#6B7280', borderRadius: 1 }} />
-                {isMajor && (
-                  <Text style={{ color: '#9CA3AF', fontSize: 12, marginTop: 6 }}>{unit === 'kg' ? Math.round(unitValue) : unitValue.toFixed(1)}</Text>
-                )}
-              </View>
-            );
-          })}
-        </Animated.ScrollView>
-        {/* center marker */}
-        <View style={{ position: 'absolute', left: '50%', marginLeft: -1, bottom: 0, width: 2, height: 80, backgroundColor: accentColor }} />
-      </View>
-      <Text style={{ color: '#9CA3AF', marginTop: 8 }}>Swipe the ruler to adjust</Text>
-    </View>
-  );
-}
-
-// ---- Unit Step ----
-function UnitStep({ value, onChange, accentColor }: { value: WeightUnit; onChange: (u: WeightUnit) => void; accentColor: string }) {
-  const items: WeightUnit[] = ['kg', 'lbs', 'st'];
-  return (
-    <View style={{ alignItems: 'center', marginTop: 24 }}>
-      <View style={{ flexDirection: 'row', backgroundColor: '#2D2D2D', borderRadius: 999, padding: 6 }}>
-        {items.map((u) => (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 20 }}>
+      {/* Unit Selector */}
+      <View style={{ flexDirection: 'row', marginBottom: 40, backgroundColor: '#2D2D2D', borderRadius: 999, padding: 6 }}>
+        {(['kg', 'lbs', 'st'] as WeightUnit[]).map((u) => (
           <Pressable
             key={u}
-            onPress={() => onChange(u)}
+            onPress={() => onUnitChange(u)}
             style={{
               paddingVertical: 10,
               paddingHorizontal: 22,
               borderRadius: 999,
-              backgroundColor: value === u ? accentColor : 'transparent',
+              backgroundColor: unit === u ? accentColor : 'transparent',
               marginHorizontal: 4,
             }}
           >
-            <Text style={{ color: 'white', fontSize: 16 }}>{u.toUpperCase()}</Text>
+            <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>{u.toUpperCase()}</Text>
           </Pressable>
         ))}
       </View>
-    </View>
-  );
-}
 
-// ---- Progress Dots ----
-function ProgressDots({ count, current, accentColor }: { count: number; current: number; accentColor: string }) {
-  return (
-    <View style={{ position: 'absolute', bottom: 24, alignSelf: 'center', flexDirection: 'row' }}>
-      {Array.from({ length: count }).map((_, i) => (
-        <View
-          key={i}
-          style={{
-            width: i === current ? 22 : 8,
-            height: 8,
-            marginHorizontal: 4,
-            borderRadius: 8,
-            backgroundColor: i === current ? accentColor : '#3F3F46',
-          }}
-        />
-      ))}
+      <BoxCarousel data={weights} onChange={onChange} value={value} />
     </View>
   );
 }
@@ -600,32 +578,32 @@ function ProgressDots({ count, current, accentColor }: { count: number; current:
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111111',
-    paddingTop: 48,
+    backgroundColor: COLORS.black,
+  },
+  header: { alignItems: 'center', marginBottom: 12, marginTop: 50 },
+  h1: { fontSize: 24, fontFamily: FONTS.OUTFIT_BOLD, color: COLORS.white, textAlign: 'center' },
+  sub: { color: COLORS.white, textAlign: 'center', fontFamily: FONTS.OUTFIT_REGULAR, fontSize: 14, marginTop: 10 },
+  footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 18 },
+  backButtonContainer: {
+    alignSelf: 'flex-start',
     paddingHorizontal: 20,
   },
-  header: { alignItems: 'center', marginBottom: 12 },
-  h1: { color: 'white', fontSize: 28, fontWeight: '700', textAlign: 'center' },
-  sub: { color: '#9CA3AF', textAlign: 'center', marginTop: 6 },
-  footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 18 },
   backBtn: {
-    width: 56,
-    height: 56,
-    borderRadius: 40,
-    backgroundColor: '#2D2D2D',
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backArrow: { color: 'white', fontSize: 20 },
+  backArrow: { color: 'white', fontSize: 26 },
   nextBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 22,
-    height: 56,
-    borderRadius: 40,
+    paddingHorizontal: 80,
+    height: 60,
+    borderRadius: 10,
   },
-  nextText: { color: 'white', fontSize: 16, fontWeight: '600', marginRight: 8 },
+  nextText: { color: 'white', fontSize: 16, fontFamily: FONTS.OUTFIT_MEDIUM, },
   nextArrow: { color: 'white', fontSize: 18 },
 });
 
@@ -636,3 +614,4 @@ const styles = StyleSheet.create({
 //     console.log(values);
 //   }}
 // />
+

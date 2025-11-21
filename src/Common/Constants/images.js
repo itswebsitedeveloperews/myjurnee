@@ -9,6 +9,9 @@ export const IMAGES = {
 
   IC_EYE_OFF: require('../../assets/images_new/eye_off.png'), // Using eye as eye_off placeholder
   IC_EYE: require('../../assets/images_new/eye.png'),
+
+  IC_MALE: require('../../assets/images_new/male.png'),
+  IC_FEMALE: require('../../assets/images_new/female.png'),
   //Onboarding image
   IC_ONBOARDING_TOP: require('../../assets/images/onboardingTop.png'),
   ONBOARDING_1: require('../../assets/images_new/onboarding_1.png'),
