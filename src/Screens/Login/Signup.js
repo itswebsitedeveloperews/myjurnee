@@ -102,7 +102,7 @@ const Signup = props => {
                             {/* Logo and Tagline */}
                             <View style={styles.logoContainer}>
                                 <FastImage
-                                    source={IMAGES.WHITE_LOGO}
+                                    source={IMAGES.BLACK_LOGO}
                                     style={styles.logo}
                                     resizeMode="contain"
                                 />
@@ -119,8 +119,8 @@ const Signup = props => {
                                     onChangeText={setUsername}
                                     keyboardType="default"
                                     autoCapitalize="none"
-                                    backgroundColor={COLORS.darkGray}
-                                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                                    // backgroundColor={COLORS.darkGray}
+                                    placeholderTextColor={COLORS.textColor64}
                                     mainViewStyle={styles.inputField}
                                 />
                                 <ITextField
@@ -129,8 +129,8 @@ const Signup = props => {
                                     onChangeText={setEmail}
                                     keyboardType="email-address"
                                     autoCapitalize="none"
-                                    backgroundColor={COLORS.darkGray}
-                                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                                    // backgroundColor={COLORS.darkGray}
+                                    placeholderTextColor={COLORS.textColor64}
                                     mainViewStyle={styles.inputField}
                                 />
 
@@ -141,8 +141,8 @@ const Signup = props => {
                                     secureTextEntry={!showPassword}
                                     rightIcon={showPassword ? IMAGES.IC_EYE : IMAGES.IC_EYE_OFF}
                                     onRightIconPress={() => setShowPassword(!showPassword)}
-                                    backgroundColor={COLORS.darkGray}
-                                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                                    // backgroundColor={COLORS.darkGray}
+                                    placeholderTextColor={COLORS.textColor64}
                                     mainViewStyle={[styles.inputField]}
                                 />
                                 <ITextField
@@ -152,8 +152,8 @@ const Signup = props => {
                                     secureTextEntry={!showPassword}
                                     rightIcon={showPassword ? IMAGES.IC_EYE : IMAGES.IC_EYE_OFF}
                                     onRightIconPress={() => setShowPassword(!showPassword)}
-                                    backgroundColor={COLORS.darkGray}
-                                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                                    // backgroundColor={COLORS.darkGray}
+                                    placeholderTextColor={COLORS.textColor64}
                                     mainViewStyle={[styles.inputField, styles.passwordField]}
                                 />
 
@@ -188,7 +188,7 @@ const Signup = props => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: COLORS.black,
+        backgroundColor: COLORS.bg_color,
     },
     scrollContainer: {
         flexGrow: 1,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     welcomeTitle: {
         fontFamily: FONTS.OUTFIT_BOLD,
         fontSize: 24,
-        color: COLORS.white,
+        color: COLORS.black,
         marginBottom: 30,
         lineHeight: 32,
     },
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     },
     inputField: {
         marginBottom: 16,
-        backgroundColor: COLORS.darkGray,
+        backgroundColor: COLORS.bg_color,
         borderWidth: 1,
     },
     passwordField: {
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     registerText: {
         fontFamily: FONTS.OUTFIT_REGULAR,
         fontSize: 14,
-        color: COLORS.white,
+        color: COLORS.black,
     },
     registerLink: {
         fontFamily: FONTS.OUTFIT_MEDIUM,

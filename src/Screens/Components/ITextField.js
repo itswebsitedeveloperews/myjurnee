@@ -20,7 +20,7 @@ const ITextField = ({
   rightIcon,
   onRightIconPress,
   secureTextEntry = false,
-  placeholderTextColor = COLORS.textColor64,
+  placeholderTextColor = COLORS.black,
   backgroundColor,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -100,10 +100,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontFamily: FONTS.OUTFIT_REGULAR,
     fontSize: 16,
-    color: COLORS.textColor,
+    color: COLORS.black,
   },
   inputDark: {
-    color: COLORS.white,
+    color: COLORS.black,
   },
   inputWithLeftIcon: {
     paddingLeft: 8,

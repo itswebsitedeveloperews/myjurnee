@@ -8,6 +8,7 @@ import Profile from '../Screens/More/Profile';
 import CoursesStack from './CoursesStack';
 import WeightTrackerStack from './WeightTrackerStack';
 import FitnessOnboardingWizard from '../Screens/Components/fitness_onboarding_wizard';
+import MoreStack from './MoreStack';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -44,7 +45,7 @@ const DashboardBottomTab = () => {
       />
       <Tab.Screen
         name="Profile"
-        component={Profile}
+        component={MoreStack}
         options={{
           tabBarLabel: 'Profile',
         }}

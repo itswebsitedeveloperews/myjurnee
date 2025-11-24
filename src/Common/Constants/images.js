@@ -6,6 +6,7 @@ export const IMAGES = {
   LOGIN_BG_IMAGE: require('../../assets/images_new/login_background_img.png'),
   HOME_SCREEN_LOGO_V1: require('../../assets/images_new/home_screen_logo_v1.png'),
   WHITE_LOGO: require('../../assets/images_new/white_logo.png'),
+  BLACK_LOGO: require('../../assets/images_new/black_logo.png'),
 
   IC_EYE_OFF: require('../../assets/images_new/eye_off.png'), // Using eye as eye_off placeholder
   IC_EYE: require('../../assets/images_new/eye.png'),

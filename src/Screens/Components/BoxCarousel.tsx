@@ -11,6 +11,7 @@ import Animated, {
     useSharedValue,
 } from 'react-native-reanimated';
 import { COLORS } from '../../Common/Constants/colors';
+import { FONTS } from '../../Common/Constants/fonts';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -78,7 +79,7 @@ const BoxCarousel = ({
                 onChange(selectedValue);
             }
             scrollTimeoutRef.current = null;
-        }, 500); // Longer delay (500ms) to ensure fast scrolling is fully settled
+        }, 300); // Longer delay (500ms) to ensure fast scrolling is fully settled
     };
 
     const onMomentumScrollEnd = (e: any) => {
@@ -202,7 +203,7 @@ const BoxCarousel = ({
                     keyExtractor={(item: any, index: number) => `${item.id}-${index}`}
                     onScrollToIndexFailed={(info) => {
                         // Fallback: scroll to offset if scrollToIndex fails
-                        const wait = new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+                        const wait = new Promise<void>((resolve) => setTimeout(() => resolve(), 300));
                         wait.then(() => {
                             if (flatListRef.current && info.index >= 0 && info.index < data.length) {
                                 const offset = info.index * ITEM_WIDTH;
@@ -230,12 +231,18 @@ const Item = ({ index, item, transX }: { index: number; item: any; transX: any }
             return null;
         }
     });
+    const isCenter = useDerivedValue(() => {
+        return (
+            udv.value !== null &&
+            Math.abs((udv.value as number) - index * ITEM_WIDTH) < ITEM_WIDTH * 0.25
+        );
+    });
 
     const animatedStyle = useAnimatedStyle(() => {
         // Determine if this card is centered
-        const isCenter =
-            udv.value !== null &&
-            Math.abs((udv.value as number) - index * ITEM_WIDTH) < ITEM_WIDTH * 0.25;
+        // const isCenter =
+        //     udv.value !== null &&
+        //     Math.abs((udv.value as number) - index * ITEM_WIDTH) < ITEM_WIDTH * 0.25;
 
         return {
             opacity: opacityAnimation(udv, index),
@@ -245,14 +252,21 @@ const Item = ({ index, item, transX }: { index: number; item: any; transX: any }
                 },
             ],
             // Card visual to match Figma
-            backgroundColor: isCenter ? '#9B5CF6' : 'transparent',
+            backgroundColor: isCenter.value ? '#9B5CF6' : 'transparent',
             borderWidth: 2,
             borderColor: '#9B5CF6',
         };
     });
+
+    const textStyle = useAnimatedStyle(() => {
+        return {
+            color: isCenter.value ? 'white' : COLORS.black,
+        };
+    });
+
     return (
         <Animated.View style={[styles.card, animatedStyle]}>
-            <Text style={[styles.label, { color: 'white' }]}>{item.text}</Text>
+            <Animated.Text style={[styles.label, textStyle]}>{item.text}</Animated.Text>
         </Animated.View>
     );
 };
@@ -348,9 +362,9 @@ const styles = StyleSheet.create({
         elevation: 12,
     },
     label: {
-        fontWeight: 'bold',
-        fontSize: 24,
-        color: '#fff',
+        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontSize: 18,
+
     },
 });
 

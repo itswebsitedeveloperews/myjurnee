@@ -462,7 +462,7 @@ const GenderStep = React.memo(({
             backgroundColor: value === 'male' ? accentColor : 'transparent',
           }}
         >
-          <Text style={{ color: value === 'male' ? '#FFFFFF' : '#E5E7EB', fontSize: 18, fontWeight: '600' }}>
+          <Text style={{ color: value === 'male' ? COLORS.white : COLORS.black, fontSize: 16, fontFamily: FONTS.OUTFIT_REGULAR }}>
             Male
           </Text>
           {/* <Text style={{ fontSize: 40 }}>👨</Text> */}
@@ -491,7 +491,7 @@ const GenderStep = React.memo(({
             backgroundColor: value === 'female' ? accentColor : 'transparent',
           }}
         >
-          <Text style={{ color: value === 'female' ? '#FFFFFF' : '#E5E7EB', fontSize: 18, fontWeight: '600' }}>
+          <Text style={{ color: value === 'female' ? COLORS.white : COLORS.black, fontSize: 16, fontFamily: FONTS.OUTFIT_REGULAR }}>
             Female
           </Text>
           <FastImage
@@ -509,10 +509,19 @@ const GenderStep = React.memo(({
 const StepHeader = React.memo(({ step }: { step: 'gender' | 'age' | 'currentWeight' | 'goalWeight' }) => {
   const title = (() => {
     switch (step) {
-      case 'gender': return 'What Is Your Gender?';
-      case 'age': return 'What Is Your Age?';
-      case 'currentWeight': return 'Your Current Weight?';
-      case 'goalWeight': return 'Your Goal Weight?';
+      case 'gender': return 'What Is Your';
+      case 'age': return 'What Is Your';
+      case 'currentWeight': return 'Your Current';
+      case 'goalWeight': return 'Your Goal';
+    }
+  })();
+
+  const titleQue = (() => {
+    switch (step) {
+      case 'gender': return 'Gender?';
+      case 'age': return 'Age?';
+      case 'currentWeight': return 'Weight?';
+      case 'goalWeight': return 'Weight?';
     }
   })();
 
@@ -527,7 +536,7 @@ const StepHeader = React.memo(({ step }: { step: 'gender' | 'age' | 'currentWeig
 
   return (
     <View style={{ alignItems: 'center' }}>
-      <Text style={styles.h1}>{title}</Text>
+      <Text style={styles.h1}>{title} <Text style={{ color: COLORS.purple }}>{titleQue}</Text></Text>
       <Text style={styles.sub}>{subtitle}</Text>
     </View>
   );
@@ -671,7 +680,7 @@ function WeightStep({
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 20 }}>
       {/* Unit Selector */}
-      <View style={{ flexDirection: 'row', marginBottom: 40, backgroundColor: '#2D2D2D', borderRadius: 999, padding: 6 }}>
+      <View style={{ flexDirection: 'row', marginBottom: 40, backgroundColor: COLORS.bg_color, borderRadius: 10, borderColor: COLORS.purple, borderWidth: 1.5, padding: 6 }}>
         {(['kg', 'lbs', 'st'] as WeightUnit[]).map((u) => (
           <Pressable
             key={u}
@@ -679,12 +688,12 @@ function WeightStep({
             style={{
               paddingVertical: 10,
               paddingHorizontal: 22,
-              borderRadius: 999,
+              borderRadius: 10,
               backgroundColor: unit === u ? accentColor : 'transparent',
               marginHorizontal: 4,
             }}
           >
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>{u.toUpperCase()}</Text>
+            <Text style={{ fontSize: 16, fontFamily: FONTS.OUTFIT_REGULAR, color: unit === u ? COLORS.white : COLORS.black }}>{u.toUpperCase()}</Text>
           </Pressable>
         ))}
       </View>
@@ -698,11 +707,11 @@ function WeightStep({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.black,
+    backgroundColor: COLORS.bg_color,
   },
   header: { alignItems: 'center', marginBottom: 12, marginTop: 50 },
-  h1: { fontSize: 24, fontFamily: FONTS.OUTFIT_BOLD, color: COLORS.white, textAlign: 'center' },
-  sub: { color: COLORS.white, textAlign: 'center', fontFamily: FONTS.OUTFIT_REGULAR, fontSize: 14, marginTop: 10 },
+  h1: { fontSize: 24, fontFamily: FONTS.OUTFIT_BOLD, color: COLORS.black, textAlign: 'center' },
+  sub: { color: COLORS.black, textAlign: 'center', fontFamily: FONTS.OUTFIT_REGULAR, fontSize: 14, marginTop: 10 },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 18 },
   backButtonContainer: {
     alignSelf: 'flex-start',
@@ -714,7 +723,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backArrow: { color: 'white', fontSize: 26 },
+  backArrow: { color: COLORS.black, fontSize: 25 },
   nextBtn: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -151,7 +151,7 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.profile_bg,
+    backgroundColor: COLORS.bg_color,
   },
   scrollView: {
     flex: 1,
