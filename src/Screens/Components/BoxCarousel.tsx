@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
         elevation: 12,
     },
     label: {
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         fontSize: 18,
 
     },

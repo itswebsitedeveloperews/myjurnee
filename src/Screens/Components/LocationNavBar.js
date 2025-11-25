@@ -1,20 +1,20 @@
 import React from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {COLORS} from '../../Common/Constants/colors';
-import {FONTS} from '../../Common/Constants/fonts';
-import {IMAGES} from '../../Common/Constants/images';
+import { COLORS } from '../../Common/Constants/colors';
+import { FONTS } from '../../Common/Constants/fonts';
+import { IMAGES } from '../../Common/Constants/images';
 
 const LocationNavBar = () => {
   return (
     <View style={styles.container}>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <FastImage
           source={IMAGES.IC_LOCATION}
-          style={{height: 24, width: 24}}
+          style={{ height: 24, width: 24 }}
           resizeMode="contain"
         />
-        <View style={{marginLeft: 7}}>
+        <View style={{ marginLeft: 7 }}>
           <Text style={styles.titleText}>Science City Rd</Text>
           <Text style={styles.subtitleText}>Sola, Ahmedabad, Gujarat</Text>
         </View>
@@ -22,7 +22,7 @@ const LocationNavBar = () => {
       <View>
         <FastImage
           source={IMAGES.IC_BELL}
-          style={{height: 24, width: 24}}
+          style={{ height: 24, width: 24 }}
           resizeMode="contain"
         />
       </View>
@@ -41,13 +41,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   titleText: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.URBANIST_MEDIUM,
     color: COLORS.textColor,
     fontSize: 16,
     lineHeight: 22,
   },
   subtitleText: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontFamily: FONTS.URBANIST_REGULAR,
     color: COLORS.textColor64,
     fontSize: 12,
     lineHeight: 16,

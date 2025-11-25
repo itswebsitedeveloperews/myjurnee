@@ -56,13 +56,13 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     username: {
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         fontSize: 18,
         color: COLORS.textColor,
         marginBottom: 4,
     },
     handle: {
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         fontSize: 14,
         color: COLORS.textColor64,
     },

@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     title: {
-        fontFamily: FONTS.OUTFIT_MEDIUM,
+        fontFamily: FONTS.URBANIST_MEDIUM,
         fontSize: 12,
         color: COLORS.textColor64,
         letterSpacing: 1,

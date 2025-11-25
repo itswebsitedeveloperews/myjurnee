@@ -87,7 +87,7 @@ const WeightTrackerChart: React.FC<WeightTrackerChartProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Weight Tracker</Text>
-
+      <View style={styles.divider} />
       {/* Legend */}
       <View style={styles.legend}>
         <View style={styles.legendItem}>
@@ -133,11 +133,11 @@ const WeightTrackerChart: React.FC<WeightTrackerChartProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F5F5F5',
-    borderTopLeftRadius: 16,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
-    borderTopRightRadius: 16, // More pronounced curve for top-right
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    borderTopRightRadius: 12, // More pronounced curve for top-right
     padding: 20,
     marginTop: 20,
     overflow: 'hidden',
@@ -226,6 +226,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#6B7280',
     borderStyle: 'dashed',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.textColor14,
+    marginBottom: 12
   },
 });
 

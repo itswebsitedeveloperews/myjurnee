@@ -20,4 +20,5 @@ export const COLORS = {
   purple: '#8B5CF6', // Purple color for buttons and active states
   darkGray: '#1A1A1A', // Dark gray for input fields
   bg_color: '#F4F8FF',
+  grayBg: '#F5F5F5',
 };

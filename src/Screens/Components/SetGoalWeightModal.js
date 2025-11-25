@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         flex: 1,
         fontSize: 18,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.textColor,
         marginLeft: 40,
         textAlign: 'center',
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     closeButtonText: {
         fontSize: 16,
         color: COLORS.textColor,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         textAlign: 'center',
     },
     content: {
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     },
     inputLabel: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.textColor,
         marginBottom: 8,
     },
@@ -189,14 +189,14 @@ const styles = StyleSheet.create({
     },
     input: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         color: COLORS.textColor,
         paddingVertical: 12,
         paddingHorizontal: 0,
     },
     dateInput: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         color: COLORS.textColor,
         paddingVertical: 12,
         paddingHorizontal: 0,
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     },
     updateButtonText: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
     },
     updateButtonTextEnabled: {
         color: COLORS.textColor,

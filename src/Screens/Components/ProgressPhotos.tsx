@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 22,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.black,
         textAlign: 'center',
         marginBottom: 15,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     },
     photoLabel: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.black,
         marginBottom: 12,
         alignSelf: 'center',
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     },
     placeholderText: {
         fontSize: 14,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         color: COLORS.textColor44,
     },
 });

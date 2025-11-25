@@ -349,13 +349,13 @@ const styles = StyleSheet.create({
     },
     timeText: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         color: COLORS.textColor,
     },
     headerTitle: {
         flex: 1,
         fontSize: 18,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.textColor,
         marginLeft: 40,
         textAlign: 'center',
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     closeButtonText: {
         fontSize: 16,
         color: COLORS.textColor,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         textAlign: 'center',
     },
     content: {
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     },
     inputLabel: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.textColor,
         marginBottom: 8,
     },
@@ -407,14 +407,14 @@ const styles = StyleSheet.create({
     },
     input: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         color: COLORS.textColor,
         paddingVertical: 12,
         paddingHorizontal: 0,
     },
     dateInput: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         color: COLORS.textColor,
         paddingVertical: 12,
         paddingHorizontal: 0,
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     },
     photoSectionTitle: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.textColor,
         textAlign: 'center',
         marginBottom: 15,
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     },
     uploadText: {
         fontSize: 14,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         color: COLORS.textColor44,
         marginBottom: 15,
     },
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     },
     orText: {
         fontSize: 14,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         color: COLORS.textColor44,
         marginBottom: 10,
     },
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     },
     browseButtonText: {
         fontSize: 14,
-        fontFamily: FONTS.OUTFIT_MEDIUM,
+        fontFamily: FONTS.URBANIST_MEDIUM,
         color: COLORS.pr_blue,
     },
     updateButton: {
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
     },
     updateButtonText: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
     },
     updateButtonTextEnabled: {
         color: COLORS.textColor,
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     },
     selectedPhotosTitle: {
         fontSize: 14,
-        fontFamily: FONTS.OUTFIT_MEDIUM,
+        fontFamily: FONTS.URBANIST_MEDIUM,
         color: COLORS.textColor,
         marginBottom: 10,
     },
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
     removePhotoText: {
         color: COLORS.white,
         fontSize: 12,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
     },
     datePickerContainer: {
         position: 'absolute',
@@ -579,12 +579,12 @@ const styles = StyleSheet.create({
     },
     datePickerCancelText: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_MEDIUM,
+        fontFamily: FONTS.URBANIST_MEDIUM,
         color: COLORS.pr_blue,
     },
     datePickerTitle: {
         fontSize: 18,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.textColor,
     },
     datePickerConfirmButton: {
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
     },
     datePickerConfirmText: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.pr_blue,
     },
     datePicker: {

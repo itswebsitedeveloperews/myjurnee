@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     width: 200,
   },
   welcomeTitle: {
-    fontFamily: FONTS.OUTFIT_BOLD,
+    fontFamily: FONTS.URBANIST_BOLD,
     fontSize: 24,
     color: COLORS.black,
     marginBottom: 30,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     // marginBottom: 15,
   },
   forgotPasswordText: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontFamily: FONTS.URBANIST_REGULAR,
     fontSize: 12,
     color: COLORS.black,
   },
@@ -224,12 +224,12 @@ const styles = StyleSheet.create({
 
   },
   registerText: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontFamily: FONTS.URBANIST_REGULAR,
     fontSize: 14,
     color: COLORS.black,
   },
   registerLink: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.URBANIST_MEDIUM,
     color: COLORS.purple,
   },
 });

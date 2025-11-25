@@ -314,18 +314,18 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 24,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.titleColor,
     },
     headerSubTitle: {
         fontSize: 16,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         color: COLORS.subTitleColor,
         marginTop: 3
     },
     subHeaderTitle: {
         fontSize: 20,
-        fontFamily: FONTS.OUTFIT_SEMIBOLD,
+        fontFamily: FONTS.URBANIST_SEMIBOLD,
         color: COLORS.black,
         paddingHorizontal: 20,
         marginBottom: 10
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     viewMoreBtnText: {
         fontSize: 16,
         textDecorationLine: 'underline',
-        fontFamily: FONTS.OUTFIT_SEMIBOLD,
+        fontFamily: FONTS.URBANIST_SEMIBOLD,
         color: COLORS.black,
         marginRight: 10
         // paddingHorizontal: 20,
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     },
     userNameText: {
         fontSize: 22,
-        fontFamily: FONTS.OUTFIT_MEDIUM,
+        fontFamily: FONTS.URBANIST_MEDIUM,
         color: COLORS.black
     },
     logoContainer: {
@@ -373,20 +373,20 @@ const styles = StyleSheet.create({
     },
     subTitleText: {
         color: COLORS.textColor,
-        fontFamily: FONTS.OUTFIT_MEDIUM,
+        fontFamily: FONTS.URBANIST_MEDIUM,
         fontSize: 48,
         textAlign: 'center'
     },
     subText1: {
         marginTop: 15,
         color: COLORS.textColor,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         fontSize: 22,
         textAlign: 'center'
     },
 
     viewMoreText: {
-        fontFamily: FONTS.OUTFIT_MEDIUM,
+        fontFamily: FONTS.URBANIST_MEDIUM,
         fontSize: 18,
         color: COLORS.black
     },

@@ -1,22 +1,22 @@
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {COLORS} from '../../Common/Constants/colors';
-import {FONTS} from '../../Common/Constants/fonts';
-import {IMAGES} from '../../Common/Constants/images';
-import {windowHeight} from '../../Utils/Dimentions';
-import {ASSET_URL} from '../../Environment';
-import {noImag} from '../../Utils/Utils';
+import { COLORS } from '../../Common/Constants/colors';
+import { FONTS } from '../../Common/Constants/fonts';
+import { IMAGES } from '../../Common/Constants/images';
+import { windowHeight } from '../../Utils/Dimentions';
+import { ASSET_URL } from '../../Environment';
+import { noImag } from '../../Utils/Utils';
 
 const AgencyCard = ({
-  onViewAgency = () => {},
-  onChooseAgency = () => {},
+  onViewAgency = () => { },
+  onChooseAgency = () => { },
   data = {},
 }) => {
   return (
     <TouchableOpacity style={styles.container} disabled>
       <FastImage
-        source={{uri: `${ASSET_URL}${data?.agency_image} || ${noImag}`}}
+        source={{ uri: `${ASSET_URL}${data?.agency_image} || ${noImag}` }}
         style={styles.img}
         resizeMode="cover"
       />
@@ -31,7 +31,7 @@ const AgencyCard = ({
           <View style={styles.ratingRow}>
             <FastImage
               source={IMAGES.IC_STAR}
-              style={{height: 14, width: 14}}
+              style={{ height: 14, width: 14 }}
               resizeMode="contain"
             />
             <Text style={styles.ratingText}> 4.9 </Text>
@@ -52,7 +52,7 @@ const AgencyCard = ({
             onPress={() => onViewAgency(data)}>
             <FastImage
               source={IMAGES.IC_EYE}
-              style={{height: 16, width: 16, marginRight: 5}}
+              style={{ height: 16, width: 16, marginRight: 5 }}
               resizeMode="contain"
             />
             <Text style={styles.title}>{'View'}</Text>
@@ -92,13 +92,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   title: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.URBANIST_MEDIUM,
     color: COLORS.textColor,
     fontSize: 16,
     lineHeight: 18,
   },
   subTitle: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontFamily: FONTS.URBANIST_REGULAR,
     color: COLORS.textColor64,
     fontSize: 14,
     lineHeight: 18,
@@ -110,13 +110,13 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   ratingText: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.URBANIST_MEDIUM,
     color: COLORS.textColor,
     fontSize: 14,
     lineHeight: 18,
   },
   rating: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontFamily: FONTS.URBANIST_REGULAR,
     color: COLORS.textColor,
     fontSize: 14,
     lineHeight: 18,
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   btnText: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.URBANIST_MEDIUM,
     fontSize: 14,
     color: COLORS.white,
   },

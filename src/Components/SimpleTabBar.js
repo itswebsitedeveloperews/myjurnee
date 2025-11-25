@@ -89,7 +89,7 @@ const SimpleTabBar = ({ state, descriptors, navigation }) => {
                                         styles.label,
                                         {
                                             color: isFocused ? COLORS.pr_blue : COLORS.black,
-                                            fontFamily: isFocused ? FONTS.OUTFIT_SEMIBOLD : FONTS.OUTFIT_MEDIUM,
+                                            fontFamily: isFocused ? FONTS.URBANIST_SEMIBOLD : FONTS.URBANIST_MEDIUM,
                                         }
                                     ]}
                                 >

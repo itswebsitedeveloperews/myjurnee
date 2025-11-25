@@ -205,13 +205,13 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     titleText: {
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         fontSize: 24,
         color: COLORS.textColor,
         textAlign: 'left'
     },
     lessonNumText: {
-        fontFamily: FONTS.OUTFIT_MEDIUM,
+        fontFamily: FONTS.URBANIST_MEDIUM,
         fontSize: 14,
         color: COLORS.textColor44,
         textAlign: 'left'

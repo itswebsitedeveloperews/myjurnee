@@ -1,20 +1,20 @@
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {COLORS} from '../../Common/Constants/colors';
-import {FONTS} from '../../Common/Constants/fonts';
-import {IMAGES} from '../../Common/Constants/images';
-import {windowHeight} from '../../Utils/Dimentions';
-import {ASSET_URL} from '../../Environment';
+import { COLORS } from '../../Common/Constants/colors';
+import { FONTS } from '../../Common/Constants/fonts';
+import { IMAGES } from '../../Common/Constants/images';
+import { windowHeight } from '../../Utils/Dimentions';
+import { ASSET_URL } from '../../Environment';
 
-const AgencyTypeCard = ({data, onViewAgency = () => {}}) => {
-  const {agency_image, agency_name} = data || {};
+const AgencyTypeCard = ({ data, onViewAgency = () => { } }) => {
+  const { agency_image, agency_name } = data || {};
   return (
     <TouchableOpacity
       style={styles.container}
       onPress={() => onViewAgency(data)}>
       <FastImage
-        source={{uri: `${ASSET_URL}${agency_image}`}}
+        source={{ uri: `${ASSET_URL}${agency_image}` }}
         style={styles.img}
         resizeMode="cover"
       />
@@ -29,7 +29,7 @@ const AgencyTypeCard = ({data, onViewAgency = () => {}}) => {
           <View style={styles.ratingRow}>
             <FastImage
               source={IMAGES.IC_STAR}
-              style={{height: 14, width: 14}}
+              style={{ height: 14, width: 14 }}
               resizeMode="contain"
             />
             <Text style={styles.ratingText}> 4.9 </Text>
@@ -37,10 +37,10 @@ const AgencyTypeCard = ({data, onViewAgency = () => {}}) => {
           </View>
         </View>
       </View>
-      <View style={{justifyContent: 'center', paddingRight: 14}}>
+      <View style={{ justifyContent: 'center', paddingRight: 14 }}>
         <FastImage
           source={IMAGES.IC_ARROW_DOWN}
-          style={{height: 24, width: 24, transform: [{rotate: '-90deg'}]}}
+          style={{ height: 24, width: 24, transform: [{ rotate: '-90deg' }] }}
           resizeMode="contain"
         />
       </View>
@@ -77,13 +77,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   title: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.URBANIST_MEDIUM,
     color: COLORS.textColor,
     fontSize: 16,
     lineHeight: 18,
   },
   subTitle: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontFamily: FONTS.URBANIST_REGULAR,
     color: COLORS.textColor64,
     fontSize: 14,
     lineHeight: 18,
@@ -95,13 +95,13 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   ratingText: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.URBANIST_MEDIUM,
     color: COLORS.textColor,
     fontSize: 14,
     lineHeight: 18,
   },
   rating: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontFamily: FONTS.URBANIST_REGULAR,
     color: COLORS.textColor,
     fontSize: 14,
     lineHeight: 18,

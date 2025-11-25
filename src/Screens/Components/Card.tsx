@@ -21,7 +21,7 @@ const Card: React.FC<CardProps> = ({
   return (
     <View style={[styles.card, style]}>
       <Text style={[styles.title, titleStyle]}>{title}</Text>
-      <Text style={[styles.subtitle, subtitleStyle]}>{subtitle}</Text>
+      <Text style={[styles.subtitle, subtitleStyle]} numberOfLines={1}>{subtitle}</Text>
     </View>
   );
 };
@@ -32,27 +32,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    // shadowColor: '#000',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2,
+    // },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
+    // elevation: 3,
     minHeight: 80,
     justifyContent: 'center',
   },
   title: {
     fontSize: 20,
-    fontFamily: FONTS.OUTFIT_BOLD,
+    fontFamily: FONTS.URBANIST_BOLD,
     color: COLORS.textColor,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 13,
-    fontFamily: FONTS.OUTFIT_EXTRALIGHT,
-    color: COLORS.textColor64,
+    fontFamily: FONTS.URBANIST_MEDIUM,
+    color: COLORS.black,
   },
 });
 

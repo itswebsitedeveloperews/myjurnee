@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     },
     courseTitle: {
         fontSize: 34,
-        fontFamily: FONTS.OUTFIT_SEMIBOLD,
+        fontFamily: FONTS.URBANIST_SEMIBOLD,
         color: COLORS.textColor,
         lineHeight: 38,
         marginBottom: 12,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     },
     cardTitle: {
         fontSize: 14,
-        fontFamily: FONTS.OUTFIT_SEMIBOLD,
+        fontFamily: FONTS.URBANIST_SEMIBOLD,
         color: COLORS.textColor,
         marginBottom: 16,
         letterSpacing: 0.5,
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: COLORS.textColor,
         marginLeft: 16,
-        fontFamily: FONTS.OUTFIT_REGULAR
+        fontFamily: FONTS.URBANIST_REGULAR
     },
     contentSection: {
         // paddingHorizontal: 24,
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 24,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.grayText,
         marginBottom: 16,
     },
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         color: COLORS.textColor,
         marginLeft: 16,
-        fontFamily: FONTS.OUTFIT_SEMIBOLD,
+        fontFamily: FONTS.URBANIST_SEMIBOLD,
         flex: 1,
     },
     checkbox: {

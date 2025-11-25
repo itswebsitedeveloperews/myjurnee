@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         paddingHorizontal: 20,
         fontSize: 28,
-        fontFamily: FONTS.OUTFIT_MEDIUM,
+        fontFamily: FONTS.URBANIST_MEDIUM,
         color: COLORS.black
     },
     subTitle: {
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         paddingHorizontal: 20,
         fontSize: 18,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         color: COLORS.black
     }
 

@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: COLORS.black,
         marginBottom: 20,
-        fontFamily: FONTS.OUTFIT_BOLD,
+        fontFamily: FONTS.URBANIST_BOLD,
     },
     carouselContainer: {
         alignItems: 'center',
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.black,
         marginBottom: 10,
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
     },
     dotsContainer: {
         flexDirection: 'row',

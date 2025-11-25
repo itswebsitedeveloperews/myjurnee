@@ -462,7 +462,7 @@ const GenderStep = React.memo(({
             backgroundColor: value === 'male' ? accentColor : 'transparent',
           }}
         >
-          <Text style={{ color: value === 'male' ? COLORS.white : COLORS.black, fontSize: 16, fontFamily: FONTS.OUTFIT_REGULAR }}>
+          <Text style={{ color: value === 'male' ? COLORS.white : COLORS.black, fontSize: 16, fontFamily: FONTS.URBANIST_REGULAR }}>
             Male
           </Text>
           {/* <Text style={{ fontSize: 40 }}>👨</Text> */}
@@ -491,7 +491,7 @@ const GenderStep = React.memo(({
             backgroundColor: value === 'female' ? accentColor : 'transparent',
           }}
         >
-          <Text style={{ color: value === 'female' ? COLORS.white : COLORS.black, fontSize: 16, fontFamily: FONTS.OUTFIT_REGULAR }}>
+          <Text style={{ color: value === 'female' ? COLORS.white : COLORS.black, fontSize: 16, fontFamily: FONTS.URBANIST_REGULAR }}>
             Female
           </Text>
           <FastImage
@@ -693,7 +693,7 @@ function WeightStep({
               marginHorizontal: 4,
             }}
           >
-            <Text style={{ fontSize: 16, fontFamily: FONTS.OUTFIT_REGULAR, color: unit === u ? COLORS.white : COLORS.black }}>{u.toUpperCase()}</Text>
+            <Text style={{ fontSize: 16, fontFamily: FONTS.URBANIST_REGULAR, color: unit === u ? COLORS.white : COLORS.black }}>{u.toUpperCase()}</Text>
           </Pressable>
         ))}
       </View>
@@ -710,8 +710,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bg_color,
   },
   header: { alignItems: 'center', marginBottom: 12, marginTop: 50 },
-  h1: { fontSize: 24, fontFamily: FONTS.OUTFIT_BOLD, color: COLORS.black, textAlign: 'center' },
-  sub: { color: COLORS.black, textAlign: 'center', fontFamily: FONTS.OUTFIT_REGULAR, fontSize: 14, marginTop: 10 },
+  h1: { fontSize: 24, fontFamily: FONTS.URBANIST_BOLD, color: COLORS.black, textAlign: 'center' },
+  sub: { color: COLORS.black, textAlign: 'center', fontFamily: FONTS.URBANIST_REGULAR, fontSize: 14, marginTop: 10 },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 18 },
   backButtonContainer: {
     alignSelf: 'flex-start',
@@ -732,7 +732,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 10,
   },
-  nextText: { color: 'white', fontSize: 16, fontFamily: FONTS.OUTFIT_MEDIUM, },
+  nextText: { color: 'white', fontSize: 16, fontFamily: FONTS.URBANIST_MEDIUM, },
   nextArrow: { color: 'white', fontSize: 18 },
 });
 

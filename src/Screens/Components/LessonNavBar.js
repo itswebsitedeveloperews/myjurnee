@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   title: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.URBANIST_MEDIUM,
     color: COLORS.textColor,
     fontSize: 18,
   },

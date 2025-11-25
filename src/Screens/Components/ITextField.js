@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   inputStyle: {
     flex: 1,
     paddingHorizontal: 12,
-    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontFamily: FONTS.URBANIST_REGULAR,
     fontSize: 16,
     color: COLORS.black,
   },

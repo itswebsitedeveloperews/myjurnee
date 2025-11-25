@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 10,
     fontSize: 16,
-    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontFamily: FONTS.URBANIST_REGULAR,
     color: COLORS.textColor,
   },
 });

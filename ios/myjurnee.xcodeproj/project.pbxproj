@@ -40,6 +40,14 @@
 				"Outfit-Regular.ttf",
 				"Outfit-SemiBold.ttf",
 				"Outfit-Thin.ttf",
+				"Urbanist-Bold.ttf",
+				"Urbanist-ExtraBold.ttf",
+				"Urbanist-ExtraLight.ttf",
+				"Urbanist-Light.ttf",
+				"Urbanist-Medium.ttf",
+				"Urbanist-Regular.ttf",
+				"Urbanist-SemiBold.ttf",
+				"Urbanist-Thin.ttf",
 			);
 			target = 13B07F861A680F5B00A75B9A /* myjurnee */;
 		};

@@ -70,13 +70,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   title: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.URBANIST_MEDIUM,
     color: COLORS.textColor,
     fontSize: 16,
     lineHeight: 18,
   },
   subTitle: {
-    fontFamily: FONTS.OUTFIT_REGULAR,
+    fontFamily: FONTS.URBANIST_REGULAR,
     color: COLORS.textColor64,
     fontSize: 14,
     lineHeight: 18,
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   btnText: {
-    fontFamily: FONTS.OUTFIT_MEDIUM,
+    fontFamily: FONTS.URBANIST_MEDIUM,
     fontSize: 14,
     color: COLORS.pr_blue,
   },

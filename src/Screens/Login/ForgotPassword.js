@@ -88,13 +88,13 @@ const styles = StyleSheet.create({
         bottom: 0,
     },
     title: {
-        fontFamily: FONTS.OUTFIT_MEDIUM,
+        fontFamily: FONTS.URBANIST_MEDIUM,
         fontSize: 30,
         color: COLORS.textColor,
         textAlign: 'center',
     },
     description: {
-        fontFamily: FONTS.OUTFIT_REGULAR,
+        fontFamily: FONTS.URBANIST_REGULAR,
         fontSize: 14,
         color: COLORS.textColor,
         numberOfLines: 2,
