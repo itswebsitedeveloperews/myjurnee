@@ -22,59 +22,69 @@ const ITextField = ({
   secureTextEntry = false,
   placeholderTextColor = COLORS.black,
   backgroundColor,
+  hasError,
+  errorText
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <View style={[
-      styles.container,
-      isFocused && styles.containerFocused,
-      { borderColor: isFocused ? COLORS.purple : COLORS.textColor64 },
-      backgroundColor && { backgroundColor },
-      mainViewStyle
-    ]}>
-      {leftIcon && (
-        <View style={styles.leftIconContainer}>
-          <FastImage
-            source={leftIcon}
-            style={styles.iconStyle}
-            resizeMode="contain"
-          />
-        </View>
-      )}
-      <TextInput
-        style={[
-          styles.inputStyle,
-          leftIcon && styles.inputWithLeftIcon,
-          backgroundColor && styles.inputDark
-        ]}
-        value={value}
-        onChangeText={text => onChangeText(text)}
-        numberOfLines={numberOfLines}
-        placeholder={placeholder}
-        placeholderTextColor={placeholderTextColor}
-        secureTextEntry={secureTextEntry}
-        keyboardType={keyboardType}
-        autoCapitalize={autoCapitalize}
-        maxLength={maxLength}
-        onSubmitEditing={onSubmitEditing}
-        multiline={multiline}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-      />
-      {rightIcon && (
-        <TouchableOpacity
-          style={styles.rightIconContainer}
-          onPress={onRightIconPress}
-          activeOpacity={0.7}>
-          <FastImage
-            source={rightIcon}
-            style={styles.iconStyle}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
-      )}
-    </View>
+    <>
+      <View style={[
+        styles.container,
+        isFocused && styles.containerFocused,
+        { borderColor: hasError ? COLORS.red : isFocused ? COLORS.purple : COLORS.textColor64 },
+        backgroundColor && { backgroundColor },
+        mainViewStyle
+      ]}>
+        {leftIcon && (
+          <View style={styles.leftIconContainer}>
+            <FastImage
+              source={leftIcon}
+              style={styles.iconStyle}
+              resizeMode="contain"
+            />
+          </View>
+        )}
+        <TextInput
+          style={[
+            styles.inputStyle,
+            leftIcon && styles.inputWithLeftIcon,
+            backgroundColor && styles.inputDark
+          ]}
+          value={value}
+          autoCorrect={false}
+          onChangeText={text => onChangeText(text)}
+          numberOfLines={numberOfLines}
+          placeholder={placeholder}
+          placeholderTextColor={placeholderTextColor}
+          secureTextEntry={secureTextEntry}
+          keyboardType={keyboardType}
+          autoCapitalize={autoCapitalize}
+          maxLength={maxLength}
+          onSubmitEditing={onSubmitEditing}
+          multiline={multiline}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+        />
+        {rightIcon && (
+          <TouchableOpacity
+            style={styles.rightIconContainer}
+            onPress={onRightIconPress}
+            activeOpacity={0.7}>
+            <FastImage
+              source={rightIcon}
+              style={styles.iconStyle}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+      <View>
+        {hasError && !!errorText && (
+          <Text style={styles.errorText}>{errorText}</Text>
+        )}
+      </View>
+    </>
   );
 };
 
@@ -120,4 +130,11 @@ const styles = StyleSheet.create({
     height: 20,
     width: 20,
   },
+  errorText: {
+    fontFamily: FONTS.URBANIST_REGULAR,
+    fontSize: 14,
+    color: COLORS.red,
+    marginLeft: 5,
+    marginTop: 2
+  }
 });

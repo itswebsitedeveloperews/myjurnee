@@ -9,7 +9,14 @@ export const IMAGES = {
   BLACK_LOGO: require('../../assets/images_new/black_logo.png'),
 
   IC_EYE_OFF: require('../../assets/images_new/eye_off.png'), // Using eye as eye_off placeholder
-  IC_EYE: require('../../assets/images_new/eye.png'),
+  IC_EYE: require('../../assets/images_new/fluent_eye.png'), // Using eye as eye_off placeholder
+  IC_PROFILE: require('../../assets/images_new/profile.png'), // Using eye as eye_off placeholder
+  IC_MALE_BLACK: require('../../assets/images_new/male_black.png'),
+  IC_DOWN_CHEVRON: require('../../assets/images_new/down_chervon.png'),
+
+  IC_CASHBACK: require('../../assets/images_new/cashback.png'),
+  IC_LOCK: require('../../assets/images_new/lock.png'),
+  IC_SAVING: require('../../assets/images_new/saving.png'),
 
   IC_MALE: require('../../assets/images_new/male.png'),
   IC_FEMALE: require('../../assets/images_new/female.png'),
@@ -65,7 +72,7 @@ export const IMAGES = {
 
   // Login screen icons
   IC_USER_PROFILE: require('../../assets/images/user.png'),
-  IC_LOCK: require('../../assets/images/briefcase.png'), // Using briefcase as lock placeholder
+
 
   IC_ARROW_RIGHT_CHEVRON: require('../../assets/images/arrow_right.png'),
 

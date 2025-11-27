@@ -20,18 +20,49 @@ import ITextField from '../Components/ITextField';
 import { JWTLogin } from '../../redux/auth/authActions';
 
 const Login = props => {
+  const defaultErrorState = {
+    userName: {
+      hasError: false,
+      errorText: ''
+    },
+    password: {
+      hasError: false,
+      errorText: ''
+    },
+  }
+
   const [username, setUsername] = useState(__DEV__ ? 'educatebystw' : '');
   const [password, setPassword] = useState(__DEV__ ? 'a$ipMwVbGYseEhEz$C' : '');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorState, setErrorState] = useState(defaultErrorState);
   const dispatch = useDispatch();
+
+  const onChangeUsername = (text) => {
+    setErrorState({ ...errorState, userName: { hasError: false, errorText: '' } })
+    setUsername(text)
+  }
+
+  const onChangePassword = (text) => {
+    setErrorState({ ...errorState, password: { hasError: false, errorText: '' } })
+    setPassword(text)
+  }
+
+  const handleError = (error) => {
+    if (error?.code == 'email_error') {
+      setErrorState({ ...errorState, userName: { hasError: true, errorText: error?.message || 'The username or email you entered is incorrect.' } })
+    }
+    else if (error?.code == 'password_error') {
+      setErrorState({ ...errorState, password: { hasError: true, errorText: error?.message || 'password_error' } })
+    }
+  }
 
   const onLogin = () => {
     if (!username) {
-      Alert.alert('Error', 'Please enter username or email');
+      setErrorState({ ...errorState, userName: { hasError: true, errorText: 'Please enter email or username' } })
       return;
     } else if (!password) {
-      Alert.alert('Error', 'Please enter password');
+      setErrorState({ ...errorState, password: { hasError: true, errorText: 'Please enter password' } })
       return;
     }
 
@@ -49,7 +80,7 @@ const Login = props => {
       onFailure: (error) => {
         setLoading(false);
         console.log('Login failed:', error);
-        Alert.alert('Login Failed', error || 'Invalid credentials. Please try again.');
+        handleError(error);
       }
     }));
   };
@@ -95,9 +126,11 @@ const Login = props => {
                 <ITextField
                   placeholder="Enter your email"
                   value={username}
-                  onChangeText={setUsername}
+                  onChangeText={onChangeUsername}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  hasError={errorState.userName.hasError}
+                  errorText={errorState.userName.errorText}
                   backgroundColor={COLORS.darkGray}
                   placeholderTextColor={COLORS.textColor64}
                   mainViewStyle={styles.inputField}
@@ -106,11 +139,13 @@ const Login = props => {
                 <ITextField
                   placeholder="Enter your password"
                   value={password}
-                  onChangeText={setPassword}
+                  onChangeText={onChangePassword}
                   secureTextEntry={!showPassword}
                   rightIcon={showPassword ? IMAGES.IC_EYE : IMAGES.IC_EYE_OFF}
                   onRightIconPress={() => setShowPassword(!showPassword)}
                   backgroundColor={COLORS.darkGray}
+                  hasError={errorState.password.hasError}
+                  errorText={errorState.password.errorText}
                   placeholderTextColor={COLORS.textColor64}
                   mainViewStyle={[styles.inputField, styles.passwordField]}
                 />
@@ -195,12 +230,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   inputField: {
-    marginBottom: 16,
+    marginTop: 16,
     backgroundColor: COLORS.bg_color,
     borderWidth: 1,
   },
   passwordField: {
-    marginBottom: 8,
+    // marginBottom: 8,
   },
   forgotPasswordContainer: {
     alignSelf: 'flex-end',

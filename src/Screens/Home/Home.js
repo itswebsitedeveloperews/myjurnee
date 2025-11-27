@@ -16,7 +16,7 @@ import { FONTS } from '../../Common/Constants/fonts';
 import { dashboadData } from '../../Utils/Data';
 import { windowHeight, windowWidth } from '../../Utils/Dimentions';
 import { useDispatch, useSelector } from 'react-redux';
-import LastingWeightsComponent from './LastingWeightsComponent'
+import MembershipCard from '../Components/MembershipCard'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 import FastImage from 'react-native-fast-image';
@@ -27,45 +27,11 @@ import IButton from '../Components/IButton';
 import { getUserFitnessDetails } from '../../api/profileApi';
 import ISearchBar from '../Components/ISearchBar';
 
-const games = [
-    {
-        id: '1',
-        rank: 1,
-        title: 'Clash of Clans',
-        subtitle: 'Build, Battle, Defend &...',
-        cta: 'View',
-        icon: IMAGES.HOME_SCREEN_LOGO_V1,
-        bgColor: '#5E3BB9',
-    },
-    {
-        id: '2',
-        rank: 2,
-        title: 'UNO!™',
-        subtitle: "The World's #1 Card G...",
-        cta: 'View',
-        icon: IMAGES.HOME_SCREEN_LOGO_V1,
-        bgColor: '#C7463A',
-    },
-    {
-        id: '3',
-        rank: 3,
-        title: 'Ludo King',
-        subtitle: 'Recall your childhood!',
-        cta: 'Play',
-        icon: IMAGES.HOME_SCREEN_LOGO_V1,
-        bgColor: '#7A8593',
-    },
-    {
-        id: '4',
-        rank: 4,
-        title: 'Clash Royale',
-        subtitle: 'Epic PvP Card Battle St...',
-        cta: 'View',
-        icon: IMAGES.HOME_SCREEN_LOGO_V1,
-        bgColor: '#D3792F',
-    },
+const benefits = [
+    { id: '1', icon: IMAGES.IC_LOCK, title: 'Unlock Extra Discount', subtitle: '& Low Prices' },
+    { id: '2', icon: IMAGES.IC_SAVING, title: 'Instant Extra Discount', subtitle: 'In Flash Sales/ BOGO' },
+    { id: '3', icon: IMAGES.IC_CASHBACK, title: 'Earn Extra Cashback', subtitle: 'as uCoin Cash' },
 ];
-
 const Home = props => {
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -288,6 +254,31 @@ const Home = props => {
                         </TouchableOpacity>
                     </View>
                     <CoursesGrid items={courses} loading={loading} onCardPress={(item) => onCourseClick(item)} />
+                </View>
+
+                <View style={{ marginTop: 25 }}>
+                    <Text style={styles.subHeaderTitle}>{`Pricing`}</Text>
+                </View>
+                <View style={{ paddingHorizontal: 20 }}>
+                    <MembershipCard
+                        title="Basic"
+                        price="2,000"
+                        period="/Year"
+                        linearColor={['rgba(0, 0, 0, 0.6)', 'transparent']}
+                        subtitle="or Shop for £10,000 in a year & get for FREE"
+                        benefits={benefits}
+                        onPress={() => console.log('card pressed')}
+                    />
+                    <MembershipCard
+                        title="Premium"
+                        price="25,000"
+                        period="/Year"
+                        subtitle="or Shop for £10,000 in a year & get for FREE"
+                        benefits={benefits}
+                        linearColor={['#EC4E1E', '#FF9248',]}
+                        backgroundColor='#FF9248'
+                        onPress={() => console.log('card pressed')}
+                    />
                 </View>
                 {/* <View style={{ height: 30 }} />
                 <Text style={styles.subHeaderTitle}>{`Lasting weight-loss`}</Text>

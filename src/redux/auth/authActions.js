@@ -98,7 +98,7 @@ export const JWTLogin = ({ username, password, onSuccess, onFailure }) => {
         .catch(err => {
           console.log('JWT login error:', err);
           if (isFunction(onFailure)) {
-            onFailure(cleanErrorMessage(err?.response?.data?.message));
+            onFailure(err?.response?.data);
           }
         });
     } catch (error) {
@@ -131,7 +131,7 @@ export const RegisterUser = ({ username, email, password, onSuccess, onFailure }
         .catch(err => {
           console.log('Register error:', err);
           if (isFunction(onFailure)) {
-            onFailure(cleanErrorMessage(err?.response?.data?.message || 'Registration failed'));
+            onFailure(err?.response?.data || 'Registration failed');
           }
         });
     } catch (error) {

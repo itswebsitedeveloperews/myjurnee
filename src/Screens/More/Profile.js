@@ -80,6 +80,10 @@ const Profile = props => {
     console.log('My Library pressed');
   };
 
+  const onProfileBoxClick = () => {
+    props.navigation.navigate('EditProfile')
+  }
+
   const onLogoutPress = () => {
     dispatch(LogUserOut({
       onSuccess: () => {
@@ -108,6 +112,7 @@ const Profile = props => {
           profileImage={userData.profileImage}
           username={userData.username}
           handle={userData.handle}
+          onPress={onProfileBoxClick}
         />}
 
         {/* APP SETTINGS Section */}

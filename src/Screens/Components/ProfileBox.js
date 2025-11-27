@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
@@ -9,10 +9,11 @@ const ProfileBox = ({
     username,
     handle,
     imageStyle,
-    containerStyle
+    containerStyle,
+    onPress = () => { }
 }) => {
     return (
-        <View style={[styles.container, containerStyle]}>
+        <TouchableOpacity style={[styles.container, containerStyle]} activeOpacity={0.4} onPress={() => onPress()}>
             <FastImage
                 source={profileImage}
                 style={[styles.profileImage, imageStyle]}
@@ -22,7 +23,7 @@ const ProfileBox = ({
                 <Text style={styles.username}>{username}</Text>
                 <Text style={styles.handle}>{handle}</Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 };
 

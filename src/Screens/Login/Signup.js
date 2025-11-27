@@ -15,12 +15,34 @@ import { RegisterUser } from '../../redux/auth/authActions';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 
 const Signup = props => {
+
+    const defaultErrorState = {
+        email: {
+            hasError: false,
+            errorText: ''
+        },
+        userName: {
+            hasError: false,
+            errorText: ''
+        },
+        password: {
+            hasError: false,
+            errorText: ''
+        },
+        confirmPassword: {
+            hasError: false,
+            errorText: ''
+        }
+    }
+
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [errorState, setErrorState] = useState(defaultErrorState);
+
     const dispatch = useDispatch();
 
     const validateEmail = (email) => {
@@ -28,24 +50,53 @@ const Signup = props => {
         return emailRegex.test(email);
     };
 
+    const onChangeUsername = (text) => {
+        setErrorState({ ...errorState, userName: { hasError: false, errorText: '' } })
+        setUsername(text)
+    }
+
+    const onChangeEmail = (text) => {
+        setErrorState({ ...errorState, email: { hasError: false, errorText: '' } })
+        setEmail(text)
+    }
+
+    const onChangePassword = (text) => {
+        setErrorState({ ...errorState, password: { hasError: false, errorText: '' } })
+        setPassword(text)
+    }
+
+    const onChangeConfirmPassword = (text) => {
+        setErrorState({ ...errorState, confirmPassword: { hasError: false, errorText: '' } })
+        setConfirmPassword(text)
+    }
+
+    const handleError = (error) => {
+        if (error?.code == 'email_exists') {
+            setErrorState({ ...errorState, email: { hasError: true, errorText: error?.message || 'Email already exists with this account.' } })
+        }
+        else if (error?.code == 'username_exists') {
+            setErrorState({ ...errorState, userName: { hasError: true, errorText: error?.message || 'Username already exists with this account.' } })
+        }
+    }
+
     const onSignupClick = () => {
         if (!username.trim()) {
-            Alert.alert('Error', 'Please enter username');
+            setErrorState({ ...errorState, userName: { hasError: true, errorText: 'Please enter username' } })
             return;
         } else if (!email.trim()) {
-            Alert.alert('Error', 'Please enter email');
+            setErrorState({ ...errorState, email: { hasError: true, errorText: 'Please enter email' } })
             return;
         } else if (!validateEmail(email.trim())) {
-            Alert.alert('Error', 'Please enter a valid email address');
+            setErrorState({ ...errorState, email: { hasError: true, errorText: 'Please enter a valid email address' } })
             return;
         } else if (!password.trim()) {
-            Alert.alert('Error', 'Please enter password');
+            setErrorState({ ...errorState, password: { hasError: true, errorText: 'Please enter password' } })
             return;
         } else if (password.length < 6) {
-            Alert.alert('Error', 'Password must be at least 6 characters long');
+            setErrorState({ ...errorState, password: { hasError: true, errorText: 'Password must be at least 6 characters long' } })
             return;
         } else if (confirmPassword.trim() !== password.trim()) {
-            Alert.alert('Error', 'Passwords do not match');
+            setErrorState({ ...errorState, confirmPassword: { hasError: true, errorText: 'Passwords do not match' } })
             return;
         }
 
@@ -76,9 +127,9 @@ const Signup = props => {
                     props.navigation.replace('FitnessOnboardingWizard');
                 }
             },
-            onFailure: (errorMessage) => {
+            onFailure: (error) => {
                 setLoading(false);
-                Alert.alert('Registration Failed', errorMessage || 'Something went wrong. Please try again.');
+                handleError(error);
             }
         }));
     };
@@ -116,9 +167,11 @@ const Signup = props => {
                                 <ITextField
                                     placeholder="Enter Username"
                                     value={username}
-                                    onChangeText={setUsername}
+                                    onChangeText={onChangeUsername}
                                     keyboardType="default"
                                     autoCapitalize="none"
+                                    hasError={errorState.userName.hasError}
+                                    errorText={errorState.userName.errorText}
                                     // backgroundColor={COLORS.darkGray}
                                     placeholderTextColor={COLORS.textColor64}
                                     mainViewStyle={styles.inputField}
@@ -126,10 +179,11 @@ const Signup = props => {
                                 <ITextField
                                     placeholder="Enter your email"
                                     value={email}
-                                    onChangeText={setEmail}
+                                    onChangeText={onChangeEmail}
                                     keyboardType="email-address"
                                     autoCapitalize="none"
-                                    // backgroundColor={COLORS.darkGray}
+                                    hasError={errorState.email.hasError}
+                                    errorText={errorState.email.errorText}
                                     placeholderTextColor={COLORS.textColor64}
                                     mainViewStyle={styles.inputField}
                                 />
@@ -137,22 +191,24 @@ const Signup = props => {
                                 <ITextField
                                     placeholder="Enter your password"
                                     value={password}
-                                    onChangeText={setPassword}
+                                    onChangeText={onChangePassword}
                                     secureTextEntry={!showPassword}
                                     rightIcon={showPassword ? IMAGES.IC_EYE : IMAGES.IC_EYE_OFF}
                                     onRightIconPress={() => setShowPassword(!showPassword)}
-                                    // backgroundColor={COLORS.darkGray}
+                                    hasError={errorState.password.hasError}
+                                    errorText={errorState.password.errorText}
                                     placeholderTextColor={COLORS.textColor64}
                                     mainViewStyle={[styles.inputField]}
                                 />
                                 <ITextField
                                     placeholder="Confirm password"
                                     value={confirmPassword}
-                                    onChangeText={setConfirmPassword}
+                                    onChangeText={onChangeConfirmPassword}
                                     secureTextEntry={!showPassword}
                                     rightIcon={showPassword ? IMAGES.IC_EYE : IMAGES.IC_EYE_OFF}
                                     onRightIconPress={() => setShowPassword(!showPassword)}
-                                    // backgroundColor={COLORS.darkGray}
+                                    hasError={errorState.confirmPassword.hasError}
+                                    errorText={errorState.confirmPassword.errorText}
                                     placeholderTextColor={COLORS.textColor64}
                                     mainViewStyle={[styles.inputField, styles.passwordField]}
                                 />
@@ -219,7 +275,7 @@ const styles = StyleSheet.create({
     logoContainer: {
         alignItems: 'center',
         marginTop: 25,
-        marginBottom: 60,
+        marginBottom: 40,
     },
     logo: {
         height: 80,
@@ -229,14 +285,14 @@ const styles = StyleSheet.create({
         fontFamily: FONTS.URBANIST_BOLD,
         fontSize: 24,
         color: COLORS.black,
-        marginBottom: 30,
+        marginBottom: 10,
         lineHeight: 32,
     },
     inputContainer: {
         marginBottom: 24,
     },
     inputField: {
-        marginBottom: 16,
+        marginTop: 16,
         backgroundColor: COLORS.bg_color,
         borderWidth: 1,
     },

@@ -16,13 +16,12 @@ export default SectionHeader;
 const styles = StyleSheet.create({
     container: {
         marginHorizontal: 20,
-        marginTop: 30,
+        marginTop: 20,
         marginBottom: 12,
     },
     title: {
         fontFamily: FONTS.URBANIST_MEDIUM,
-        fontSize: 12,
-        color: COLORS.textColor64,
-        letterSpacing: 1,
+        fontSize: 16,
+        color: COLORS.textColorSection,
     },
 });

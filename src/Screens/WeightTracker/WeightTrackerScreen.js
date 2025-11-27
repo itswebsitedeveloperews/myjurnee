@@ -18,6 +18,7 @@ import { getCurrentWeekDates, getFullWeekDatesArray } from '../../Utils/Utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { setWeightGoalAction, setWeightGoalProgessAction } from '../../redux/WeightLogs/weightLogActions';
 import { getGoalWeight, getWeightLogs } from '../../api/weightGoalApi';
+import WeightChart from '../Components/WeightChart';
 
 const WeightTrackerScreen = ({ navigation }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -113,13 +114,22 @@ const WeightTrackerScreen = ({ navigation }) => {
                 return [0, 0, 0, 0, 0, 0, 0]
             }
             const fullWeekDates = getFullWeekDatesArray();
+            const fullWeekDateOnly = getCurrentWeekDates();
+
             // Create a map of date to weight
             const weightMap = {};
             chart.forEach(entry => {
                 weightMap[entry.date] = entry.weight;
             });
             // Map full dates to weights (null if no data)
-            const data = fullWeekDates.map(date => weightMap[date] ?? 0);
+            // const data = fullWeekDates.map(date => weightMap[date] ?? 0);
+
+            const data = fullWeekDates.map(date => {
+                return {
+                    xLabel: date.split("-")[2],
+                    value: (weightMap[date]) ?? 0,
+                }
+            });
 
             return data;
         } catch (error) {
@@ -300,14 +310,15 @@ const WeightTrackerScreen = ({ navigation }) => {
                 />
 
                 {/* Weight Tracker Chart */}
-                <WeightTrackerChart
+                {/* <WeightTrackerChart
                     data={chartData}
                     goalWeight={weightStats.goalWeight}
                     selectedIndex={1}
                     onDataPointPress={(data) => {
                         console.log('Data point pressed:', data);
                     }}
-                />
+                /> */}
+                <WeightChart data={chartData} />
 
                 {/* Progress Photos */}
                 <ProgressPhotos

@@ -14,13 +14,31 @@ import { useDispatch } from 'react-redux';
 import { ForgotPasswordAction } from '../../redux/auth/authActions';
 
 const ForgotPassword = props => {
+
+    const defaultErrorState = {
+        email: {
+            hasError: false,
+            errorText: ''
+        }
+    }
+
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [errorState, setErrorState] = useState(defaultErrorState);
     const dispatch = useDispatch();
+
+    const onChangeEmail = (text) => {
+        setErrorState({ ...errorState, email: { hasError: false, errorText: '' } })
+        setEmail(text)
+    }
+
+    const handleError = (error) => {
+        setErrorState({ ...errorState, email: { hasError: true, errorText: error || 'Email error.' } })
+    }
 
     const onSubmit = () => {
         if (!email) {
-            Alert.alert('Please enter email address');
+            setErrorState({ ...errorState, email: { hasError: true, errorText: 'Please enter email address' } })
             return;
         }
 
@@ -37,15 +55,16 @@ const ForgotPassword = props => {
                     }
                 ]);
             },
-            onFailure: (errorMessage) => {
+            onFailure: (error) => {
                 setIsLoading(false);
-                Alert.alert('Link share Failed', errorMessage || 'Something went wrong. Please try again.');
+                handleError(error);
+                // Alert.alert('Link share Failed', errorMessage || 'Something went wrong. Please try again.');
             }
         }));
     }
     return (
         <SafeAreaView style={safeAreaStyle}>
-            <FastImage source={IMAGES.LOGIN_BG_IMAGE} style={styles.backgroundImage} resizeMode="cover" />
+            {/* <FastImage source={IMAGES.LOGIN_BG_IMAGE} style={styles.backgroundImage} resizeMode="cover" /> */}
             <View style={{ paddingHorizontal: 20, }}>
                 <INavBar title="" onBackPress={() => props.navigation.goBack()} />
             </View>
@@ -56,8 +75,10 @@ const ForgotPassword = props => {
                     <ITextField
                         placeholder="Email Address"
                         value={email}
-                        onChangeText={text => setEmail(text)}
+                        onChangeText={text => onChangeEmail(text)}
                         mainViewStyle={styles.inputField}
+                        hasError={errorState.email.hasError}
+                        errorText={errorState.email.errorText}
                     />
                 </View>
                 <View style={styles.buttonContainer}>
@@ -105,15 +126,12 @@ const styles = StyleSheet.create({
         flex: 1,
         maxHeight: windowHeight * 0.07,
         marginTop: 30,
-
     },
     inputField: {
         flex: 1,
         maxHeight: 48,
         width: '100%',
-
-        backgroundColor: COLORS.white,
-        borderWidth: 0
+        backgroundColor: COLORS.bg_color,
     },
     buttonContainer: {
         marginTop: 30,

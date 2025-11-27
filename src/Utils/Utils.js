@@ -45,6 +45,7 @@ export const getCurrentWeekDates = () => {
     d.setDate(startOfWeek.getDate() + i);
     return d.getDate().toString();
   });
+
   return labels;
 };
 
