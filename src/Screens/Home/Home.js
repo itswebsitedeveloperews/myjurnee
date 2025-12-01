@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     FlatList,
     Image,
     ImageBackground,
-    RefreshControl,
+    Linking,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
 import { safeAreaStyle } from '../../Common/CommonStyles';
 import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
@@ -23,6 +25,8 @@ import FastImage from 'react-native-fast-image';
 import CoursesGrid from '../Components/CoursesGrid'
 import { IMAGES } from '../../Common/Constants/images';
 import { getCourseAction } from '../../redux/cources/courceActions';
+import { getCheckoutSessionAction, getMembershipPlansAction, getMembershipByEmailAction } from '../../redux/dashboard/dashboardActions';
+import { getProfileData } from '../../redux/profile/profileActions';
 import IButton from '../Components/IButton';
 import { getUserFitnessDetails } from '../../api/profileApi';
 import ISearchBar from '../Components/ISearchBar';
@@ -36,11 +40,16 @@ const Home = props => {
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [plansLoading, setPlansLoading] = useState(false);
     const [userChar, setUserChar] = useState('');
     const [courses, setCourses] = useState([]);
     const [checkingOnboarding, setCheckingOnboarding] = useState(true);
     const [searchValue, setSearchValue] = useState('');
     const dispatch = useDispatch();
+
+    const membershipPlans = useSelector(state => state.dashboard?.membershipPlansData)
+    const profileData = useSelector(state => state.profile?.profileData)
+    const userMembership = useSelector(state => state.dashboard?.userMembership)
 
     useEffect(() => {
         checkAuthentication();
@@ -55,7 +64,10 @@ const Home = props => {
 
     useEffect(() => {
         setLoading(true);
+        setPlansLoading(true);
         dispatch(getCourseAction({ onSuccess, onFailure }));
+        dispatch(getMembershipPlansAction({ onSuccessPlans, onFailurePlans }));
+        dispatch(getProfileData({ onSuccessProfile, onFailureProfile }));
     }, []);
 
     const onSuccess = (response) => {
@@ -66,6 +78,44 @@ const Home = props => {
     const onFailure = () => {
         setLoading(false);
     };
+
+    const onSuccessPlans = (response) => {
+        setPlansLoading(false);
+        // transformCoursesToCards(response);
+    };
+
+    const onFailurePlans = () => {
+        setPlansLoading(false);
+    };
+
+    const onSuccessProfile = () => {
+        // Profile data loaded successfully
+        console.log('Profile data loaded:', profileData);
+    };
+
+    const onFailureProfile = () => {
+        // Handle profile data loading failure
+        console.log('Failed to load profile data');
+    };
+
+    const onSuccessMembership = (response) => {
+        console.log('User membership loaded:', response);
+    };
+
+    const onFailureMembership = () => {
+        console.log('Failed to load user membership');
+    };
+
+    // Check user membership when profile data with email is available
+    useEffect(() => {
+        if (profileData?.email) {
+            dispatch(getMembershipByEmailAction({
+                email: profileData.email,
+                onSuccess: onSuccessMembership,
+                onFailure: onFailureMembership
+            }));
+        }
+    }, [profileData?.email]);
 
     const transformCoursesToCards = (courses) => {
         const bgColors = ['#5E3BB9', '#C7463A', '#7A8593', '#D3792F'];
@@ -118,6 +168,82 @@ const Home = props => {
                 setUserChar(userName);
             });
     }
+
+    const onMembershipCardPress = (plan) => {
+
+        if (!profileData?.email) {
+            return;
+        }
+        setPlansLoading(true);
+        const data = {
+            level_id: plan?.id,
+            email: profileData?.email || '',
+        }
+        dispatch(getCheckoutSessionAction({ data, onSuccessCheckout, onFailureCheckout }));
+    }
+    const onSuccessCheckout = (response) => {
+        console.log('onSuccessCheckout ---', response)
+        openCheckout(response);
+        setPlansLoading(false);
+    }
+    const onFailureCheckout = () => {
+        console.log('onFailureCheckout ---')
+        setPlansLoading(false);
+    }
+
+    const renderMembershipPlans = () => {
+        if (plansLoading) {
+            return (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}>
+                    <ActivityIndicator color={COLORS.black} size={'small'} />
+                </View>
+            )
+        }
+
+        return (
+            <>
+                {membershipPlans.map(plan => (
+                    <MembershipCard
+                        key={plan.id}
+                        title={plan.title}
+                        price={plan.price}
+                        period={plan.period}
+                        subtitle={plan.subtitle}
+                        benefits={plan.benefits}
+                        linearColor={plan.linearColor}
+                        backgroundColor={plan.backgroundColor}
+                        onPress={() => onMembershipCardPress(plan)}
+                    />
+                ))}
+            </>
+        )
+    }
+
+
+
+    const openCheckout = async (url) => {
+        try {
+            if (await InAppBrowser.isAvailable()) {
+                const result = await InAppBrowser.open(url, {
+                    // iOS
+                    dismissButtonStyle: 'cancel',
+                    preferredBarTintColor: '#453AA4',
+                    preferredControlTintColor: 'white',
+                    // Android
+                    showTitle: true,
+                    enableUrlBarHiding: true,
+                    enableDefaultShare: false,
+                });
+                console.log('inappbrowser result', result);
+            } else {
+                // fallback to system browser
+                await Linking.openURL(url);
+            }
+        } catch (error) {
+            console.error('openCheckout error', error);
+            await Linking.openURL(url);
+        }
+    };
 
     const checkOnboardingStatus = async () => {
         try {
@@ -260,35 +386,8 @@ const Home = props => {
                     <Text style={styles.subHeaderTitle}>{`Pricing`}</Text>
                 </View>
                 <View style={{ paddingHorizontal: 20 }}>
-                    <MembershipCard
-                        title="Basic"
-                        price="2,000"
-                        period="/Year"
-                        linearColor={['rgba(0, 0, 0, 0.6)', 'transparent']}
-                        subtitle="or Shop for £10,000 in a year & get for FREE"
-                        benefits={benefits}
-                        onPress={() => console.log('card pressed')}
-                    />
-                    <MembershipCard
-                        title="Premium"
-                        price="25,000"
-                        period="/Year"
-                        subtitle="or Shop for £10,000 in a year & get for FREE"
-                        benefits={benefits}
-                        linearColor={['#EC4E1E', '#FF9248',]}
-                        backgroundColor='#FF9248'
-                        onPress={() => console.log('card pressed')}
-                    />
+                    {renderMembershipPlans()}
                 </View>
-                {/* <View style={{ height: 30 }} />
-                <Text style={styles.subHeaderTitle}>{`Lasting weight-loss`}</Text>
-                <LastingWeightsComponent />
-                {/* <View style={{ height: 100 }} /> 
-
-                
-                <View style={{ height: 30 }} />
-                <Text style={{ ...styles.subHeaderTitle }}>{`Contact us`}</Text> */}
-
             </ScrollView>
         </SafeAreaView>
     );

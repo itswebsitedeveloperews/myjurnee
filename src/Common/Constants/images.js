@@ -24,6 +24,7 @@ export const IMAGES = {
   IC_FILTER: require('../../assets/images_new/filter.png'),
   IC_SEARCH: require('../../assets/images/search.png'),
   IC_GRAY_SEARCH: require('../../assets/images_new/gray_search.png'),
+  IC_CAMERA: require('../../assets/images_new/camera.png'),
   //Onboarding image
   IC_ONBOARDING_TOP: require('../../assets/images/onboardingTop.png'),
   ONBOARDING_1: require('../../assets/images_new/onboarding_1.png'),
@@ -55,7 +56,7 @@ export const IMAGES = {
   IC_BRIEFCASE: require('../../assets/images/briefcase.png'),
   IC_LOGOUT: require('../../assets/images/log_out.png'),
   IC_PENCIL: require('../../assets/images/pencil.png'),
-  IC_CAMERA: require('../../assets/images/camera.png'),
+
   IC_DUSTBIN: require('../../assets/images/dustbin.png'),
   IC_PROFILE_DOTS: require('../../assets/images/profileBG.png'),
   FILLED_CHECKBOX: require('../../assets/images/FilledCheckbox.png'),

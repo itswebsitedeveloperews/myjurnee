@@ -22,7 +22,7 @@ export default ICameraButton;
 const styles = StyleSheet.create({
   container: {
     padding: 6,
-    backgroundColor: COLORS.pr_blue,
+    backgroundColor: COLORS.purple,
     width: 30,
     height: 30,
     borderRadius: 50,

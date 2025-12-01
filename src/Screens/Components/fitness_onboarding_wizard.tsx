@@ -254,7 +254,9 @@ export default function FitnessOnboardingWizard({
             state.gender || '',
             state.age || 0,
             state.currentWeight || 0,
-            state.goalWeight || 0
+            state.unit || 'kg',
+            state.goalWeight || 0,
+            state.unit || 'kg'
           )
             .then(response => {
               console.log('User fitness details saved successfully:', response);
@@ -681,7 +683,7 @@ function WeightStep({
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 20 }}>
       {/* Unit Selector */}
       <View style={{ flexDirection: 'row', marginBottom: 40, backgroundColor: COLORS.bg_color, borderRadius: 10, borderColor: COLORS.purple, borderWidth: 1.5, padding: 6 }}>
-        {(['kg', 'lbs', 'st'] as WeightUnit[]).map((u) => (
+        {(['kg', 'lbs'] as WeightUnit[]).map((u) => (
           <Pressable
             key={u}
             onPress={() => onUnitChange(u)}

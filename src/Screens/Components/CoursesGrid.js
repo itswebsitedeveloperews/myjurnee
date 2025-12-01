@@ -118,9 +118,8 @@ const styles = StyleSheet.create({
   },
   courseIconContainer: {
     flex: 1,
-    backgroundColor: 'red',
+    // backgroundColor: 'red',
     margin: 14,
-
   },
   gradient: {
     flex: 1,

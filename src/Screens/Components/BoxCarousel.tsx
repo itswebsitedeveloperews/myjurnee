@@ -252,7 +252,7 @@ const Item = ({ index, item, transX }: { index: number; item: any; transX: any }
                 },
             ],
             // Card visual to match Figma
-            backgroundColor: isCenter.value ? '#9B5CF6' : 'transparent',
+            backgroundColor: isCenter.value ? '#9B5CF6' : COLORS.bg_color,
             borderWidth: 2,
             borderColor: '#9B5CF6',
         };
@@ -351,15 +351,15 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 6,
-        },
-        shadowOpacity: 0.37,
-        shadowRadius: 7.49,
+        // shadowColor: '#000',
+        // shadowOffset: {
+        //     width: 0,
+        //     height: 6,
+        // },
+        // shadowOpacity: 0.37,
+        // shadowRadius: 7.49,
 
-        elevation: 12,
+        // elevation: 12,
     },
     label: {
         fontFamily: FONTS.URBANIST_REGULAR,
