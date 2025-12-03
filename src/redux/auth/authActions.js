@@ -25,6 +25,7 @@ import {
   signIn,
   register,
   forgotPassword,
+  userDelete,
 } from '../../api/authApis';
 
 export const LogUserIn = ({ mobileNum, onSuccess, onFailure }) => {
@@ -202,6 +203,58 @@ export const LogUserOut = ({ onSuccess, onFailure }) => {
       console.log('Logout Error!', error);
       if (isFunction(onFailure)) {
         onFailure('An unexpected error occurred during logout');
+      }
+    }
+  };
+};
+
+export const DeleteUserAccount = ({ userId, onSuccess, onFailure }) => {
+  return async dispatch => {
+    try {
+      const userIdNumber = parseInt(userId, 10);
+      
+      userDelete(userIdNumber)
+        .then(response => {
+          console.log('Delete account response---', response);
+          
+          if (response?.success || response) {
+            // Clear all local storage and logout after successful deletion
+            localStorageHelper
+              .clearStorage()
+              .then(() => {
+                console.log('Account deleted successfully - storage cleared');
+                
+                // Reset auth state
+                dispatch(onLogin(null));
+                
+                if (isFunction(onSuccess)) {
+                  onSuccess(response);
+                }
+              })
+              .catch(error => {
+                console.log('Delete account storage clear error:', error);
+                // Still call success even if storage clear fails
+                dispatch(onLogin(null));
+                if (isFunction(onSuccess)) {
+                  onSuccess(response);
+                }
+              });
+          } else {
+            if (isFunction(onFailure)) {
+              onFailure('Failed to delete account');
+            }
+          }
+        })
+        .catch(err => {
+          console.log('Delete account error:', err);
+          if (isFunction(onFailure)) {
+            onFailure(err?.response?.data || 'Failed to delete account');
+          }
+        });
+    } catch (error) {
+      console.log('Delete Account Error!', error);
+      if (isFunction(onFailure)) {
+        onFailure('An unexpected error occurred during account deletion');
       }
     }
   };

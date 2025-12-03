@@ -282,7 +282,8 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#c7d2fe',
+        // backgroundColor: '#c7d2fe',
+        backgroundColor: COLORS.bg_color,
     },
 
     loadingContainer: {
@@ -420,15 +421,15 @@ const styles = StyleSheet.create({
         paddingVertical: 10
     },
     startButton: {
-        backgroundColor: '#a855f7',
-        borderRadius: 16,
+        backgroundColor: COLORS.purple,
+        borderRadius: 12,
         paddingVertical: 12,
         alignItems: 'center',
-        shadowColor: '#a855f7',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 5,
+        // shadowColor: '#a855f7',
+        // shadowOffset: { width: 0, height: 4 },
+        // shadowOpacity: 0.3,
+        // shadowRadius: 8,
+        // elevation: 5,
     },
     startButtonText: {
         color: '#fff',

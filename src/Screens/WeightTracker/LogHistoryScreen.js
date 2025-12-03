@@ -30,6 +30,7 @@ const LogHistoryScreen = ({ navigation, route }) => {
     const dispatch = useDispatch();
 
     const weightLogsData = useSelector(state => state.weightLogs?.logsData || []);
+    const profileData = useSelector(state => state.profile?.profileData);
 
     useEffect(() => {
         checkAuthentication();
@@ -251,7 +252,7 @@ const LogHistoryScreen = ({ navigation, route }) => {
             <View key={item.id} style={styles.logEntry}>
                 <View style={styles.logContent}>
                     <View style={styles.weightInfo}>
-                        <Text style={styles.weightText}>{item.weight} kg</Text>
+                        <Text style={styles.weightText}>{item.weight} {profileData?.weight_type || 'lbs'}</Text>
                         <Text style={styles.dateText}>{formatDate(item.date)}</Text>
                         {item.photos && item.photos.length > 0 && (
                             <Text style={styles.photosCountText}>

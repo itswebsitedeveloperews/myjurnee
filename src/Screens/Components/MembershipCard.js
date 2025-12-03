@@ -48,10 +48,10 @@ export default function MembershipCard({
             <View style={styles.benefitText}>
                 <Text style={styles.benefitTitle} numberOfLines={1}>
                     {item.title}
-                    {item.subtitle ? '' : ''}
+                    {/* {item.subtitle ? '' : ''} */}
                 </Text>
                 {item.subtitle ? (
-                    <Text style={styles.benefitSubtitle} numberOfLines={2}>
+                    <Text style={styles.benefitSubtitle} numberOfLines={1}>
                         {item.subtitle}
                     </Text>
                 ) : null}
@@ -61,8 +61,9 @@ export default function MembershipCard({
 
     return (
         <TouchableOpacity
-            activeOpacity={onPress ? 0.85 : 1}
-            onPress={onPress}
+            disabled={true}
+            // activeOpacity={onPress ? 0.85 : 1}
+            // onPress={onPress}
             style={[styles.card, { backgroundColor }, style]}
             accessibilityRole={onPress ? 'button' : 'none'}
         >
@@ -72,7 +73,7 @@ export default function MembershipCard({
                 start={{ x: 0, y: 1 }}
                 end={{ x: 0, y: 0 }}
             >
-                <View style={{ paddingHorizontal: 20, paddingVertical: 15 }}>
+                <View style={{ paddingHorizontal: 20, paddingTop: 15 }}>
                     <View style={styles.headerRow}>
                         <Text style={styles.title}>{title}</Text>
 
@@ -91,11 +92,13 @@ export default function MembershipCard({
                         data={benefits}
                         keyExtractor={(i) => String(i.id)}
                         renderItem={renderBenefit}
-                        numColumns={2}
-                        columnWrapperStyle={styles.columnWrapper}
                         scrollEnabled={false}
                         contentContainerStyle={styles.benefitsContainer}
                     />
+
+                    <TouchableOpacity style={styles.buyButton} onPress={onPress} activeOpacity={0.85}>
+                        <Text style={styles.buyButtonText}>Subscribe Now</Text>
+                    </TouchableOpacity>
                 </View>
             </LinearGradient>
         </TouchableOpacity>
@@ -155,12 +158,13 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderStyle: 'dashed',
         borderColor: 'rgba(255,255,255,0.25)',
-        marginBottom: 12,
+        marginBottom: 0,
     },
 
     benefitsContainer: {
         // spacing at bottom
-        paddingBottom: 2,
+        // paddingBottoms: 2,
+        marginVertical: 5
     },
     columnWrapper: {
         justifyContent: 'space-between',
@@ -168,9 +172,10 @@ const styles = StyleSheet.create({
     },
 
     benefitItem: {
-        // flexDirection: 'row',
+        flexDirection: 'row',
+        marginVertical: 5,
         alignItems: 'center',
-        width: '48%', // two columns with space-between
+        width: '100%', // two columns with space-between
     },
     iconWrap: {
         width: 36,
@@ -191,7 +196,22 @@ const styles = StyleSheet.create({
         fontSize: 12,
         opacity: 0.92,
         marginTop: 4,
-        textAlign: 'center',
+        // textAlign: 'center',
         fontFamily: FONTS?.URBANIST_REGULAR || undefined,
+    },
+    buyButton: {
+        backgroundColor: '#fff',
+        borderRadius: 6,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        marginHorizontal: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 10
+    },
+    buyButtonText: {
+        color: '#000',
+        fontFamily: FONTS.URBANIST_SEMIBOLD,
+        fontSize: 14,
     },
 });

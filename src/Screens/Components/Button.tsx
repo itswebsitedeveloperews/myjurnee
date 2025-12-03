@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, ActivityIndicator } from 'react-native';
 import { COLORS } from '../../Common/Constants/colors';
+import { FONTS } from '../../Common/Constants/fonts';
 
 interface ButtonProps {
   title: string;
@@ -55,26 +56,25 @@ const styles = StyleSheet.create({
     minHeight: 56,
   },
   primaryButton: {
-    backgroundColor: COLORS.pr_lavender, // Light purple/lavender color
+    backgroundColor: COLORS.purple, // Light purple/lavender color
   },
   secondaryButton: {
-    backgroundColor: '#F3F4F6',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
+    backgroundColor: COLORS.purple,
+
   },
   disabledButton: {
     opacity: 0.6,
   },
   buttonText: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: FONTS.URBANIST_BOLD,
     textAlign: 'center',
   },
   primaryText: {
-    color: '#000000',
+    color: COLORS.white,
   },
   secondaryText: {
-    color: '#374151',
+    color: COLORS.white,
   },
 });
 

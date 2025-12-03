@@ -24,8 +24,8 @@ export const getCustomerWorkTypes = data =>
 export const saveCustomerWorkTypes = data =>
   userRawFetch.post('/savecustomerworktype', data).then(extractData);
 
-export const userDelete = data =>
-  userAuthFetch.post('/deleteaccount', data).then(extractData);
+export const userDelete = (userId) =>
+  userRawFetch.post('/wp-json/custom-api/v1/delete-user', { user_id: userId }).then(extractData);
 
 export const logout = () => userAuthFetch.post('/logout').then(extractData);
 

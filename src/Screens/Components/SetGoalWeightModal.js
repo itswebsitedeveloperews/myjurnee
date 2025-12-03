@@ -15,7 +15,7 @@ import { FONTS } from '../../Common/Constants/fonts';
 
 const { width, height } = Dimensions.get('window');
 
-const SetGoalWeightModal = ({ isVisible, onClose, onSubmit }) => {
+const SetGoalWeightModal = ({ isVisible, onClose, onSubmit, weightType = 'lbs' }) => {
     const [goalWeight, setGoalWeight] = useState('');
 
     const handleSubmit = () => {
@@ -81,7 +81,7 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit }) => {
                                     style={styles.input}
                                     value={goalWeight}
                                     onChangeText={setGoalWeight}
-                                    placeholder="0.0 kg"
+                                    placeholder={`0.0 ${weightType}`}
                                     placeholderTextColor={COLORS.textColor44}
                                     keyboardType="numeric"
                                 />

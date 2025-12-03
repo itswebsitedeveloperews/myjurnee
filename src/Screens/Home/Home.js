@@ -65,10 +65,14 @@ const Home = props => {
     useEffect(() => {
         setLoading(true);
         setPlansLoading(true);
-        dispatch(getCourseAction({ onSuccess, onFailure }));
+
+        localStorageHelper.getItemFromStorage(StorageKeys.USER_ID).then(userId => {
+            console.log('userId', userId);
+            dispatch(getCourseAction({ userId: userId, onSuccess, onFailure }));
+        });
         dispatch(getMembershipPlansAction({ onSuccessPlans, onFailurePlans }));
         dispatch(getProfileData({ onSuccessProfile, onFailureProfile }));
-    }, []);
+    }, [isAuthenticated]);
 
     const onSuccess = (response) => {
         setLoading(false);
@@ -134,6 +138,7 @@ const Home = props => {
                 cta: 'View', // or dynamic if needed
                 icon: IMAGES.HOME_SCREEN_LOGO_V1, // your static or course-based image
                 bgColor: bgColors[index % bgColors.length],
+                featured_image: course.featured_image,
                 permalink: course.permalink, // if you need navigation later
                 courseName: courseNames[index % courseNames.length], // For display in gradient
                 instructor: course.author || instructors[index % instructors.length], // Use author if available
@@ -348,14 +353,14 @@ const Home = props => {
                         <Text style={styles.headerSubTitle}>Find your lessons today!</Text>
                     </View>
                     <View style={{ justifyContent: 'center' }}>
-                        <TouchableOpacity style={styles.bellButton}>
+                        {/* <TouchableOpacity style={styles.bellButton}>
                             <FastImage source={IMAGES.IC_BELL} style={styles.bellIcon} />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </View>
 
                 {/* Search Bar and Filter Button */}
-                <View style={styles.searchContainer}>
+                {/* <View style={styles.searchContainer}>
                     <View style={styles.searchBarWrapper}>
                         <ISearchBar
                             value={searchValue}
@@ -368,7 +373,7 @@ const Home = props => {
                     <TouchableOpacity style={styles.filterButton} activeOpacity={0.7}>
                         <Image source={IMAGES.IC_FILTER} style={styles.filterIcon} resizeMode="contain" />
                     </TouchableOpacity>
-                </View>
+                </View> */}
 
 
                 <View style={{ flex: 1, marginTop: 30 }}>

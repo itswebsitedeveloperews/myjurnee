@@ -64,8 +64,11 @@ export const updateUserProfile = ({
             data.profile_image = profileImage;
           }
 
+          // console.log('data ---------->', data);
+
           updateProfile(data)
             .then(response => {
+              // console.log('update profile response', response);
               if (response?.success == true) {
                 if (isFunction(onSuccess)) {
                   onSuccess();

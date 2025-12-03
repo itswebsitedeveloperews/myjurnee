@@ -15,7 +15,7 @@ const ProfileBox = ({
     return (
         <TouchableOpacity style={[styles.container, containerStyle]} activeOpacity={0.4} onPress={() => onPress()}>
             <FastImage
-                source={profileImage}
+                source={{ uri: profileImage }}
                 style={[styles.profileImage, imageStyle]}
                 resizeMode="cover"
             />

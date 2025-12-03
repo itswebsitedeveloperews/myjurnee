@@ -137,10 +137,10 @@ const EditProfile = (props) => {
             Alert.alert('Validation Error', 'Please enter your full name');
             return;
         }
-        if (!phone.trim()) {
-            Alert.alert('Validation Error', 'Please enter your phone number');
-            return;
-        }
+        // if (!phone.trim()) {
+        //     Alert.alert('Validation Error', 'Please enter your phone number');
+        //     return;
+        // }
         if (!weight.trim()) {
             Alert.alert('Validation Error', 'Please enter your weight');
             return;
@@ -165,7 +165,7 @@ const EditProfile = (props) => {
             weightType: selectedUnit,
             gender: selected.label, // API expects "Male", "Female", or "Other"
             age: age.trim(),
-            profileImage: profileImageBase64,
+            profileImage: selectedImage ? selectedImage.base64 : null,
             onSuccess: () => {
                 setLoading(false);
                 Alert.alert('Success', 'Profile updated successfully', [

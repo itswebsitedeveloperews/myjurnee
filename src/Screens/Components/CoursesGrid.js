@@ -21,6 +21,7 @@ export default function CoursesGrid({ items = [], loading = false, onCardPress =
   }
 
   const renderCourseCard = ({ item, index }) => {
+
     // Generate gradient colors based on index - deep purple to pinkish-purple
     // const gradientColors = [
     //   ['#6B46C1', '#A855F7', '#EC4899'], // Deep purple to pink
@@ -47,7 +48,7 @@ export default function CoursesGrid({ items = [], loading = false, onCardPress =
       >
         {/* Gradient Header Section */}
         <View style={styles.courseIconContainer}>
-          <FastImage source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg' }} style={styles.courseIcon} resizeMode="stretch" />
+          <FastImage source={{ uri: item?.featured_image }} style={styles.courseIcon} resizeMode="contain" />
         </View>
 
         {/* Course Details Section */}

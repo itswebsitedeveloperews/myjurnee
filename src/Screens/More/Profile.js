@@ -3,9 +3,10 @@ import {
   StyleSheet,
   View,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { safeAreaStyle } from '../../Common/CommonStyles';
 import { COLORS } from '../../Common/Constants/colors';
 import { IMAGES } from '../../Common/Constants/images';
@@ -13,19 +14,15 @@ import ProfileBox from '../Components/ProfileBox';
 import MenuItem from '../Components/MenuItem';
 import SectionHeader from '../Components/SectionHeader';
 import IButton from '../Components/IButton';
-import { LogUserOut } from '../../redux/auth/authActions';
+import DeleteAccountModal from '../Components/DeleteAccountModal';
+import { DeleteUserAccount, LogUserOut } from '../../redux/auth/authActions';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 
 const Profile = props => {
   const dispatch = useDispatch();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [userNickName, setUserNickName] = useState('');
-  const [userData, setUserData] = useState({
-    username: 'educatebystw',
-    handle: '@educatebystw',
-    profileImage: IMAGES.IC_USER_PROFILE, // Using user icon as placeholder
-  });
+  const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] = useState(false);
+  const profileData = useSelector(state => state.profile?.profileData || {});
 
   useEffect(() => {
     checkAuthentication();
@@ -36,7 +33,7 @@ const Profile = props => {
       const isLoggedIn = await localStorageHelper.getItemFromStorage(StorageKeys.IS_LOGGED);
       if (isLoggedIn === 'true') {
         setIsAuthenticated(true);
-        getUserDetailsFromLocalStorage();
+        // getUserDetailsFromLocalStorage();
       } else {
         setIsAuthenticated(false);
 
@@ -46,21 +43,6 @@ const Profile = props => {
     }
   };
 
-  const getUserDetailsFromLocalStorage = () => {
-    localStorageHelper
-      .getItemsFromStorage([StorageKeys.USER_NAME, StorageKeys.USER_NICKNAME])
-      .then(resp => {
-        console.log('resp', resp);
-        let userName = resp[StorageKeys.USER_NAME];
-        let userNickName = resp[StorageKeys.USER_NICKNAME];
-
-        setUserData({
-          username: userName,
-          handle: `@${userNickName || ''}`,
-          profileImage: IMAGES.IC_USER_PROFILE,
-        })
-      });
-  }
 
   const onSettingsPress = () => {
     // Navigate to settings screen
@@ -68,16 +50,66 @@ const Profile = props => {
     console.log('Settings pressed');
   };
 
-  const onBuildBoxPress = () => {
-    // Navigate to build a box screen
-    // props.navigation.navigate('BuildBox');
-    console.log('Build a box pressed');
+  const onCoursesPress = () => {
+    // Navigate to Courses screen, resetting the stack to initial screen
+    props.navigation.navigate('CoursesStack', {
+      screen: 'CoursesScreen',
+    });
+    console.log('Courses pressed');
   };
 
-  const onMyLibraryPress = () => {
-    // Navigate to my library screen
-    // props.navigation.navigate('MyLibrary');
-    console.log('My Library pressed');
+  const onWeightTrackerPress = () => {
+    // Navigate to Weight Tracker screen, resetting the stack to initial screen
+    props.navigation.navigate('WeightTrackerStack', {
+      screen: 'WeightTrackerScreen',
+    });
+    console.log('Weight Tracker pressed');
+  };
+
+  const onDeleteAccountPress = () => {
+    setIsDeleteAccountModalVisible(true);
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const userId = await localStorageHelper.getItemFromStorage(StorageKeys.USER_ID);
+
+      dispatch(DeleteUserAccount({
+        userId,
+        onSuccess: () => {
+          Alert.alert(
+            'Account Deleted',
+            'Your account has been successfully deleted.',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  props.navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'AuthStack' }],
+                  });
+                }
+              }
+            ]
+          );
+        },
+        onFailure: (error) => {
+          console.log('Delete account failed:', error);
+          Alert.alert(
+            'Error',
+            error || 'Failed to delete account. Please try again later.',
+            [{ text: 'OK' }]
+          );
+        }
+      }));
+    } catch (error) {
+      console.log('Delete account error:', error);
+      Alert.alert(
+        'Error',
+        'An unexpected error occurred. Please try again later.',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   const onProfileBoxClick = () => {
@@ -90,7 +122,7 @@ const Profile = props => {
         // Navigate to AuthStack after successful logout
         props.navigation.reset({
           index: 0,
-          routes: [{ name: 'AuthStack' }],
+          routes: [{ name: 'Splash' }],
         });
       },
       onFailure: (error) => {
@@ -109,9 +141,9 @@ const Profile = props => {
       >
         {/* Profile Box */}
         {isAuthenticated && <ProfileBox
-          profileImage={userData.profileImage}
-          username={userData.username}
-          handle={userData.handle}
+          profileImage={profileData?.profile_image || ''}
+          username={profileData?.full_name || ''}
+          handle={`@${profileData?.full_name || ''}`}
           onPress={onProfileBoxClick}
         />}
 
@@ -120,20 +152,28 @@ const Profile = props => {
         <MenuItem
           icon={IMAGES.IC_SETTINGS}
           title="Settings"
-          onPress={onSettingsPress}
+          onPress={onProfileBoxClick}
         />
 
         {/* SHAKE THAT WEIGHT SHOP Section */}
         <SectionHeader title="SHAKE THAT WEIGHT SHOP" />
         <MenuItem
           icon={IMAGES.IC_SHOPPING_BASKET}
-          title="Build a box"
-          onPress={onBuildBoxPress}
+          title="Courses"
+          onPress={onCoursesPress}
         />
         <MenuItem
           icon={IMAGES.IC_LIBRARY}
-          title="My Library"
-          onPress={onMyLibraryPress}
+          title="Weight Tracker"
+          onPress={onWeightTrackerPress}
+        />
+
+        {/* APP SETTINGS Section */}
+        <SectionHeader title="DANGER ZONE" />
+        <MenuItem
+          icon={IMAGES.DELETE_ICON}
+          title="Delete Account"
+          onPress={onDeleteAccountPress}
         />
 
         {/* Logout Button */}
@@ -147,6 +187,13 @@ const Profile = props => {
             />
           </View>}
       </ScrollView>
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        isVisible={isDeleteAccountModalVisible}
+        onClose={() => setIsDeleteAccountModalVisible(false)}
+        onConfirmDelete={handleDeleteAccount}
+      />
     </SafeAreaView>
   );
 };

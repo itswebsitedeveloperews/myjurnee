@@ -9,12 +9,11 @@ import {
   onCourseSuccess,
 } from './courceSlice';
 
-export const getCourseAction = ({ onSuccess, onFailure }) => {
+export const getCourseAction = ({ userId, onSuccess, onFailure }) => {
   return async dispatch => {
     try {
-      getCourse()
+      getCourse(userId)
         .then(response => {
-          // console.log('course response action---', response);
           if (response) {
             if (isFunction(onSuccess)) {
               onSuccess(response);

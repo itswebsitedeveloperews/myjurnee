@@ -19,7 +19,7 @@ import { FONTS } from '../../Common/Constants/fonts';
 
 const { width, height } = Dimensions.get('window');
 
-const SetGoalWeightModal = ({ isVisible, onClose, onSubmit }) => {
+const SetGoalWeightModal = ({ isVisible, onClose, onSubmit, weightType = 'lbs' }) => {
     const [weight, setWeight] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [dateString, setDateString] = useState(
@@ -60,7 +60,7 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit }) => {
         if (hasWeight) {
             const weightValue = parseFloat(weight);
             if (weightValue < 20 || weightValue > 500) {
-                Alert.alert('Error', 'Please enter a weight between 20 and 500 kg');
+                Alert.alert('Error', 'Please enter a weight between 20 and 500');
                 return;
             }
         }
@@ -211,7 +211,7 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit }) => {
                                     style={styles.input}
                                     value={weight}
                                     onChangeText={setWeight}
-                                    placeholder="0.0 kg"
+                                    placeholder={`0.0 ${weightType}`}
                                     placeholderTextColor={COLORS.textColor44}
                                     keyboardType="numeric"
                                 />
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     updateButtonEnabled: {
-        backgroundColor: COLORS.pr_lavender,
+        backgroundColor: COLORS.purple,
     },
     updateButtonDisabled: {
         backgroundColor: COLORS.textColor14,
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
         fontFamily: FONTS.URBANIST_BOLD,
     },
     updateButtonTextEnabled: {
-        color: COLORS.textColor,
+        color: COLORS.white,
     },
     updateButtonTextDisabled: {
         color: COLORS.textColor44,

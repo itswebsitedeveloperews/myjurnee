@@ -126,7 +126,7 @@ const LessonDetailScreen = (props) => {
     const renderPrevButton = () => {
         return (
             <TouchableOpacity style={styles.controlButtons} key={1}>
-                <Text>Prev</Text>
+                <Text style={styles.controlButtonsText}>Prev</Text>
             </TouchableOpacity>
         )
     }
@@ -134,7 +134,7 @@ const LessonDetailScreen = (props) => {
     const renderNextButton = () => {
         return (
             <TouchableOpacity style={styles.controlButtons} key={2}>
-                <Text>Next</Text>
+                <Text style={styles.controlButtonsText}>Next</Text>
             </TouchableOpacity>
         )
     }
@@ -187,16 +187,21 @@ export default LessonDetailScreen
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
+        backgroundColor: COLORS.bg_color,
     },
     controlButtons: {
-        backgroundColor: '#E0E0E0',
+        backgroundColor: COLORS.purple,
         width: windowWidth / 6,
         marginVertical: 2,
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
         marginLeft: 5
+    },
+    controlButtonsText: {
+        fontFamily: FONTS.URBANIST_BOLD,
+        fontSize: 14,
+        color: COLORS.white,
     },
     titleContainer: {
         marginTop: 20

@@ -122,9 +122,6 @@ const Signup = props => {
                             // Still navigate even if storage fails
                             props.navigation.replace('FitnessOnboardingWizard');
                         });
-                } else {
-                    // If no user_id in response, still navigate (wizard will handle it)
-                    props.navigation.replace('FitnessOnboardingWizard');
                 }
             },
             onFailure: (error) => {

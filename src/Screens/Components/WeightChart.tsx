@@ -31,8 +31,8 @@ const sampleData = [
   { xLabel: "22", value: 88 },
 ];
 
-export default function WeightChart({ data = sampleData, weightGoal = 75 }) {
-  const [selectedIndex, setSelectedIndex] = useState(1);
+export default function WeightChart({ data = sampleData, weightGoal = 75, weightType = 'lbs' }) {
+  const [selectedIndex, setSelectedIndex] = useState();
 
   const xScale = (i) =>
     PADDING.left + (i * (CHART_WIDTH - PADDING.left - PADDING.right)) / (data.length - 1);
@@ -69,12 +69,50 @@ export default function WeightChart({ data = sampleData, weightGoal = 75 }) {
     return value.replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
   };
 
-  // Y tick values
-  const yTicks = [100, 80, 60, 40, 20, 0];
+  // Generate dynamic Y tick values based on data - always returns exactly 6 items
+  const generateYTicks = (maxValue: number) => {
+    // Calculate minimum step size for exactly 6 ticks (5 intervals from 0 to max)
+    const rawStep = maxValue / 5;
+
+    // Round step UP to a nice number to ensure we cover maxValue
+    let step;
+    if (rawStep <= 5) {
+      step = 5;
+    } else if (rawStep <= 10) {
+      step = 10;
+    } else if (rawStep <= 20) {
+      step = 20;
+    } else if (rawStep <= 25) {
+      step = 25;
+    } else if (rawStep <= 30) {
+      step = 30;
+    } else if (rawStep <= 40) {
+      step = 40;
+    } else if (rawStep <= 50) {
+      step = 50;
+    } else {
+      // For larger values, round up to nearest 50
+      step = Math.ceil(rawStep / 50) * 50;
+    }
+
+    // actualMax is always step * 5 to ensure exactly 6 ticks (0, step, 2*step, 3*step, 4*step, 5*step)
+    const actualMax = step * 5;
+
+    // Generate exactly 6 ticks from actualMax down to 0
+    const ticks = [];
+    for (let i = 5; i >= 0; i--) {
+      ticks.push(step * i);
+    }
+
+    return ticks;
+  };
+
+  // Y tick values (dynamic based on data) - always exactly 6 items
+  const yTicks = useMemo(() => generateYTicks(maxVal), [maxVal]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Weight Tracker</Text>
+      <Text style={styles.title}>{`Weight Tracker (${weightType})`}</Text>
       <View style={styles.divider} />
       <View style={styles.legendRow}>
 

@@ -38,6 +38,8 @@ const WeightTrackerScreen = ({ navigation }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const dispatch = useDispatch();
     const userId = useSelector(state => state.profile?.userId || '');
+    const profileData = useSelector(state => state.profile?.profileData);
+
     useEffect(() => {
         checkAuthentication();
     }, []);
@@ -259,17 +261,17 @@ const WeightTrackerScreen = ({ navigation }) => {
                 {/* Top Row Cards */}
                 <View style={styles.cardRow}>
                     <Card
-                        title={`${weightStats.weightLost.toFixed(1)} kg`}
+                        title={`${weightStats.weightLost.toFixed(1)} ${profileData?.weight_type || 'lbs'}`}
                         subtitle="Weight Lost"
                         style={styles.card}
                     />
                     <Card
-                        title={`${weightStats.currentWeight.toFixed(1)} kg`}
+                        title={`${weightStats.currentWeight.toFixed(1)} ${profileData?.weight_type || 'lbs'}`}
                         subtitle="Current Weight"
                         style={styles.card}
                     />
                     <Card
-                        title={`${weightStats.goalWeight.toFixed(1)} kg`}
+                        title={`${weightStats.goalWeight.toFixed(1)} ${profileData?.weight_type || 'lbs'}`}
                         subtitle="Goal Weight"
                         style={styles.card}
                     />
@@ -279,12 +281,12 @@ const WeightTrackerScreen = ({ navigation }) => {
                 <View style={styles.cardRowTwo}>
                     <Card
                         title="Last 30 Days"
-                        subtitle={`${weightStats.weightLost30Days.toFixed(1)} kg Lost`}
+                        subtitle={`${weightStats.weightLost30Days.toFixed(1)} ${profileData?.weight_type || 'lbs'} Lost`}
                         style={styles.cardTwo}
                     />
                     <Card
                         title="Last 90 Days"
-                        subtitle={`${weightStats.weightLost90Days.toFixed(1)} kg Lost`}
+                        subtitle={`${weightStats.weightLost90Days.toFixed(1)} ${profileData?.weight_type || 'lbs'} Lost`}
                         style={styles.cardTwo}
                     />
                 </View>
@@ -318,7 +320,7 @@ const WeightTrackerScreen = ({ navigation }) => {
                         console.log('Data point pressed:', data);
                     }}
                 /> */}
-                <WeightChart data={chartData} />
+                <WeightChart data={chartData} weightGoal={weightStats.goalWeight} weightType={profileData?.weight_type} />
 
                 {/* Progress Photos */}
                 <ProgressPhotos
@@ -339,6 +341,7 @@ const WeightTrackerScreen = ({ navigation }) => {
                 isVisible={isModalVisible}
                 onClose={handleCloseModal}
                 onSubmit={handleWeightSubmit}
+                weightType={profileData?.weight_type}
             />
 
             {/* Set Goal Weight Modal */}
@@ -346,6 +349,7 @@ const WeightTrackerScreen = ({ navigation }) => {
                 isVisible={isSetGoalWeightModalVisible}
                 onClose={handleCloseSetGoalWeightModal}
                 onSubmit={handleSetGoalWeightSubmit}
+                weightType={profileData?.weight_type}
             />
         </SafeAreaView>
     );

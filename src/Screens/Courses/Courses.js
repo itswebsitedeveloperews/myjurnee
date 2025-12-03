@@ -17,6 +17,7 @@ import { windowWidth } from '../../Utils/Dimentions';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import { IMAGES } from '../../Common/Constants/images';
+import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 
 const CoursesScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
@@ -31,7 +32,9 @@ const CoursesScreen = ({ navigation }) => {
 
     useEffect(() => {
         setLoading(true);
-        dispatch(getCourseAction({ onSuccess, onFailure }));
+        localStorageHelper.getItemFromStorage(StorageKeys.USER_ID).then(userId => {
+            dispatch(getCourseAction({ userId: userId, onSuccess, onFailure }));
+        });
     }, []);
 
     const onSuccess = () => {
@@ -81,12 +84,13 @@ const CoursesScreen = ({ navigation }) => {
     const renderCourseItem = ({ item, index }) => (
         <TouchableOpacity onPress={() => OnCoursePress(item)} style={styles.courseItem}>
             <View style={styles.courseThumbnail}>
-                <TouchableOpacity style={styles.startCourseButton}>
+                {/* <TouchableOpacity style={styles.startCourseButton}>
                     <Text style={styles.startCourseText}>Start Course</Text>
-                </TouchableOpacity>
-                <View style={styles.bookIcon}>
+                </TouchableOpacity> */}
+                <FastImage source={{ uri: item.featured_image }} style={styles.courseThumbnailImage} resizeMode="contain" />
+                {/* <View style={styles.bookIcon}>
                     <Text style={styles.bookIconText}>📖</Text>
-                </View>
+                </View> */}
             </View>
             <View style={styles.courseDetails}>
                 <Text style={styles.courseTitle} numberOfLines={2}>
@@ -101,9 +105,9 @@ const CoursesScreen = ({ navigation }) => {
                     <Text style={styles.courseDate}>
                         {formatDate(item.date) || 'No date available'}
                     </Text>
-                    <TouchableOpacity style={styles.downloadButton}>
+                    {/* <TouchableOpacity style={styles.downloadButton}>
                         <FastImage source={IMAGES.DOWNLOAD_BLACK} style={styles.downloadIcon} resizeMode="contain" />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </View>
         </TouchableOpacity>
@@ -113,7 +117,7 @@ const CoursesScreen = ({ navigation }) => {
         <View style={styles.header}>
             <Text style={styles.headerTitle}>Courses</Text>
 
-            <View style={styles.searchContainer}>
+            {/* <View style={styles.searchContainer}>
                 <Text style={styles.searchIcon}>🔍</Text>
                 <TextInput
                     style={styles.searchInput}
@@ -122,9 +126,9 @@ const CoursesScreen = ({ navigation }) => {
                     value={searchText}
                     onChangeText={setSearchText}
                 />
-            </View>
+            </View> */}
 
-            <View style={styles.filterContainer}>
+            {/* <View style={styles.filterContainer}>
                 <TouchableOpacity style={styles.filterButton}>
                     <Text style={styles.filterIcon}>☰</Text>
                 </TouchableOpacity>
@@ -151,7 +155,7 @@ const CoursesScreen = ({ navigation }) => {
                     <Text style={styles.sortText}>{sortBy}</Text>
                     <Text style={styles.chevronIcon}>▼</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
         </View>
     ), [searchText]);
 
@@ -205,7 +209,7 @@ const CoursesScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
+        backgroundColor: COLORS.bg_color,
     },
     loadingContainer: {
         flex: 1,
@@ -229,7 +233,7 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.textColor,
-        marginBottom: 20,
+        // marginBottom: 20,
     },
     searchContainer: {
         flexDirection: 'row',
@@ -333,6 +337,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         position: 'relative',
+    },
+    courseThumbnailImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 8,
     },
     startCourseButton: {
         position: 'absolute',
