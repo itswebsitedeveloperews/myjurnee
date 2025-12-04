@@ -207,7 +207,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 10
+        marginTop: 5,
+        marginBottom: 15
     },
     buyButtonText: {
         color: '#000',

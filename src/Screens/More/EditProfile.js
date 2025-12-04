@@ -168,18 +168,29 @@ const EditProfile = (props) => {
             profileImage: selectedImage ? selectedImage.base64 : null,
             onSuccess: () => {
                 setLoading(false);
-                Alert.alert('Success', 'Profile updated successfully', [
-                    {
-                        text: 'OK',
-                        onPress: () => props.navigation.goBack()
-                    }
-                ]);
+                props.navigation.navigate('Profile', { profileUpdated: true });
             },
             onFailure: (errorMessage) => {
                 setLoading(false);
                 Alert.alert('Error', errorMessage || 'Failed to update profile. Please try again.');
             }
         }));
+    };
+
+    const onChangeWeightUnit = (u) => {
+        const convertedWeight = convertWeightToNewUnit(weight, selectedUnit, u);
+        setSelectedUnit(u);
+        setWeight(convertedWeight.toString());
+    };
+
+    const convertWeightToNewUnit = (weight, selectedUnit, newUnit) => {
+        // 1 kg = 2.20462 lbs
+        // 1 lbs = 0.45359237 kg
+        if (selectedUnit === 'lbs' && newUnit === 'kg') {
+            return Math.round(weight / 2.20462);
+        } else if (selectedUnit === 'kg' && newUnit === 'lbs') {
+            return Math.round(weight * 2.20462);
+        }
     };
 
     return (
@@ -241,7 +252,7 @@ const EditProfile = (props) => {
                     onChangeText={setWeight}
                     showUnitToggle
                     unit={selectedUnit}
-                    onUnitChange={(u) => setSelectedUnit(u)}
+                    onUnitChange={(u) => onChangeWeightUnit(u)}
                     placeholder="Enter weight"
                     keyboardType="decimal-pad"
                     placeholderTextColor={COLORS.textColor64}
@@ -268,7 +279,7 @@ const EditProfile = (props) => {
                 />
                 <View style={styles.buttonContainer}>
                     <IButton
-                        title="Submit"
+                        title="Save Changes"
                         onPress={handleSubmit}
                         loading={loading}
                         mainViewStyle={styles.loginButton}

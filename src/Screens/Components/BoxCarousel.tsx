@@ -1,6 +1,6 @@
 
-import React, { useEffect, useRef } from 'react';
-import { StyleSheet, FlatList, View, Text, Dimensions } from 'react-native';
+import React, { useEffect, useRef, useCallback } from 'react';
+import { StyleSheet, FlatList, View, Text, Dimensions, Platform } from 'react-native';
 import Animated, {
     Extrapolate,
     interpolate,
@@ -14,6 +14,7 @@ import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+const isAndroid = Platform.OS === 'android';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = Math.round(SCREEN_WIDTH / 5);
@@ -32,11 +33,26 @@ const BoxCarousel = ({
     const lastSelectedIndexRef = useRef<number | null>(null);
     const flatListRef = useRef<FlatList>(null);
     const lastDataLengthRef = useRef<number>(0);
+    const lastUserSelectedValueRef = useRef<number | null>(null);
+    const isUserScrollingRef = useRef<boolean>(false);
+    const scrollEndHandledRef = useRef<boolean>(false);
     const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const lastScrollOffsetRef = useRef<number>(0);
 
-    const renderItem = ({ item, index }: { item: any; index: number }) => {
+    const renderItem = useCallback(({ item, index }: { item: any; index: number }) => {
         return <Item index={index} item={item} transX={transX} />;
-    };
+    }, []);
+
+    const keyExtractor = useCallback((item: any, index: number) => `${item.id}-${index}`, []);
+
+    const getItemLayout = useCallback(
+        (_: any, index: number) => ({
+            length: ITEM_WIDTH,
+            offset: ITEM_WIDTH * index,
+            index,
+        }),
+        [],
+    );
 
     const scrollHandler = useAnimatedScrollHandler({
         onScroll: (event) => {
@@ -44,52 +60,113 @@ const BoxCarousel = ({
         },
     });
 
-    const calculateSelectedItem = (scrollOffset: number) => {
-        // Clear any pending timeout
+    const calculateSelectedItem = (scrollOffset: number, shouldSnap: boolean = false) => {
+        // Prevent duplicate handling if both onScrollEndDrag and onMomentumScrollEnd fire
+        if (scrollEndHandledRef.current) {
+            return;
+        }
+        scrollEndHandledRef.current = true;
+
+        // Calculate which item should be centered based on scroll offset
+        // scrollOffset of 0 means item 0 is centered (due to paddingHorizontal)
+        const itemIndex = Math.round(scrollOffset / ITEM_WIDTH);
+        const clampedIndex = Math.max(0, Math.min(itemIndex, data.length - 1));
+
+        // For Android, manually snap to the correct position
+        if (shouldSnap && isAndroid && flatListRef.current) {
+            const targetOffset = clampedIndex * ITEM_WIDTH;
+            flatListRef.current.scrollToOffset({ offset: targetOffset, animated: true });
+        }
+
+        // Only call onChange if the index actually changed
+        if (clampedIndex !== lastSelectedIndexRef.current && data[clampedIndex] && onChange) {
+            lastSelectedIndexRef.current = clampedIndex;
+            // Use item.id if available, otherwise parse item.text as number (supports decimals)
+            const selectedValue = data[clampedIndex].id ?? parseFloat(data[clampedIndex].text);
+
+            // Track this as user-selected value to prevent feedback loop
+            lastUserSelectedValueRef.current = selectedValue;
+
+            console.log('BoxCarousel - Selected:', {
+                scrollOffset,
+                itemIndex,
+                clampedIndex,
+                itemText: data[clampedIndex].text,
+                itemId: data[clampedIndex].id,
+                selectedValue,
+            });
+            onChange(selectedValue);
+        }
+
+        // Mark scrolling as ended and reset flag after a short delay
+        isUserScrollingRef.current = false;
+        setTimeout(() => {
+            scrollEndHandledRef.current = false;
+        }, 100);
+    };
+
+    const onScrollBeginDrag = () => {
+        // User started scrolling - prevent value effect from interfering
+        isUserScrollingRef.current = true;
+        scrollEndHandledRef.current = false;
+
+        // Clear any pending scroll timeout
         if (scrollTimeoutRef.current) {
             clearTimeout(scrollTimeoutRef.current);
             scrollTimeoutRef.current = null;
         }
+    };
 
-        // Use a longer delay to ensure scroll has fully settled
-        // This is especially important for fast scrolling - we wait longer to ensure
-        // the snap animation has completely finished
-        scrollTimeoutRef.current = setTimeout(() => {
-            // Calculate the expected snap position
-            // With snapToInterval={ITEM_WIDTH}, the scroll will snap to the nearest multiple of ITEM_WIDTH
-            const snappedOffset = Math.round(scrollOffset / ITEM_WIDTH) * ITEM_WIDTH;
-            const itemIndex = Math.round(snappedOffset / ITEM_WIDTH);
-            const clampedIndex = Math.max(0, Math.min(itemIndex, data.length - 1));
+    const onScrollEndDrag = (e: any) => {
+        // onScrollEndDrag fires when user releases finger
+        const scrollOffset = e.nativeEvent.contentOffset.x;
+        lastScrollOffsetRef.current = scrollOffset;
 
-            // Only call onChange if the index actually changed
-            if (clampedIndex !== lastSelectedIndexRef.current && data[clampedIndex] && onChange) {
-                lastSelectedIndexRef.current = clampedIndex;
-                // Use item.id if available, otherwise parse item.text as number (supports decimals)
-                const selectedValue = data[clampedIndex].id ?? parseFloat(data[clampedIndex].text);
-                console.log('BoxCarousel - Selected (settled):', {
-                    scrollOffset,
-                    snappedOffset,
-                    itemIndex,
-                    clampedIndex,
-                    itemText: data[clampedIndex].text,
-                    itemId: data[clampedIndex].id,
-                    selectedValue,
-                    dataLength: data.length,
-                });
-                onChange(selectedValue);
-            }
+        // For Android, we need to handle the case where momentum scroll doesn't fire
+        // Use a timeout to detect if momentum scroll will happen
+        if (isAndroid) {
+            scrollTimeoutRef.current = setTimeout(() => {
+                // If momentum scroll didn't fire, handle the snap here
+                if (!scrollEndHandledRef.current) {
+                    calculateSelectedItem(scrollOffset, true);
+                }
+            }, 150);
+        }
+    };
+
+    const onMomentumScrollBegin = () => {
+        // Momentum scroll is starting - clear the timeout from onScrollEndDrag
+        if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
             scrollTimeoutRef.current = null;
-        }, 300); // Longer delay (500ms) to ensure fast scrolling is fully settled
+        }
     };
 
     const onMomentumScrollEnd = (e: any) => {
         // onMomentumScrollEnd fires after momentum scrolling stops
         // This is the most reliable event - it fires after the user lifts their finger
         // and the scroll has completed, including any snap animations
-        // We use a longer delay (500ms) to ensure fast scrolling is fully settled
         const scrollOffset = e.nativeEvent.contentOffset.x;
-        calculateSelectedItem(scrollOffset);
+
+        // Clear any pending timeout
+        if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+            scrollTimeoutRef.current = null;
+        }
+
+        // For Android, always snap to ensure proper alignment
+        calculateSelectedItem(scrollOffset, isAndroid);
     };
+
+    // Reset lastSelectedIndex when data changes (e.g., unit change)
+    useEffect(() => {
+        if (data.length !== lastDataLengthRef.current) {
+            lastSelectedIndexRef.current = null;
+            lastDataLengthRef.current = data.length;
+            // Reset user selection tracking when data changes to allow value effect to work
+            lastUserSelectedValueRef.current = null;
+        }
+    }, [data]);
 
     // Cleanup timeout on unmount
     useEffect(() => {
@@ -100,16 +177,22 @@ const BoxCarousel = ({
         };
     }, []);
 
-    // Reset lastSelectedIndex when data changes (e.g., unit change)
-    useEffect(() => {
-        if (data.length !== lastDataLengthRef.current) {
-            lastSelectedIndexRef.current = null;
-            lastDataLengthRef.current = data.length;
-        }
-    }, [data]);
-
     // Scroll to the value when it changes (e.g., when unit changes)
+    // But skip if user is actively scrolling or if this is the value they just selected
     useEffect(() => {
+        // Don't interfere if user is actively scrolling
+        if (isUserScrollingRef.current) {
+            return;
+        }
+
+        // Don't scroll if this is the value the user just selected (prevents feedback loop)
+        if (value !== null && value !== undefined && lastUserSelectedValueRef.current !== null) {
+            const tolerance = 0.01; // Small tolerance for floating point comparison
+            if (Math.abs(value - lastUserSelectedValueRef.current) < tolerance) {
+                return;
+            }
+        }
+
         if (value !== null && value !== undefined && data.length > 0 && flatListRef.current) {
             // Find the closest match in the data array
             let closestIndex = -1;
@@ -144,26 +227,15 @@ const BoxCarousel = ({
                     nearbyValues,
                 });
 
-                // Scroll to the index after a small delay to ensure the list is rendered
+                // Use scrollToOffset for consistent behavior across platforms
+                // The offset is simply index * ITEM_WIDTH because paddingHorizontal handles centering
+                const scrollDelay = isAndroid ? 300 : 200;
                 setTimeout(() => {
-                    try {
-                        flatListRef.current?.scrollToIndex({
-                            index: closestIndex,
-                            animated: false, // Use false for immediate positioning
-                            viewPosition: 0.5,
-                        });
-                        // Update transX to match
-                        transX.value = closestIndex * ITEM_WIDTH;
-                        lastSelectedIndexRef.current = closestIndex;
-                    } catch (error) {
-                        console.log('BoxCarousel - scrollToIndex failed, using scrollToOffset');
-                        // Fallback: scroll to offset
-                        const offset = closestIndex * ITEM_WIDTH;
-                        flatListRef.current?.scrollToOffset({ offset, animated: false });
-                        transX.value = offset;
-                        lastSelectedIndexRef.current = closestIndex;
-                    }
-                }, 200);
+                    const offset = closestIndex * ITEM_WIDTH;
+                    flatListRef.current?.scrollToOffset({ offset, animated: false });
+                    transX.value = offset;
+                    lastSelectedIndexRef.current = closestIndex;
+                }, scrollDelay);
             }
         }
     }, [value, data, onChange]);
@@ -189,18 +261,28 @@ const BoxCarousel = ({
                 <AnimatedFlatList
                     ref={flatListRef}
                     onScroll={scrollHandler}
+                    onScrollBeginDrag={onScrollBeginDrag}
+                    onScrollEndDrag={onScrollEndDrag}
+                    onMomentumScrollBegin={onMomentumScrollBegin}
                     onMomentumScrollEnd={onMomentumScrollEnd}
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     style={styles.list}
                     contentContainerStyle={{ paddingHorizontal: (SCREEN_WIDTH - ITEM_WIDTH) / 2 }}
                     data={data}
-                    decelerationRate="fast"
+                    decelerationRate={isAndroid ? 'normal' : 'fast'}
                     snapToInterval={ITEM_WIDTH}
                     scrollEventThrottle={16}
-                    snapToAlignment="center"
+                    snapToAlignment="start"
+                    disableIntervalMomentum={isAndroid}
+                    pagingEnabled={false}
                     renderItem={renderItem}
-                    keyExtractor={(item: any, index: number) => `${item.id}-${index}`}
+                    getItemLayout={getItemLayout}
+                    keyExtractor={keyExtractor}
+                    removeClippedSubviews={isAndroid}
+                    windowSize={isAndroid ? 5 : 21}
+                    maxToRenderPerBatch={isAndroid ? 5 : 10}
+                    initialNumToRender={isAndroid ? 10 : 20}
                     onScrollToIndexFailed={(info) => {
                         // Fallback: scroll to offset if scrollToIndex fails
                         const wait = new Promise<void>((resolve) => setTimeout(() => resolve(), 300));
@@ -239,13 +321,8 @@ const Item = ({ index, item, transX }: { index: number; item: any; transX: any }
     });
 
     const animatedStyle = useAnimatedStyle(() => {
-        // Determine if this card is centered
-        // const isCenter =
-        //     udv.value !== null &&
-        //     Math.abs((udv.value as number) - index * ITEM_WIDTH) < ITEM_WIDTH * 0.25;
-
         return {
-            opacity: opacityAnimation(udv, index),
+            opacity: opacityAnimation(transX, index),
             transform: [
                 {
                     scale: scaleAnimation(udv, index),
@@ -290,25 +367,23 @@ const scaleAnimation = (udv: any, index: number) => {
         );
 };
 
-const opacityAnimation = (udv: any, index: number) => {
+const opacityAnimation = (transX: any, index: number) => {
     'worklet';
 
-    return udv.value === null
-        ? 0
-        : interpolate(
-            udv.value,
-            [
-                (index - 3) * ITEM_WIDTH,
-                (index - 2) * ITEM_WIDTH,
-                (index - 1) * ITEM_WIDTH,
-                index * ITEM_WIDTH,
-                (index + 1) * ITEM_WIDTH,
-                (index + 2) * ITEM_WIDTH,
-                (index + 3) * ITEM_WIDTH,
-            ],
-            [0, 0.7, 0.8, 1, 0.8, 0.7, 0],
-            Extrapolate.CLAMP,
-        );
+    return interpolate(
+        transX.value,
+        [
+            (index - 3) * ITEM_WIDTH,
+            (index - 2) * ITEM_WIDTH,
+            (index - 1) * ITEM_WIDTH,
+            index * ITEM_WIDTH,
+            (index + 1) * ITEM_WIDTH,
+            (index + 2) * ITEM_WIDTH,
+            (index + 3) * ITEM_WIDTH,
+        ],
+        [0, 0.7, 0.8, 1, 0.8, 0.7, 0],
+        Extrapolate.CLAMP,
+    );
 };
 
 const styles = StyleSheet.create({

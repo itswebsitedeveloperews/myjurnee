@@ -95,7 +95,8 @@ export default function CoursesGrid({ items = [], loading = false, onCardPress =
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 10,
+    // paddingVertical: 20,
+    // backgroundColor: 'red',
   },
   listContent: {
     paddingRight: 20,
@@ -116,6 +117,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
+    marginVertical: 10
   },
   courseIconContainer: {
     flex: 1,

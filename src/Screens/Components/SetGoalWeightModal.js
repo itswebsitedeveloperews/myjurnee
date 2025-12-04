@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     updateButtonEnabled: {
-        backgroundColor: COLORS.pr_lavender,
+        backgroundColor: COLORS.purple,
     },
     updateButtonDisabled: {
         backgroundColor: COLORS.textColor14,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
         fontFamily: FONTS.URBANIST_BOLD,
     },
     updateButtonTextEnabled: {
-        color: COLORS.textColor,
+        color: COLORS.white,
     },
     updateButtonTextDisabled: {
         color: COLORS.textColor44,

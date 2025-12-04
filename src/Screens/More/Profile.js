@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
 import { safeAreaStyle } from '../../Common/CommonStyles';
 import { COLORS } from '../../Common/Constants/colors';
 import { IMAGES } from '../../Common/Constants/images';
@@ -15,6 +16,7 @@ import MenuItem from '../Components/MenuItem';
 import SectionHeader from '../Components/SectionHeader';
 import IButton from '../Components/IButton';
 import DeleteAccountModal from '../Components/DeleteAccountModal';
+import Snackbar from '../Components/Snackbar';
 import { DeleteUserAccount, LogUserOut } from '../../redux/auth/authActions';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 
@@ -22,11 +24,24 @@ const Profile = props => {
   const dispatch = useDispatch();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] = useState(false);
+  const [showSnackbar, setShowSnackbar] = useState(false);
   const profileData = useSelector(state => state.profile?.profileData || {});
 
   useEffect(() => {
     checkAuthentication();
-  }, [])
+  }, []);
+
+  // Listen for navigation focus to show snackbar if profile was updated
+  useFocusEffect(
+    React.useCallback(() => {
+      const params = props.route?.params;
+      if (params?.profileUpdated) {
+        setShowSnackbar(true);
+        // Clear the param to prevent showing snackbar again on next focus
+        props.navigation.setParams({ profileUpdated: undefined });
+      }
+    }, [props.route?.params])
+  );
 
   const checkAuthentication = async () => {
     try {
@@ -52,18 +67,24 @@ const Profile = props => {
 
   const onCoursesPress = () => {
     // Navigate to Courses screen, resetting the stack to initial screen
-    props.navigation.navigate('CoursesStack', {
-      screen: 'CoursesScreen',
+    // props.navigation.navigate('CoursesStack', {
+    //   screen: 'CoursesScreen',
+    // });
+    props.navigation.reset({
+      index: 0,
+      routes: [{ name: 'CoursesStack' }],
     });
-    console.log('Courses pressed');
   };
 
   const onWeightTrackerPress = () => {
     // Navigate to Weight Tracker screen, resetting the stack to initial screen
-    props.navigation.navigate('WeightTrackerStack', {
-      screen: 'WeightTrackerScreen',
+    // props.navigation.navigate('WeightTrackerStack', {
+    //   screen: 'WeightTrackerScreen',
+    // });
+    props.navigation.reset({
+      index: 0,
+      routes: [{ name: 'WeightTrackerStack' }],
     });
-    console.log('Weight Tracker pressed');
   };
 
   const onDeleteAccountPress = () => {
@@ -193,6 +214,16 @@ const Profile = props => {
         isVisible={isDeleteAccountModalVisible}
         onClose={() => setIsDeleteAccountModalVisible(false)}
         onConfirmDelete={handleDeleteAccount}
+      />
+
+      {/* Snackbar for profile update success */}
+      <Snackbar
+        visible={showSnackbar}
+        message="Profile **successfully** updated"
+        type="success"
+        duration={3000}
+        onDismiss={() => setShowSnackbar(false)}
+        position="bottom"
       />
     </SafeAreaView>
   );
