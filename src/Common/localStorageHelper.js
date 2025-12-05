@@ -13,6 +13,7 @@ export const StorageKeys = {
   IS_LOGGED: 'IS_LOGGED',
   FIRST_TIME_LOGIN: 'FIRST_TIME_LOGIN',
   ONBOARDING_SHOWN: 'ONBOARDING_SHOWN',
+  TEMP_SIGNUP_CREDENTIALS: 'TEMP_SIGNUP_CREDENTIALS', // Temporary storage for signup credentials
 };
 
 class LocalStorageHelper {

@@ -110,15 +110,30 @@ const Signup = props => {
                 setLoading(false);
                 // Save user_id to storage for the fitness onboarding wizard
                 if (response?.id) {
+                    // Store temporary signup credentials for auto-login after onboarding
+                    const tempCredentials = {
+                        username: username.trim(),
+                        email: email.trim(),
+                        password: password,
+                    };
+
                     localStorageHelper
                         .setStorageItem({ key: StorageKeys.USER_ID, value: String(response.id) })
                         .then(() => {
                             console.log('User ID saved to storage:', response.id);
+                            // Store temporary credentials for auto-login
+                            return localStorageHelper.setStorageArrayItem({
+                                key: StorageKeys.TEMP_SIGNUP_CREDENTIALS,
+                                value: tempCredentials,
+                            });
+                        })
+                        .then(() => {
+                            console.log('Temporary signup credentials saved for auto-login');
                             // Navigate to fitness onboarding wizard after successful signup
                             props.navigation.replace('FitnessOnboardingWizard');
                         })
                         .catch(error => {
-                            console.error('Error saving user ID:', error);
+                            console.error('Error saving user data:', error);
                             // Still navigate even if storage fails
                             props.navigation.replace('FitnessOnboardingWizard');
                         });

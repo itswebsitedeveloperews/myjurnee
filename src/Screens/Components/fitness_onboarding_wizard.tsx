@@ -29,6 +29,8 @@ import FastImage from 'react-native-fast-image';
 import { IMAGES } from '../../Common/Constants/images';
 import { setUserFitnessDetails } from '../../api/profileApi';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
+import { useDispatch } from 'react-redux';
+import { JWTLogin } from '../../redux/auth/authActions';
 
 const AnimatedFlatList = AnimatedReanimated.createAnimatedComponent(FlatList<number>);
 
@@ -190,6 +192,7 @@ export default function FitnessOnboardingWizard({
 }: FitnessOnboardingWizardProps) {
   const navigation = useNavigation();
   const route = useRoute();
+  const reduxDispatch = useDispatch();
   // Get navigateToAfterComplete from route params or props (route params take precedence)
   const navigateToAfterComplete = (route.params as any)?.navigateToAfterComplete || navigateToProp;
   const [state, dispatch] = useReducer(reducer, { ...initialState, ...init });
@@ -260,25 +263,108 @@ export default function FitnessOnboardingWizard({
           )
             .then(response => {
               console.log('User fitness details saved successfully:', response);
-              setIsSubmitting(false);
-              // Navigate to specified screen after successful API call
-              if (navigateToAfterComplete === 'Home') {
-                // Navigate back to DashboardBottomTab (which shows Home tab)
-                if (navigation.canGoBack()) {
-                  navigation.goBack();
-                } else {
-                  // Fallback: navigate to DashboardBottomTab
-                  (navigation as any).navigate('DashboardBottomTab');
-                }
-              } else {
-                // Otherwise, reset navigation stack to the specified screen
-                navigation.dispatch(
-                  CommonActions.reset({
-                    index: 0,
-                    routes: [{ name: navigateToAfterComplete }],
-                  })
-                );
-              }
+
+              // Check for temporary signup credentials to auto-login
+              localStorageHelper
+                .getArrayItemFromStorage(StorageKeys.TEMP_SIGNUP_CREDENTIALS)
+                .then(tempCredentials => {
+                  if (tempCredentials && (tempCredentials.username || tempCredentials.email) && tempCredentials.password) {
+                    console.log('Auto-logging in user with signup credentials...');
+
+                    // Auto-login user with stored credentials
+                    reduxDispatch(
+                      JWTLogin({
+                        username: tempCredentials.username || tempCredentials.email,
+                        password: tempCredentials.password,
+                        onSuccess: (loginResponse: any) => {
+                          console.log('Auto-login successful:', loginResponse);
+                          setIsSubmitting(false);
+
+                          // Clear temporary credentials after successful login
+                          localStorageHelper
+                            .removeStorageItems([StorageKeys.TEMP_SIGNUP_CREDENTIALS])
+                            .then(() => {
+                              console.log('Temporary signup credentials cleared');
+                            })
+                            .catch(err => {
+                              console.error('Error clearing temporary credentials:', err);
+                            });
+
+                          // Navigate to DashboardStack after successful auto-login
+                          navigation.dispatch(
+                            CommonActions.reset({
+                              index: 0,
+                              routes: [{ name: 'DashboardStack' }],
+                            })
+                          );
+                        },
+                        onFailure: (error: any) => {
+                          console.error('Auto-login failed:', error);
+                          setIsSubmitting(false);
+
+                          // Clear temporary credentials even on failure
+                          localStorageHelper
+                            .removeStorageItems([StorageKeys.TEMP_SIGNUP_CREDENTIALS])
+                            .catch(err => {
+                              console.error('Error clearing temporary credentials:', err);
+                            });
+
+                          // Fallback: navigate to Login screen if auto-login fails
+                          navigation.dispatch(
+                            CommonActions.reset({
+                              index: 0,
+                              routes: [{ name: 'Login' }],
+                            })
+                          );
+                        },
+                      }) as any
+                    );
+                  } else {
+                    // No temporary credentials found, use normal navigation flow
+                    console.log('No temporary signup credentials found, using normal navigation');
+                    setIsSubmitting(false);
+
+                    // Navigate to specified screen after successful API call
+                    if (navigateToAfterComplete === 'Home') {
+                      // Navigate back to DashboardBottomTab (which shows Home tab)
+                      if (navigation.canGoBack()) {
+                        navigation.goBack();
+                      } else {
+                        // Fallback: navigate to DashboardBottomTab
+                        (navigation as any).navigate('DashboardBottomTab');
+                      }
+                    } else {
+                      // Otherwise, reset navigation stack to the specified screen
+                      navigation.dispatch(
+                        CommonActions.reset({
+                          index: 0,
+                          routes: [{ name: navigateToAfterComplete }],
+                        })
+                      );
+                    }
+                  }
+                })
+                .catch(error => {
+                  // If credentials don't exist, this is expected - use normal navigation flow
+                  console.log('No temporary signup credentials found (this is normal for non-signup flows):', error);
+                  setIsSubmitting(false);
+
+                  // Fallback: use normal navigation flow
+                  if (navigateToAfterComplete === 'Home') {
+                    if (navigation.canGoBack()) {
+                      navigation.goBack();
+                    } else {
+                      (navigation as any).navigate('DashboardBottomTab');
+                    }
+                  } else {
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: navigateToAfterComplete }],
+                      })
+                    );
+                  }
+                });
             })
             .catch(error => {
               console.error('Error saving user fitness details:', error);
@@ -320,7 +406,7 @@ export default function FitnessOnboardingWizard({
           }
         });
     }
-  }, [index, steps.length, state, isSubmitting, navigation, navigateToAfterComplete]);
+  }, [index, steps.length, state, isSubmitting, navigation, navigateToAfterComplete, reduxDispatch]);
 
   const goPrev = useCallback(() => {
     if (index > 0) {
