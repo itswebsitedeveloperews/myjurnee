@@ -5,7 +5,8 @@ import { isFunction } from '../../Utils/Utils';
 import {
   getMembershipPlans,
   getCheckoutSession,
-  getMembershipByEmail
+  getMembershipByEmail,
+  cancelSubscription
 } from '../../api/dashboardApi';
 import {
   onMembershipPlansSuccess,
@@ -18,12 +19,12 @@ const benefits = [
   { id: '3', icon: IMAGES.IC_CASHBACK, title: 'Earn Extra Cashback', subtitle: 'as uCoin Cash' },
 ];
 
-export const getMembershipPlansAction = ({ onSuccessPlans, onFailurePlans }) => {
+export const getMembershipPlansAction = ({ userId, onSuccessPlans, onFailurePlans }) => {
   return async dispatch => {
     try {
-      getMembershipPlans()
-        .then(async response => {
-          const updateResponse = await populatePlanResponse(response);
+      getMembershipPlans(userId)
+        .then(response => {
+          const updateResponse = populatePlanResponse(response);
 
           if (isFunction(onSuccessPlans)) {
             onSuccessPlans();
@@ -97,21 +98,60 @@ export const getMembershipByEmailAction = ({ email, onSuccess, onFailure }) => {
   };
 };
 
-const populatePlanResponse = async (apiResponse) => {
-  if (!apiResponse) {
+export const cancelMembershipAction = ({ email, onSuccess, onFailure }) => {
+  return async dispatch => {
+    try {
+      const data = { email };
+      console.log('cancel membership data ---', data);
+      cancelSubscription(data)
+        .then(response => {
+          console.log('cancel subscription response ---', response);
+          if (!response.error) {
+            if (isFunction(onSuccess)) {
+              onSuccess(response);
+            }
+            // Clear user membership from Redux state after successful cancellation
+            dispatch(onUserMembershipSuccess({}));
+          } else {
+            if (isFunction(onFailure)) {
+              onFailure(response?.message || 'Failed to cancel membership');
+            }
+          }
+        })
+        .catch(err => {
+          console.log('cancel subscription error ---', err.response?.data || err);
+          if (isFunction(onFailure)) {
+            onFailure(err.response?.data?.message || 'Failed to cancel membership');
+          }
+        });
+    } catch (error) {
+      console.log('Error!', error);
+      if (isFunction(onFailure)) {
+        onFailure('An unexpected error occurred');
+      }
+    }
+  };
+};
+
+const populatePlanResponse = (apiResponse) => {
+  if (!apiResponse || !apiResponse.levels || !Array.isArray(apiResponse.levels)) {
     return []
   }
 
-  const membershipPlans = Object.keys(apiResponse).map(key => {
-    const item = apiResponse[key];
+  const membershipPlans = apiResponse.levels.map(item => {
+    // Handle floating-point precision issues by parsing and rounding properly
+    const initialPayment = item.initial_payment != null
+      ? parseFloat(item.initial_payment).toFixed(2)
+      : '0.00';
 
     return {
       id: item.id,
       title: item.name,
-      price: Number(item.initial_payment)?.toFixed(2),
+      price: initialPayment,
       period: `/${item.cycle_period}`,
       subtitle: `or Shop for £10,000 in a year & get for FREE`,
       benefits,
+      purchased: item.accessed,
       linearColor:
         item.id === "2"
           ? ['#EC4E1E', '#FF9248']

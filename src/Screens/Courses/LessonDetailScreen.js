@@ -1,127 +1,36 @@
-import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { COLORS } from '../../Common/Constants/colors'
 import RenderHtml from 'react-native-render-html';
 import LessonNavBar from '../Components/LessonNavBar'
 import { windowWidth } from '../../Utils/Dimentions'
 import { FONTS } from '../../Common/Constants/fonts'
+import { useDispatch, useSelector } from 'react-redux'
+import { getLessonDetailAction } from '../../redux/cources/courceActions'
 
 
-const source = {
-    html: `
-  <div class="ld-tabs ld-tab-count-1">
-	
-	<div class="ld-tabs-content">
-		
-							<div class="ld-tab-content ld-visible" id="ld-tab-content-223">
-											
-<p><em>A Registered Dietician’s Practical Guide to Navigating Social Eating Without Sabotaging Your Goals</em></p>
-
-
-
-<h2 class="wp-block-heading">Welcome to Your Social Success Revolution!</h2>
-
-
-
-<p>Hey there, social butterfly! Welcome to what might be the most liberating course you’ll ever take for weight loss success. I’m absolutely thrilled you’re here because we’re about to tackle one of the biggest challenges people face on their weight loss journey – how to maintain your goals while still enjoying a rich, social life!</p>
-
-
-
-<p>You know what? So many people think that losing weight means becoming a social hermit, turning down invitations, or being “that person” who makes everyone else feel awkward about their food choices. But I’m here to tell you that’s complete rubbish! You can absolutely maintain an active social life AND achieve your weight loss goals.</p>
-
-
-
-<p>As a registered dietician, I’ve helped thousands of people navigate everything from pub nights to wedding receptions, from work lunches to family gatherings, all while staying true to their health goals. The secret isn’t avoiding social situations – it’s learning how to navigate them like a pro!</p>
-
-
-
-<h2 class="wp-block-heading">What You’ll Master in This Course</h2>
-
-
-
-<p>By the end of this empowering journey, you’ll be able to:</p>
-
-
-
-<ul class="wp-block-list">
-<li><strong>Communicate confidently</strong> with friends and family about your health goals</li>
-
-
-
-<li><strong>Handle peer pressure</strong> with grace and maintain your boundaries</li>
-
-
-
-<li><strong>Make smart choices</strong> at any UK restaurant, pub, or takeaway</li>
-
-
-
-<li><strong>Navigate group meals</strong> without feeling deprived or awkward</li>
-
-
-
-<li><strong>Choose better drinks</strong> (both alcoholic and non-alcoholic) that support your goals</li>
-
-
-
-<li><strong>Enjoy social eating</strong> while staying on track with your weight loss</li>
-
-
-
-<li><strong>Feel confident</strong> in any social eating situation</li>
-</ul>
-
-
-
-<h2 class="wp-block-heading">Who This Course Is For</h2>
-
-
-
-<p>This course is perfect for you if:</p>
-
-
-
-<ul class="wp-block-list">
-<li>You love socializing but worry it’s sabotaging your weight loss</li>
-
-
-
-<li>You feel awkward or different when trying to eat healthily around others</li>
-
-
-
-<li>You struggle with peer pressure around food and drinks</li>
-
-
-
-<li>You want practical strategies for real UK social eating situations</li>
-
-
-
-<li>You’re tired of feeling like you have to choose between your social life and your health goals</li>
-
-
-
-<li>You want to feel confident and comfortable in any eating situation</li>
-</ul>
-			</div>
-
-			
-	</div> <!--/.ld-tabs-content-->
-
-</div>
-    `
-};
-
-const arrData = [
-    { id: 1 },
-    { id: 2 },
-    { id: 3 },
-    { id: 4 },
-]
 
 const LessonDetailScreen = (props) => {
+    const [loading, setLoading] = useState(false);
+    const lessonId = props.route.params?.lessonId;
+    const dispatch = useDispatch();
+    const lessonData = useSelector(state => state.cource?.lessonDetailData || null);
+
+    useEffect(() => {
+        if (lessonId) {
+            setLoading(true);
+            dispatch(getLessonDetailAction({ lessonId, onSuccess, onFailure }));
+        }
+    }, [lessonId]);
+
+    const onSuccess = () => {
+        setLoading(false);
+    };
+
+    const onFailure = () => {
+        setLoading(false);
+    };
 
     const renderPrevButton = () => {
         return (
@@ -137,6 +46,24 @@ const LessonDetailScreen = (props) => {
                 <Text style={styles.controlButtonsText}>Next</Text>
             </TouchableOpacity>
         )
+    }
+
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.container} edges={['top']}>
+                <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
+                <View style={{ paddingHorizontal: 20 }}>
+                    <LessonNavBar
+                        onBackPress={() => props.navigation.goBack()}
+                        rightComponents={[renderPrevButton(), renderNextButton()]}
+                    />
+                </View>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={COLORS.pr_blue} />
+                    <Text style={styles.loadingText}>Loading lesson...</Text>
+                </View>
+            </SafeAreaView>
+        );
     }
 
     return (
@@ -155,27 +82,36 @@ const LessonDetailScreen = (props) => {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Lesson Title */}
-                <View style={styles.titleContainer}>
-                    <Text style={styles.titleText} numberOfLines={3}>
-                        Communication and Confidence – Owning Your Health Journey
-                    </Text>
-                </View>
+                {lessonData?.title?.rendered && (
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.titleText} numberOfLines={3}>
+                            {lessonData.title.rendered}
+                        </Text>
+                    </View>
+                )}
 
                 {/* Lesson Number Container */}
-                <View style={styles.lessonNumContainer}>
-                    <Text style={styles.lessonNumText} numberOfLines={1}>
-                        Lesson 1 of 4
-                    </Text>
-                </View>
-
+                {lessonData?.menu_order !== undefined && (
+                    <View style={styles.lessonNumContainer}>
+                        <Text style={styles.lessonNumText} numberOfLines={1}>
+                            Lesson {lessonData.menu_order + 1}
+                        </Text>
+                    </View>
+                )}
 
                 {/* HTML Content of the lesson */}
-                <View style={styles.htmlContainer}>
-                    <RenderHtml
-                        contentWidth={windowWidth}
-                        source={source}
-                    />
-                </View>
+                {lessonData?.content?.rendered && (
+                    <View style={styles.htmlContainer}>
+                        <RenderHtml
+                            contentWidth={windowWidth - 30}
+                            source={{
+                                html: lessonData.content.rendered
+                            }}
+                            tagsStyles={htmlTagsStyles}
+                            baseStyle={styles.htmlBaseStyle}
+                        />
+                    </View>
+                )}
 
             </ScrollView>
         </SafeAreaView>
@@ -183,6 +119,101 @@ const LessonDetailScreen = (props) => {
 }
 
 export default LessonDetailScreen
+
+// HTML Tags Styles
+const htmlTagsStyles = {
+    h1: {
+        fontFamily: FONTS.URBANIST_BOLD,
+        fontSize: 28,
+        color: COLORS.textColor,
+        marginTop: 24,
+        marginBottom: 12,
+        // lineHeight: 34,
+    },
+    h2: {
+        fontFamily: FONTS.URBANIST_BOLD,
+        fontSize: 24,
+        color: COLORS.textColor,
+        marginTop: 20,
+        marginBottom: 10,
+        // lineHeight: 30,
+    },
+    h3: {
+        fontFamily: FONTS.URBANIST_SEMIBOLD,
+        fontSize: 20,
+        color: COLORS.textColor,
+        marginTop: 18,
+        marginBottom: 8,
+        // lineHeight: 26,
+    },
+    h4: {
+        fontFamily: FONTS.URBANIST_SEMIBOLD,
+        fontSize: 18,
+        color: COLORS.textColor,
+        marginTop: 16,
+        marginBottom: 8,
+        // lineHeight: 24,
+    },
+    p: {
+        fontFamily: FONTS.URBANIST_REGULAR,
+        fontSize: 16,
+        color: COLORS.textColor,
+        marginTop: 12,
+        marginBottom: 12,
+        // lineHeight: 24,
+    },
+    ul: {
+        marginTop: 12,
+        marginBottom: 12,
+        paddingLeft: 20,
+    },
+    ol: {
+        marginTop: 12,
+        marginBottom: 12,
+        paddingLeft: 20,
+    },
+    li: {
+        fontFamily: FONTS.URBANIST_REGULAR,
+        fontSize: 16,
+        color: COLORS.textColor,
+        marginTop: 8,
+        marginBottom: 8,
+        // lineHeight: 24,
+    },
+    strong: {
+        fontFamily: FONTS.URBANIST_BOLD,
+        fontWeight: 'bold',
+        color: COLORS.textColor,
+    },
+    em: {
+        fontFamily: FONTS.URBANIST_REGULAR,
+        fontStyle: 'italic',
+        color: COLORS.textColor,
+    },
+    a: {
+        fontFamily: FONTS.URBANIST_SEMIBOLD,
+        color: COLORS.pr_blue,
+        textDecorationLine: 'underline',
+    },
+    blockquote: {
+        fontFamily: FONTS.URBANIST_REGULAR,
+        fontSize: 16,
+        color: COLORS.textColor,
+        fontStyle: 'italic',
+        borderLeftWidth: 4,
+        borderLeftColor: COLORS.pr_blue,
+        paddingLeft: 16,
+        marginTop: 12,
+        marginBottom: 12,
+    },
+    code: {
+        fontFamily: FONTS.URBANIST_REGULAR,
+        fontSize: 14,
+        backgroundColor: COLORS.grayBg,
+        padding: 4,
+        borderRadius: 4,
+    },
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -224,5 +255,22 @@ const styles = StyleSheet.create({
     htmlContainer: {
         marginTop: 20,
         paddingBottom: 50
+    },
+    htmlBaseStyle: {
+        fontFamily: FONTS.URBANIST_REGULAR,
+        fontSize: 16,
+        color: COLORS.textColor,
+        // lineHeight: 24,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: COLORS.textColor,
+        fontFamily: FONTS.URBANIST_REGULAR,
     }
 })

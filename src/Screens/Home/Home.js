@@ -25,7 +25,7 @@ import FastImage from 'react-native-fast-image';
 import CoursesGrid from '../Components/CoursesGrid'
 import { IMAGES } from '../../Common/Constants/images';
 import { getCourseAction } from '../../redux/cources/courceActions';
-import { getCheckoutSessionAction, getMembershipPlansAction, getMembershipByEmailAction } from '../../redux/dashboard/dashboardActions';
+import { getCheckoutSessionAction, getMembershipPlansAction } from '../../redux/dashboard/dashboardActions';
 import { getProfileData } from '../../redux/profile/profileActions';
 import IButton from '../Components/IButton';
 import { getUserFitnessDetails } from '../../api/profileApi';
@@ -49,7 +49,6 @@ const Home = props => {
 
     const membershipPlans = useSelector(state => state.dashboard?.membershipPlansData)
     const profileData = useSelector(state => state.profile?.profileData)
-    const userMembership = useSelector(state => state.dashboard?.userMembership)
 
     useEffect(() => {
         checkAuthentication();
@@ -67,10 +66,9 @@ const Home = props => {
         setPlansLoading(true);
 
         localStorageHelper.getItemFromStorage(StorageKeys.USER_ID).then(userId => {
-            console.log('userId', userId);
             dispatch(getCourseAction({ userId: userId, onSuccess, onFailure }));
+            dispatch(getMembershipPlansAction({ userId: userId, onSuccessPlans, onFailurePlans }));
         });
-        dispatch(getMembershipPlansAction({ onSuccessPlans, onFailurePlans }));
         dispatch(getProfileData({ onSuccessProfile, onFailureProfile }));
     }, [isAuthenticated]);
 
@@ -102,24 +100,6 @@ const Home = props => {
         console.log('Failed to load profile data');
     };
 
-    const onSuccessMembership = (response) => {
-        console.log('User membership loaded:', response);
-    };
-
-    const onFailureMembership = () => {
-        console.log('Failed to load user membership');
-    };
-
-    // Check user membership when profile data with email is available
-    useEffect(() => {
-        if (profileData?.email) {
-            dispatch(getMembershipByEmailAction({
-                email: profileData.email,
-                onSuccess: onSuccessMembership,
-                onFailure: onFailureMembership
-            }));
-        }
-    }, [profileData?.email]);
 
     const transformCoursesToCards = (courses) => {
         const bgColors = ['#5E3BB9', '#C7463A', '#7A8593', '#D3792F'];
@@ -217,6 +197,7 @@ const Home = props => {
                         benefits={plan.benefits}
                         linearColor={plan.linearColor}
                         backgroundColor={plan.backgroundColor}
+                        purchased={plan.purchased}
                         onPress={() => onMembershipCardPress(plan)}
                     />
                 ))}
@@ -240,14 +221,43 @@ const Home = props => {
                     enableDefaultShare: false,
                 });
                 console.log('inappbrowser result', result);
+
+                // Refresh membership plans when browser closes (regardless of result type)
+                // This ensures cards are updated if user completed checkout
+                refreshMembershipPlans();
             } else {
                 // fallback to system browser
                 await Linking.openURL(url);
+                // Refresh after a delay to allow time for checkout completion
+                setTimeout(() => {
+                    refreshMembershipPlans();
+                }, 2000);
             }
         } catch (error) {
             console.error('openCheckout error', error);
             await Linking.openURL(url);
+            // Refresh after a delay to allow time for checkout completion
+            setTimeout(() => {
+                refreshMembershipPlans();
+            }, 2000);
         }
+    };
+
+    const refreshMembershipPlans = () => {
+        localStorageHelper.getItemFromStorage(StorageKeys.USER_ID).then(userId => {
+            if (userId) {
+                setPlansLoading(true);
+                dispatch(getMembershipPlansAction({
+                    userId: userId,
+                    onSuccessPlans: () => {
+                        setPlansLoading(false);
+                    },
+                    onFailurePlans: () => {
+                        setPlansLoading(false);
+                    }
+                }));
+            }
+        });
     };
 
     const checkOnboardingStatus = async () => {

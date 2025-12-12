@@ -5,3 +5,6 @@ export const getCourse = (userId) =>
 
 export const getCourseDetail = (id) =>
     userAuthFetch.get(`wp-json/learndash/v1/course-details/?id=${id}`).then(extractData);
+
+export const getLessonDetail = (lessonId) =>
+    userAuthFetch.get(`/wp-json/ldlms/v2/sfwd-lessons/${lessonId}`).then(extractData);

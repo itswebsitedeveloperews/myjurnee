@@ -16,20 +16,47 @@ import MenuItem from '../Components/MenuItem';
 import SectionHeader from '../Components/SectionHeader';
 import IButton from '../Components/IButton';
 import DeleteAccountModal from '../Components/DeleteAccountModal';
+import CancelMembershipModal from '../Components/CancelMembershipModal';
 import Snackbar from '../Components/Snackbar';
 import { DeleteUserAccount, LogUserOut } from '../../redux/auth/authActions';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
+import { getMembershipByEmailAction, cancelMembershipAction } from '../../redux/dashboard/dashboardActions';
+import { getProfileData } from '../../redux/profile/profileActions';
 
 const Profile = props => {
   const dispatch = useDispatch();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] = useState(false);
+  const [isCancelMembershipModalVisible, setIsCancelMembershipModalVisible] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [membershipLoaded, setMembershipLoaded] = useState(false);
   const profileData = useSelector(state => state.profile?.profileData || {});
+  const userMembership = useSelector(state => state.dashboard?.userMembership || {});
 
   useEffect(() => {
     checkAuthentication();
   }, []);
+
+  // Load profile data and membership when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getProfileData({ onSuccessProfile, onFailureProfile }));
+    }
+  }, [isAuthenticated]);
+
+  // Check user membership when profile data with email is available
+  useEffect(() => {
+    if (profileData?.email) {
+      setMembershipLoaded(false); // Reset loading state when email changes
+      dispatch(getMembershipByEmailAction({
+        email: profileData.email,
+        onSuccess: onSuccessMembership,
+        onFailure: onFailureMembership
+      }));
+    } else {
+      setMembershipLoaded(false); // Reset if no email available
+    }
+  }, [profileData?.email]);
 
   // Listen for navigation focus to show snackbar if profile was updated
   useFocusEffect(
@@ -89,6 +116,71 @@ const Profile = props => {
 
   const onDeleteAccountPress = () => {
     setIsDeleteAccountModalVisible(true);
+  };
+
+  const onSuccessProfile = () => {
+    // Profile data loaded successfully
+    console.log('Profile data loaded:', profileData);
+  };
+
+  const onFailureProfile = () => {
+    // Handle profile data loading failure
+    console.log('Failed to load profile data');
+  };
+
+  const onSuccessMembership = (response) => {
+    console.log('User membership loaded:', response);
+    console.log('Membership status:', response?.membership?.status);
+    setMembershipLoaded(true);
+  };
+
+  const onFailureMembership = () => {
+    console.log('Failed to load user membership');
+    setMembershipLoaded(true); // Mark as loaded even on failure so button can be shown/hidden correctly
+  };
+
+  const onCancelMembershipPress = () => {
+    // Check if user has an active membership
+    if (userMembership?.status === 'active') {
+      setIsCancelMembershipModalVisible(true);
+    } else {
+      Alert.alert(
+        'No Active Membership',
+        'You do not have an active membership to cancel.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
+  const handleCancelMembership = () => {
+    if (!profileData?.email) {
+      Alert.alert(
+        'Error',
+        'Email not found. Please try again.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    dispatch(cancelMembershipAction({
+      email: profileData.email,
+      onSuccess: (response) => {
+        console.log('Membership cancelled successfully:', response);
+        Alert.alert(
+          'Membership Cancelled',
+          'Your membership has been cancelled successfully.',
+          [{ text: 'OK' }]
+        );
+      },
+      onFailure: (error) => {
+        console.log('Cancel membership failed:', error);
+        Alert.alert(
+          'Error',
+          error || 'Failed to cancel membership. Please try again later.',
+          [{ text: 'OK' }]
+        );
+      }
+    }));
   };
 
   const handleDeleteAccount = async () => {
@@ -191,6 +283,17 @@ const Profile = props => {
 
         {/* APP SETTINGS Section */}
         <SectionHeader title="DANGER ZONE" />
+        {/* Show Cancel Membership only if membership data has been loaded and user has an active membership */}
+        {(() => {
+          // Debug logging
+          return membershipLoaded && userMembership?.status === 'active';
+        })() && (
+            <MenuItem
+              icon={IMAGES.DELETE_ICON}
+              title="Cancel Membership"
+              onPress={onCancelMembershipPress}
+            />
+          )}
         <MenuItem
           icon={IMAGES.DELETE_ICON}
           title="Delete Account"
@@ -214,6 +317,14 @@ const Profile = props => {
         isVisible={isDeleteAccountModalVisible}
         onClose={() => setIsDeleteAccountModalVisible(false)}
         onConfirmDelete={handleDeleteAccount}
+      />
+
+      {/* Cancel Membership Modal */}
+      <CancelMembershipModal
+        isVisible={isCancelMembershipModalVisible}
+        onClose={() => setIsCancelMembershipModalVisible(false)}
+        onConfirmCancel={handleCancelMembership}
+        membershipName={userMembership?.name}
       />
 
       {/* Snackbar for profile update success */}

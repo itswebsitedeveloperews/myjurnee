@@ -3,10 +3,12 @@ import { isFunction } from '../../Utils/Utils';
 import {
   getCourse,
   getCourseDetail,
+  getLessonDetail,
 } from '../../api/courceApi.js';
 import {
   onCourseDetailSuccess,
   onCourseSuccess,
+  onLessonDetailSuccess,
 } from './courceSlice';
 
 export const getCourseAction = ({ userId, onSuccess, onFailure }) => {
@@ -43,6 +45,29 @@ export const getCourseDetailAction = ({ courseId, onSuccess, onFailure }) => {
               onSuccess();
             }
             dispatch(onCourseDetailSuccess(response));
+          }
+        })
+        .catch(err => {
+          if (isFunction(onFailure)) {
+            onFailure();
+          }
+        });
+    } catch (error) {
+      console.log('Error!', error);
+    }
+  };
+};
+
+export const getLessonDetailAction = ({ lessonId, onSuccess, onFailure }) => {
+  return async dispatch => {
+    try {
+      getLessonDetail(lessonId)
+        .then(response => {
+          if (response) {
+            if (isFunction(onSuccess)) {
+              onSuccess();
+            }
+            dispatch(onLessonDetailSuccess(response));
           }
         })
         .catch(err => {

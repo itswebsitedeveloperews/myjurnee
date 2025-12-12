@@ -39,6 +39,7 @@ export default function MembershipCard({
     style,
     linearColor = ['rgba(0, 0, 0, 0.6)', 'transparent'],
     backgroundColor = COLORS.purple || '#6B46C1',
+    purchased = false,
 }) {
     const renderBenefit = ({ item }) => (
         <View style={styles.benefitItem}>
@@ -96,8 +97,8 @@ export default function MembershipCard({
                         contentContainerStyle={styles.benefitsContainer}
                     />
 
-                    <TouchableOpacity style={styles.buyButton} onPress={onPress} activeOpacity={0.85}>
-                        <Text style={styles.buyButtonText}>Subscribe Now</Text>
+                    <TouchableOpacity style={styles.buyButton} onPress={purchased ? null : onPress} activeOpacity={0.85}>
+                        <Text style={styles.buyButtonText}>{purchased ? 'Subscribed' : 'Subscribe Now'}</Text>
                     </TouchableOpacity>
                 </View>
             </LinearGradient>

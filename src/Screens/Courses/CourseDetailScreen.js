@@ -174,8 +174,8 @@ const CourseDetailScreen = (props) => {
         extrapolate: 'clamp',
     });
 
-    const OnLessonClick = () => {
-        props.navigation.navigate('LessonDetailScreen');
+    const OnLessonClick = (lessonId) => {
+        props.navigation.navigate('LessonDetailScreen', { lessonId });
     }
 
     if (loading) {
@@ -242,7 +242,7 @@ const CourseDetailScreen = (props) => {
                     <Text style={styles.sectionTitle}>Course Content</Text>
 
                     {courseData?.lessons.map((lesson) => (
-                        <TouchableOpacity onPress={() => OnLessonClick()} key={lesson.ID} style={styles.lessonCard}>
+                        <TouchableOpacity onPress={() => OnLessonClick(lesson.ID)} key={lesson.ID} style={styles.lessonCard}>
                             <View style={styles.lessonContent}>
                                 <FileText color="#666" size={24} />
                                 <Text style={styles.lessonTitle} numberOfLines={2}>{lesson.title}</Text>
