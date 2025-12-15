@@ -35,10 +35,10 @@ export const getCourseAction = ({ userId, onSuccess, onFailure }) => {
   };
 };
 
-export const getCourseDetailAction = ({ courseId, onSuccess, onFailure }) => {
+export const getCourseDetailAction = ({ courseId, userId, onSuccess, onFailure }) => {
   return async dispatch => {
     try {
-      getCourseDetail(courseId)
+      getCourseDetail(courseId, userId)
         .then(response => {
           if (response) {
             if (isFunction(onSuccess)) {

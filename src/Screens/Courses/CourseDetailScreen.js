@@ -23,6 +23,7 @@ import { FONTS } from '../../Common/Constants/fonts';
 import { getCourseDetailAction } from '../../redux/cources/courceActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatDate } from '../../Utils/Utils';
+import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 
 const source = {
     html: `
@@ -139,7 +140,9 @@ const CourseDetailScreen = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        dispatch(getCourseDetailAction({ courseId, onSuccess, onFailure }));
+        localStorageHelper.getItemFromStorage(StorageKeys.USER_ID).then(userId => {
+            dispatch(getCourseDetailAction({ courseId, userId: userId, onSuccess, onFailure }));
+        });
     }, []);
 
     const onSuccess = () => {
