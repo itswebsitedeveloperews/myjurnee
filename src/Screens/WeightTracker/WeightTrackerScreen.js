@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 28,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.textColor,
     },
     loadingContainer: {
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     },
     authText: {
         fontSize: 16,
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: COLORS.textColor44,
         textAlign: 'center',
     },
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     },
     demoText: {
         fontSize: 14,
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: '#1976D2',
         textAlign: 'center',
     },

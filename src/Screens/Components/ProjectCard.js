@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 12,
   },
   title: {
-    fontFamily: FONTS.URBANIST_MEDIUM,
+    fontFamily: FONTS.BROTHER_1816_MEDIUM,
     color: COLORS.textColor,
     fontSize: 16,
     lineHeight: 18,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   address: {
-    fontFamily: FONTS.URBANIST_REGULAR,
+    fontFamily: FONTS.BROTHER_1816_REGULAR,
     color: COLORS.grayText,
     fontSize: 14,
     // lineHeight: 22,

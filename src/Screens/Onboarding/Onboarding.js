@@ -187,15 +187,15 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 52,
-        lineHeight: 60,
-        letterSpacing: 1,
-        fontFamily: FONTS.URBANIST_BOLD,
+        lineHeight: Platform.OS === 'ios' ? 50 : null,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.white,
         marginBottom: 12,
+
     },
     description: {
         fontSize: 18,
-        fontFamily: FONTS.URBANIST_SEMIBOLD,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: COLORS.white,
         lineHeight: 18,
     },
@@ -221,7 +221,9 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#D153FF',
-        paddingVertical: 16,
+        // paddingVertical: 12,
+        paddingBottom: 12,
+        paddingTop: 8,
         paddingHorizontal: 32,
         borderRadius: 8,
         alignItems: 'center',
@@ -230,11 +232,11 @@ const styles = StyleSheet.create({
         marginHorizontal: 80
     },
     buttonText: {
-        fontSize: 20,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontSize: 24,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.white,
         // textTransform: 'uppercase',
-        letterSpacing: 2,
+        // letterSpacing: 2,
     },
 });
 

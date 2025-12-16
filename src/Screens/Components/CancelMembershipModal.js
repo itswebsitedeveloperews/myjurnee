@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         flex: 1,
         fontSize: 18,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.red,
         marginLeft: 40,
         textAlign: 'center',
@@ -127,12 +127,12 @@ const styles = StyleSheet.create({
     closeButtonText: {
         fontSize: 16,
         color: COLORS.textColor,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         textAlign: 'center',
     },
     warningText: {
         fontSize: 14,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor,
         marginBottom: 16,
         lineHeight: 20,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     },
     cancelButtonText: {
         fontSize: 15,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.textColor,
         textAlign: 'center',
     },
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     },
     confirmButtonText: {
         fontSize: 15,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.white,
         textAlign: 'center',
     },

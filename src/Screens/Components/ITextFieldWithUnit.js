@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     inputStyle: {
         flex: 1,
         // paddingHorizontal: 8,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         fontSize: 16,
         color: COLORS.black,
     },
@@ -212,11 +212,11 @@ const styles = StyleSheet.create({
     },
     unitText: {
         fontSize: 13,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.white,
     },
     unitTextActive: {
         color: COLORS.black,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
     },
 });

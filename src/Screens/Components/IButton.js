@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   title: {
-    fontFamily: FONTS.URBANIST_SEMIBOLD,
+    fontFamily: FONTS.BROTHER_1816_MEDIUM,
     color: COLORS.white,
     fontSize: 15,
     lineHeight: 22,

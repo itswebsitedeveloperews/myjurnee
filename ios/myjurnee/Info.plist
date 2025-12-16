@@ -60,6 +60,11 @@
 		<string>Urbanist-Regular.ttf</string>
 		<string>Urbanist-SemiBold.ttf</string>
 		<string>Urbanist-Thin.ttf</string>
+		<string>Brother-1816-Bold.otf</string>
+		<string>Brother-1816-Extra-Bold.otf</string>
+		<string>Brother-1816-Light.otf</string>
+		<string>Brother-1816-Medium.otf</string>
+		<string>Brother-1816-Regular.otf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

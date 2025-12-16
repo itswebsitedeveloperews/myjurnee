@@ -17,4 +17,10 @@ export const FONTS = {
   URBANIST_REGULAR: 'Urbanist-Regular', //400
   URBANIST_SEMIBOLD: 'Urbanist-SemiBold', //600
   URBANIST_THIN: 'Urbanist-Thin', //100
+
+
+  BROTHER_1816_BOLD: 'Brother-1816-Bold', //100
+  BROTHER_1816_LIGHT: 'Brother-1816-Light', //300
+  BROTHER_1816_MEDIUM: 'Brother-1816-Medium', //500
+  BROTHER_1816_REGULAR: 'Brother-1816-Regular', //400
 };

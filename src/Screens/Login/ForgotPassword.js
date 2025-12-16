@@ -109,13 +109,13 @@ const styles = StyleSheet.create({
         bottom: 0,
     },
     title: {
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         fontSize: 30,
         color: COLORS.textColor,
         textAlign: 'center',
     },
     description: {
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         fontSize: 14,
         color: COLORS.textColor,
         numberOfLines: 2,

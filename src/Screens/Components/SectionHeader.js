@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     title: {
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         fontSize: 16,
         color: COLORS.textColorSection,
     },

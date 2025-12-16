@@ -409,19 +409,19 @@ const styles = StyleSheet.create({
     },
     weightText: {
         fontSize: 18,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.textColor,
         marginBottom: 4,
     },
     photoTitle: {
         fontSize: 18,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.textColor,
         marginBottom: 4,
     },
     dateText: {
         fontSize: 14,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor44,
     },
     changeInfo: {
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     },
     changeText: {
         fontSize: 14,
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
     },
     deleteButton: {
         padding: 4,
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     },
     photosCountText: {
         fontSize: 12,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor44,
         marginTop: 2,
     },
@@ -500,12 +500,12 @@ const styles = StyleSheet.create({
     undoText: {
         flex: 1,
         fontSize: 16,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.textColor,
     },
     undoButton: {
         fontSize: 16,
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: '#2196F3',
     },
     loadingContainer: {
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     },
     loadingText: {
         fontSize: 16,
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: COLORS.textColor44,
     },
     emptyContainer: {
@@ -528,14 +528,14 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 18,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.textColor,
         marginBottom: 8,
         textAlign: 'center',
     },
     emptySubtext: {
         fontSize: 14,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor44,
         textAlign: 'center',
     },
@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
     },
     authText: {
         fontSize: 16,
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: COLORS.textColor44,
         textAlign: 'center',
     },
@@ -561,7 +561,7 @@ const styles = StyleSheet.create({
     },
     demoText: {
         fontSize: 14,
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: '#1976D2',
         textAlign: 'center',
     },

@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     loadingText: {
         marginTop: 10,
         fontSize: 16,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor,
     },
     listContainer: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 28,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.textColor,
         // marginBottom: 20,
     },
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         fontSize: 16,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor,
     },
     filterContainer: {
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     },
     filterText: {
         fontSize: 14,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor,
     },
     selectedFilterText: {
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     },
     sortText: {
         fontSize: 14,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor,
         marginRight: 5,
     },
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     },
     startCourseText: {
         fontSize: 10,
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: COLORS.white,
     },
     bookIcon: {
@@ -370,14 +370,14 @@ const styles = StyleSheet.create({
     },
     courseTitle: {
         fontSize: 16,
-        fontFamily: FONTS.URBANIST_SEMIBOLD,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: COLORS.textColor,
         lineHeight: 22,
         marginBottom: 4,
     },
     courseAuthor: {
         fontSize: 12,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor44,
         marginBottom: 8,
     },
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     },
     courseDate: {
         fontSize: 12,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor44,
         flex: 1,
     },
@@ -415,14 +415,14 @@ const styles = StyleSheet.create({
     },
     emptyTitle: {
         fontSize: 20,
-        fontFamily: FONTS.URBANIST_SEMIBOLD,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: COLORS.textColor,
         textAlign: 'center',
         marginBottom: 10,
     },
     emptySubtitle: {
         fontSize: 16,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.textColor44,
         textAlign: 'center',
         lineHeight: 22,

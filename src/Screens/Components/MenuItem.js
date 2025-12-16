@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
         marginRight: 16,
     },
     title: {
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         fontSize: 16,
         color: COLORS.textColor,
         flex: 1,

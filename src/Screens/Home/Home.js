@@ -419,18 +419,18 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 24,
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.titleColor,
     },
     headerSubTitle: {
         fontSize: 16,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         color: COLORS.subTitleColor,
         marginTop: 3
     },
     subHeaderTitle: {
         fontSize: 20,
-        fontFamily: FONTS.URBANIST_SEMIBOLD,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: COLORS.black,
         paddingHorizontal: 20,
         marginBottom: 10
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     viewMoreBtnText: {
         fontSize: 16,
         textDecorationLine: 'underline',
-        fontFamily: FONTS.URBANIST_SEMIBOLD,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: COLORS.black,
         marginRight: 10
         // paddingHorizontal: 20,
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
     },
     userNameText: {
         fontSize: 22,
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         color: COLORS.black
     },
     logoContainer: {
@@ -478,20 +478,20 @@ const styles = StyleSheet.create({
     },
     subTitleText: {
         color: COLORS.textColor,
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         fontSize: 48,
         textAlign: 'center'
     },
     subText1: {
         marginTop: 15,
         color: COLORS.textColor,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         fontSize: 22,
         textAlign: 'center'
     },
 
     viewMoreText: {
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         fontSize: 18,
         color: COLORS.black
     },

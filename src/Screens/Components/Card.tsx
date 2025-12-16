@@ -45,13 +45,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontFamily: FONTS.URBANIST_BOLD,
+    fontFamily: FONTS.BROTHER_1816_BOLD,
     color: COLORS.textColor,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 13,
-    fontFamily: FONTS.URBANIST_MEDIUM,
+    fontFamily: FONTS.BROTHER_1816_MEDIUM,
     color: COLORS.black,
   },
 });

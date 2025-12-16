@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontFamily: FONTS.URBANIST_BOLD,
+    fontFamily: FONTS.BROTHER_1816_BOLD,
     color: COLORS.black,
     marginBottom: 12,
     marginTop: 10,

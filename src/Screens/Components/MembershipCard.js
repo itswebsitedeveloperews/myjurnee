@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     },
     title: {
         color: '#fff',
-        fontFamily: FONTS?.URBANIST_SEMIBOLD || undefined,
+        fontFamily: FONTS?.BROTHER_1816_MEDIUM || undefined,
         fontSize: 20,
     },
     priceWrap: {
@@ -129,13 +129,13 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 14,
         marginRight: 4,
-        fontFamily: FONTS?.URBANIST_REGULAR || undefined,
+        fontFamily: FONTS?.BROTHER_1816_REGULAR || undefined,
         opacity: 0.95,
     },
     price: {
         color: '#fff',
         fontSize: 20,
-        fontFamily: FONTS?.URBANIST_BOLD || undefined,
+        fontFamily: FONTS?.BROTHER_1816_BOLD || undefined,
     },
     period: {
         color: '#fff',
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         marginLeft: 6,
         alignSelf: 'flex-end',
         opacity: 0.95,
-        fontFamily: FONTS?.URBANIST_REGULAR || undefined,
+        fontFamily: FONTS?.BROTHER_1816_REGULAR || undefined,
     },
 
     subtitle: {
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         opacity: 0.95,
         fontSize: 13,
-        fontFamily: FONTS?.URBANIST_REGULAR || undefined,
+        fontFamily: FONTS?.BROTHER_1816_REGULAR || undefined,
     },
 
     divider: {
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     },
     benefitTitle: {
         color: '#fff',
-        fontFamily: FONTS?.URBANIST_SEMIBOLD || undefined,
+        fontFamily: FONTS?.BROTHER_1816_MEDIUM || undefined,
         fontSize: 13,
     },
     benefitSubtitle: {
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
         opacity: 0.92,
         marginTop: 4,
         // textAlign: 'center',
-        fontFamily: FONTS?.URBANIST_REGULAR || undefined,
+        fontFamily: FONTS?.BROTHER_1816_REGULAR || undefined,
     },
     buyButton: {
         backgroundColor: '#fff',
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     },
     buyButtonText: {
         color: '#000',
-        fontFamily: FONTS.URBANIST_SEMIBOLD,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         fontSize: 14,
     },
 });

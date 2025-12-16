@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 18,
-    fontFamily: FONTS.URBANIST_BOLD,
+    fontFamily: FONTS.BROTHER_1816_BOLD,
     textAlign: 'center',
   },
   primaryText: {

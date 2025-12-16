@@ -176,13 +176,13 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     message: {
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         fontSize: 14,
         color: COLORS.white,
         lineHeight: 20,
     },
     boldText: {
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         color: COLORS.white,
     },
     closeButton: {

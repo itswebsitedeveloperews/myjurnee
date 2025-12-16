@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     labelText: {
         fontSize: 14,
         color: DEFAULT_COLORS.text,
-        fontFamily: FONTS.URBANIST_REGULAR
+        fontFamily: FONTS.BROTHER_1816_REGULAR
     },
     right: {
         flexDirection: 'row',

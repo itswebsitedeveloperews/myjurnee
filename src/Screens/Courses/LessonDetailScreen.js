@@ -111,7 +111,7 @@ const LessonDetailScreen = (props) => {
                             baseStyle={styles.htmlBaseStyle}
                             defaultTextProps={{
                                 style: Platform.OS === 'android' ? {
-                                    fontFamily: FONTS.URBANIST_REGULAR,
+                                    fontFamily: FONTS.BROTHER_1816_REGULAR,
                                 } : undefined
                             }}
                             enableExperimentalMarginCollapsing={true}
@@ -219,17 +219,17 @@ const getHtmlTagsStyles = () => {
     if (Platform.OS === 'ios') {
         return {
             ...baseStyles,
-            h1: { ...baseStyles.h1, fontFamily: FONTS.URBANIST_BOLD },
-            h2: { ...baseStyles.h2, fontFamily: FONTS.URBANIST_BOLD },
-            h3: { ...baseStyles.h3, fontFamily: FONTS.URBANIST_SEMIBOLD },
-            h4: { ...baseStyles.h4, fontFamily: FONTS.URBANIST_SEMIBOLD },
-            p: { ...baseStyles.p, fontFamily: FONTS.URBANIST_REGULAR },
-            li: { ...baseStyles.li, fontFamily: FONTS.URBANIST_REGULAR },
-            strong: { ...baseStyles.strong, fontFamily: FONTS.URBANIST_BOLD },
-            em: { ...baseStyles.em, fontFamily: FONTS.URBANIST_REGULAR },
-            a: { ...baseStyles.a, fontFamily: FONTS.URBANIST_SEMIBOLD },
-            blockquote: { ...baseStyles.blockquote, fontFamily: FONTS.URBANIST_REGULAR },
-            code: { ...baseStyles.code, fontFamily: FONTS.URBANIST_REGULAR },
+            h1: { ...baseStyles.h1, fontFamily: FONTS.BROTHER_1816_BOLD },
+            h2: { ...baseStyles.h2, fontFamily: FONTS.BROTHER_1816_BOLD },
+            h3: { ...baseStyles.h3, fontFamily: FONTS.BROTHER_1816_MEDIUM },
+            h4: { ...baseStyles.h4, fontFamily: FONTS.BROTHER_1816_MEDIUM },
+            p: { ...baseStyles.p, fontFamily: FONTS.BROTHER_1816_REGULAR },
+            li: { ...baseStyles.li, fontFamily: FONTS.BROTHER_1816_REGULAR },
+            strong: { ...baseStyles.strong, fontFamily: FONTS.BROTHER_1816_BOLD },
+            em: { ...baseStyles.em, fontFamily: FONTS.BROTHER_1816_REGULAR },
+            a: { ...baseStyles.a, fontFamily: FONTS.BROTHER_1816_MEDIUM },
+            blockquote: { ...baseStyles.blockquote, fontFamily: FONTS.BROTHER_1816_REGULAR },
+            code: { ...baseStyles.code, fontFamily: FONTS.BROTHER_1816_REGULAR },
         };
     }
 
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
         marginLeft: 5
     },
     controlButtonsText: {
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         fontSize: 14,
         color: COLORS.white,
     },
@@ -264,13 +264,13 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     titleText: {
-        fontFamily: FONTS.URBANIST_BOLD,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         fontSize: 24,
         color: COLORS.textColor,
         textAlign: 'left'
     },
     lessonNumText: {
-        fontFamily: FONTS.URBANIST_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         fontSize: 14,
         color: COLORS.textColor44,
         textAlign: 'left'
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
         }),
     },
     htmlBaseStyle: {
-        ...(Platform.OS === 'ios' && { fontFamily: FONTS.URBANIST_REGULAR }),
+        ...(Platform.OS === 'ios' && { fontFamily: FONTS.BROTHER_1816_REGULAR }),
         fontSize: 16,
         color: COLORS.textColor,
     },
@@ -297,6 +297,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
         fontSize: 16,
         color: COLORS.textColor,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
     }
 })

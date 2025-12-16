@@ -31,6 +31,11 @@
 		84FC7AF12E9FD60500518F24 /* Exceptions for "fonts" folder in "myjurnee" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Brother-1816-Bold.otf",
+				"Brother-1816-Extra-Bold.otf",
+				"Brother-1816-Light.otf",
+				"Brother-1816-Medium.otf",
+				"Brother-1816-Regular.otf",
 				"Outfit-Black.ttf",
 				"Outfit-Bold.ttf",
 				"Outfit-ExtraBold.ttf",
@@ -229,9 +234,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-myjurnee/Pods-myjurnee-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-myjurnee/Pods-myjurnee-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -268,9 +277,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-myjurnee/Pods-myjurnee-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-myjurnee/Pods-myjurnee-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -297,7 +310,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 3PF4WZ2G2Z;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = myjurnee/Info.plist;
@@ -327,7 +340,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 3PF4WZ2G2Z;
 				INFOPLIST_FILE = myjurnee/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";

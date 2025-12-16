@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   categoryTitle: {
     fontSize: 15,
-    fontFamily: FONTS.URBANIST_BOLD,
+    fontFamily: FONTS.BROTHER_1816_BOLD,
     color: COLORS.white,
     textAlign: 'center',
     letterSpacing: 2,
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   },
   instructorName: {
     fontSize: 13,
-    fontFamily: FONTS.URBANIST_REGULAR,
+    fontFamily: FONTS.BROTHER_1816_REGULAR,
     color: COLORS.white,
     textAlign: 'center',
   },
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 11,
-    fontFamily: FONTS.URBANIST_MEDIUM,
+    fontFamily: FONTS.BROTHER_1816_MEDIUM,
     color: COLORS.white,
   },
   detailsContainer: {
@@ -191,13 +191,13 @@ const styles = StyleSheet.create({
   },
   courseTitle: {
     fontSize: 16,
-    fontFamily: FONTS.URBANIST_SEMIBOLD,
+    fontFamily: FONTS.BROTHER_1816_MEDIUM,
     color: COLORS.black,
     marginBottom: 10,
   },
   courseDescription: {
     fontSize: 12,
-    fontFamily: FONTS.URBANIST_REGULAR,
+    fontFamily: FONTS.BROTHER_1816_REGULAR,
     color: COLORS.black,
     marginBottom: 12,
     lineHeight: 18
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   viewButtonText: {
     fontSize: 14,
-    fontFamily: FONTS.URBANIST_SEMIBOLD,
+    fontFamily: FONTS.BROTHER_1816_MEDIUM,
     color: COLORS.white,
   },
 });

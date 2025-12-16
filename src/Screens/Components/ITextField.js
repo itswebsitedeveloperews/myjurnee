@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   inputStyle: {
     flex: 1,
     paddingHorizontal: 12,
-    fontFamily: FONTS.URBANIST_REGULAR,
+    fontFamily: FONTS.BROTHER_1816_REGULAR,
     fontSize: 16,
     color: COLORS.black,
   },
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     width: 20,
   },
   errorText: {
-    fontFamily: FONTS.URBANIST_REGULAR,
+    fontFamily: FONTS.BROTHER_1816_REGULAR,
     fontSize: 14,
     color: COLORS.red,
     marginLeft: 5,

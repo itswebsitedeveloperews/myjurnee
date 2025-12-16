@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
         // elevation: 12,
     },
     label: {
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
         fontSize: 18,
 
     },

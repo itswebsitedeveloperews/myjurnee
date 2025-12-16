@@ -41,13 +41,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   titleText: {
-    fontFamily: FONTS.URBANIST_MEDIUM,
+    fontFamily: FONTS.BROTHER_1816_MEDIUM,
     color: COLORS.textColor,
     fontSize: 16,
     lineHeight: 22,
   },
   subtitleText: {
-    fontFamily: FONTS.URBANIST_REGULAR,
+    fontFamily: FONTS.BROTHER_1816_REGULAR,
     color: COLORS.textColor64,
     fontSize: 12,
     lineHeight: 16,
