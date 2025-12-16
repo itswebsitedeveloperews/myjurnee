@@ -28,9 +28,9 @@ export const IMAGES = {
   IC_CAMERA: require('../../assets/images_new/camera.png'),
   //Onboarding image
   IC_ONBOARDING_TOP: require('../../assets/images/onboardingTop.png'),
-  ONBOARDING_1: require('../../assets/images_new/onboarding_1.png'),
-  ONBOARDING_2: require('../../assets/images_new/onboarding_2.png'),
-  ONBOARDING_3: require('../../assets/images_new/onboarding_3.png'),
+  ONBOARDING_1: require('../../assets/images_new/onboarding_1.jpg'),
+  ONBOARDING_2: require('../../assets/images_new/onboarding_2.jpg'),
+  ONBOARDING_3: require('../../assets/images_new/onboarding_3.jpg'),
   IC_ARROW_LEFT: require('../../assets/images_new/Arrow_Left.png'),
 
   //ICONS

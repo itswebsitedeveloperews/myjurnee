@@ -1,4 +1,4 @@
-import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native'
+import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Dimensions, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { COLORS } from '../../Common/Constants/colors'
@@ -55,7 +55,7 @@ const LessonDetailScreen = (props) => {
                 <View style={{ paddingHorizontal: 20 }}>
                     <LessonNavBar
                         onBackPress={() => props.navigation.goBack()}
-                        rightComponents={[renderPrevButton(), renderNextButton()]}
+                    // rightComponents={[renderPrevButton(), renderNextButton()]}
                     />
                 </View>
                 <View style={styles.loadingContainer}>
@@ -72,7 +72,7 @@ const LessonDetailScreen = (props) => {
             <View style={{ paddingHorizontal: 20 }}>
                 <LessonNavBar
                     onBackPress={() => props.navigation.goBack()}
-                    rightComponents={[renderPrevButton(), renderNextButton()]}
+                // rightComponents={[renderPrevButton(), renderNextButton()]}
                 />
             </View>
 
@@ -103,12 +103,23 @@ const LessonDetailScreen = (props) => {
                 {lessonData?.content?.rendered && (
                     <View style={styles.htmlContainer}>
                         <RenderHtml
-                            contentWidth={windowWidth - 30}
+                            contentWidth={Dimensions.get('window').width - 30}
                             source={{
                                 html: lessonData.content.rendered
                             }}
                             tagsStyles={htmlTagsStyles}
                             baseStyle={styles.htmlBaseStyle}
+                            defaultTextProps={{
+                                style: Platform.OS === 'android' ? {
+                                    fontFamily: FONTS.URBANIST_REGULAR,
+                                } : undefined
+                            }}
+                            enableExperimentalMarginCollapsing={true}
+                            renderersProps={{
+                                img: {
+                                    enableExperimentalPercentWidth: true
+                                }
+                            }}
                         />
                     </View>
                 )}
@@ -120,100 +131,112 @@ const LessonDetailScreen = (props) => {
 
 export default LessonDetailScreen
 
-// HTML Tags Styles
-const htmlTagsStyles = {
-    h1: {
-        fontFamily: FONTS.URBANIST_BOLD,
-        fontSize: 28,
-        color: COLORS.textColor,
-        marginTop: 24,
-        marginBottom: 12,
-        // lineHeight: 34,
-    },
-    h2: {
-        fontFamily: FONTS.URBANIST_BOLD,
-        fontSize: 24,
-        color: COLORS.textColor,
-        marginTop: 20,
-        marginBottom: 10,
-        // lineHeight: 30,
-    },
-    h3: {
-        fontFamily: FONTS.URBANIST_SEMIBOLD,
-        fontSize: 20,
-        color: COLORS.textColor,
-        marginTop: 18,
-        marginBottom: 8,
-        // lineHeight: 26,
-    },
-    h4: {
-        fontFamily: FONTS.URBANIST_SEMIBOLD,
-        fontSize: 18,
-        color: COLORS.textColor,
-        marginTop: 16,
-        marginBottom: 8,
-        // lineHeight: 24,
-    },
-    p: {
-        fontFamily: FONTS.URBANIST_REGULAR,
-        fontSize: 16,
-        color: COLORS.textColor,
-        marginTop: 12,
-        marginBottom: 12,
-        // lineHeight: 24,
-    },
-    ul: {
-        marginTop: 12,
-        marginBottom: 12,
-        paddingLeft: 20,
-    },
-    ol: {
-        marginTop: 12,
-        marginBottom: 12,
-        paddingLeft: 20,
-    },
-    li: {
-        fontFamily: FONTS.URBANIST_REGULAR,
-        fontSize: 16,
-        color: COLORS.textColor,
-        marginTop: 8,
-        marginBottom: 8,
-        // lineHeight: 24,
-    },
-    strong: {
-        fontFamily: FONTS.URBANIST_BOLD,
-        fontWeight: 'bold',
-        color: COLORS.textColor,
-    },
-    em: {
-        fontFamily: FONTS.URBANIST_REGULAR,
-        fontStyle: 'italic',
-        color: COLORS.textColor,
-    },
-    a: {
-        fontFamily: FONTS.URBANIST_SEMIBOLD,
-        color: COLORS.pr_blue,
-        textDecorationLine: 'underline',
-    },
-    blockquote: {
-        fontFamily: FONTS.URBANIST_REGULAR,
-        fontSize: 16,
-        color: COLORS.textColor,
-        fontStyle: 'italic',
-        borderLeftWidth: 4,
-        borderLeftColor: COLORS.pr_blue,
-        paddingLeft: 16,
-        marginTop: 12,
-        marginBottom: 12,
-    },
-    code: {
-        fontFamily: FONTS.URBANIST_REGULAR,
-        fontSize: 14,
-        backgroundColor: COLORS.grayBg,
-        padding: 4,
-        borderRadius: 4,
-    },
+// HTML Tags Styles - Platform specific font handling
+const getHtmlTagsStyles = () => {
+    const baseStyles = {
+        h1: {
+            fontSize: 28,
+            color: COLORS.textColor,
+            marginTop: 24,
+            marginBottom: 12,
+            fontWeight: 'bold',
+        },
+        h2: {
+            fontSize: 24,
+            color: COLORS.textColor,
+            marginTop: 20,
+            marginBottom: 10,
+            fontWeight: 'bold',
+        },
+        h3: {
+            fontSize: 20,
+            color: COLORS.textColor,
+            marginTop: 18,
+            marginBottom: 8,
+            fontWeight: '600',
+        },
+        h4: {
+            fontSize: 18,
+            color: COLORS.textColor,
+            marginTop: 16,
+            marginBottom: 8,
+            fontWeight: '600',
+        },
+        p: {
+            fontSize: 16,
+            color: COLORS.textColor,
+            marginTop: 12,
+            marginBottom: 12,
+        },
+        ul: {
+            marginTop: 12,
+            marginBottom: 12,
+            paddingLeft: 20,
+        },
+        ol: {
+            marginTop: 12,
+            marginBottom: 12,
+            paddingLeft: 20,
+        },
+        li: {
+            fontSize: 16,
+            color: COLORS.textColor,
+            marginTop: 8,
+            marginBottom: 8,
+        },
+        strong: {
+            fontWeight: 'bold',
+            color: COLORS.textColor,
+        },
+        em: {
+            fontStyle: 'italic',
+            color: COLORS.textColor,
+        },
+        a: {
+            color: COLORS.pr_blue,
+            textDecorationLine: 'underline',
+            fontWeight: '600',
+        },
+        blockquote: {
+            fontSize: 16,
+            color: COLORS.textColor,
+            fontStyle: 'italic',
+            borderLeftWidth: 4,
+            borderLeftColor: COLORS.pr_blue,
+            paddingLeft: 16,
+            marginTop: 12,
+            marginBottom: 12,
+        },
+        code: {
+            fontSize: 14,
+            backgroundColor: COLORS.grayBg,
+            padding: 4,
+            borderRadius: 4,
+        },
+    };
+
+    // Add fontFamily for iOS, use fontWeight for Android
+    if (Platform.OS === 'ios') {
+        return {
+            ...baseStyles,
+            h1: { ...baseStyles.h1, fontFamily: FONTS.URBANIST_BOLD },
+            h2: { ...baseStyles.h2, fontFamily: FONTS.URBANIST_BOLD },
+            h3: { ...baseStyles.h3, fontFamily: FONTS.URBANIST_SEMIBOLD },
+            h4: { ...baseStyles.h4, fontFamily: FONTS.URBANIST_SEMIBOLD },
+            p: { ...baseStyles.p, fontFamily: FONTS.URBANIST_REGULAR },
+            li: { ...baseStyles.li, fontFamily: FONTS.URBANIST_REGULAR },
+            strong: { ...baseStyles.strong, fontFamily: FONTS.URBANIST_BOLD },
+            em: { ...baseStyles.em, fontFamily: FONTS.URBANIST_REGULAR },
+            a: { ...baseStyles.a, fontFamily: FONTS.URBANIST_SEMIBOLD },
+            blockquote: { ...baseStyles.blockquote, fontFamily: FONTS.URBANIST_REGULAR },
+            code: { ...baseStyles.code, fontFamily: FONTS.URBANIST_REGULAR },
+        };
+    }
+
+    return baseStyles;
 };
+
+const htmlTagsStyles = getHtmlTagsStyles();
 
 const styles = StyleSheet.create({
     container: {
@@ -254,13 +277,16 @@ const styles = StyleSheet.create({
     },
     htmlContainer: {
         marginTop: 20,
-        paddingBottom: 50
+        paddingBottom: 50,
+        width: '100%',
+        ...(Platform.OS === 'android' && {
+            flex: 1,
+        }),
     },
     htmlBaseStyle: {
-        fontFamily: FONTS.URBANIST_REGULAR,
+        ...(Platform.OS === 'ios' && { fontFamily: FONTS.URBANIST_REGULAR }),
         fontSize: 16,
         color: COLORS.textColor,
-        // lineHeight: 24,
     },
     loadingContainer: {
         flex: 1,

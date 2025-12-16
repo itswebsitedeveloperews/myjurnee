@@ -12,30 +12,31 @@ import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
 import { IMAGES } from '../../Common/Constants/images';
 import { StorageKeys, localStorageHelper } from '../../Common/localStorageHelper';
+import FastImage from 'react-native-fast-image';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const onboardingData = [
     {
         id: '1',
-        title: 'Weight Tracker',
-        description: 'Welcome to The Ultimate Exercise Library\nPlus, the ultimate resource for\ncomprehensive exercise guidance!',
+        title: 'Change your eating habits',
+        description: 'Lorem ipsum dolor sit ame consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt utvolutpat.',
         image: IMAGES.ONBOARDING_1,
-        buttonText: 'NEXT',
+        buttonText: 'Go Ahead',
     },
     {
         id: '2',
-        title: 'Nutrition Courses',
-        description: 'Welcome to The Ultimate Exercise Library\nPlus, the ultimate resource for\ncomprehensive exercise guidance!',
+        title: 'Track your weight-loss',
+        description: 'Lorem ipsum dolor sit ame consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt utvolutpat.',
         image: IMAGES.ONBOARDING_2,
-        buttonText: 'NEXT',
+        buttonText: 'Go Ahead',
     },
     {
         id: '3',
-        title: 'Track Your Progress',
-        description: 'Welcome to The Ultimate Exercise Library\nPlus, the ultimate resource for\ncomprehensive exercise guidance!',
+        title: 'Update your progress daily',
+        description: 'Lorem ipsum dolor sit ame consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt utvolutpat.',
         image: IMAGES.ONBOARDING_3,
-        buttonText: 'GO AHEAD',
+        buttonText: 'Go Ahead',
     },
 ];
 
@@ -85,6 +86,9 @@ const Onboarding = ({ navigation }) => {
                     source={item.image}
                     style={styles.backgroundImage}
                     resizeMode="cover">
+                    <View style={styles.imageContainer}>
+                        <FastImage source={IMAGES.BLACK_LOGO} style={styles.logo} resizeMode="contain" />
+                    </View>
                     {/* <View style={styles.overlay} /> */}
                     <View style={styles.contentContainer}>
                         <View style={styles.textContainer}>
@@ -142,6 +146,17 @@ const Onboarding = ({ navigation }) => {
 export default Onboarding;
 
 const styles = StyleSheet.create({
+    imageContainer: {
+        alignItems: 'flex-end',
+        // justifyContent: 'center',
+        marginTop: Platform.OS === 'ios' ? 40 : 20,
+        marginRight: 20,
+        marginBottom: 60,
+    },
+    logo: {
+        height: 120,
+        width: 180,
+    },
     container: {
         flex: 1,
     },
@@ -179,8 +194,8 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     description: {
-        fontSize: 16,
-        fontFamily: FONTS.URBANIST_REGULAR,
+        fontSize: 18,
+        fontFamily: FONTS.URBANIST_SEMIBOLD,
         color: COLORS.white,
         lineHeight: 18,
     },
@@ -201,11 +216,11 @@ const styles = StyleSheet.create({
     },
     paginationDotActive: {
         width: 22,
-        backgroundColor: COLORS.purple,
+        backgroundColor: '#D153FF',
         opacity: 1,
     },
     button: {
-        backgroundColor: COLORS.purple,
+        backgroundColor: '#D153FF',
         paddingVertical: 16,
         paddingHorizontal: 32,
         borderRadius: 8,
@@ -215,10 +230,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 80
     },
     buttonText: {
-        fontSize: 16,
+        fontSize: 20,
         fontFamily: FONTS.URBANIST_BOLD,
         color: COLORS.white,
-        textTransform: 'uppercase',
+        // textTransform: 'uppercase',
         letterSpacing: 2,
     },
 });
