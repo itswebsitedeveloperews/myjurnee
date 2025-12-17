@@ -212,21 +212,21 @@ export const DeleteUserAccount = ({ userId, onSuccess, onFailure }) => {
   return async dispatch => {
     try {
       const userIdNumber = parseInt(userId, 10);
-      
+
       userDelete(userIdNumber)
         .then(response => {
           console.log('Delete account response---', response);
-          
+
           if (response?.success || response) {
             // Clear all local storage and logout after successful deletion
             localStorageHelper
               .clearStorage()
               .then(() => {
                 console.log('Account deleted successfully - storage cleared');
-                
+
                 // Reset auth state
                 dispatch(onLogin(null));
-                
+
                 if (isFunction(onSuccess)) {
                   onSuccess(response);
                 }

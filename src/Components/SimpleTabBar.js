@@ -10,8 +10,11 @@ import {
 import { COLORS } from '../Common/Constants/colors';
 import { FONTS } from '../Common/Constants/fonts';
 import { IMAGES } from '../Common/Constants/images';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SimpleTabBar = ({ state, descriptors, navigation }) => {
+    const insets = useSafeAreaInsets();
+
     const tabData = [
         {
             name: 'Home',
@@ -36,7 +39,7 @@ const SimpleTabBar = ({ state, descriptors, navigation }) => {
     ];
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingBottom: Platform.OS === 'ios' ? 0 : insets.bottom }]}>
             <View style={styles.tabBar}>
                 {state.routes.map((route, index) => {
                     const { options } = descriptors[route.key];

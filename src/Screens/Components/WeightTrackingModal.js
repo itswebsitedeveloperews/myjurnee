@@ -14,6 +14,7 @@ import {
 import Modal from 'react-native-modal';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
 
@@ -189,6 +190,10 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit, weightType = 'lbs' }
             animationIn="slideInUp"
             animationOut="slideOutDown"
             backdropOpacity={0.5}
+            avoidKeyboard={false}
+            useNativeDriverForBackdrop
+            hideModalContentWhileAnimating
+            statusBarTranslucent={true}
         >
             <View style={styles.modalContainer}>
                 {/* Header */}
@@ -201,7 +206,11 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit, weightType = 'lbs' }
                 </View>
 
                 {/* Content */}
-                <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                <KeyboardAwareScrollView
+                    style={styles.content}
+                    extraScrollHeight={0}
+                    enableOnAndroid={true}
+                >
                     {/* Weight and Date Input Section */}
                     <View style={styles.inputSection}>
                         <View style={styles.inputRow}>
@@ -285,7 +294,7 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit, weightType = 'lbs' }
                             (weight.trim() || selectedPhotos.length > 0) ? styles.updateButtonTextEnabled : styles.updateButtonTextDisabled
                         ]}>Update Progress</Text>
                     </TouchableOpacity>
-                </ScrollView>
+                </KeyboardAwareScrollView>
 
 
 

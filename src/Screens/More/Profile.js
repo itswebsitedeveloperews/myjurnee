@@ -246,7 +246,7 @@ const Profile = props => {
   };
 
   return (
-    <SafeAreaView style={[safeAreaStyle, styles.container]}>
+    <SafeAreaView style={[safeAreaStyle, styles.container]} edges={['top']}>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}

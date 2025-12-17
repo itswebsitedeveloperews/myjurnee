@@ -263,6 +263,33 @@ const CourseDetailScreen = (props) => {
                         source={{
                             html: courseData.content
                         }}
+                        defaultTextProps={{
+                            style: {
+                                fontFamily: FONTS.BROTHER_1816_REGULAR,
+                            }
+                        }}
+                        renderersProps={{
+                            ul: {
+                                markerBoxStyle: { paddingTop: 2 },
+                                markerTextStyle: {
+                                    fontFamily: FONTS.BROTHER_1816_REGULAR,
+                                    fontSize: 16,
+                                    lineHeight: 24,
+                                    color: COLORS.textColor,
+                                },
+                                itemContentStyle: { flex: 1 },
+                            },
+                            ol: {
+                                markerBoxStyle: { paddingTop: 2 },
+                                markerTextStyle: {
+                                    fontFamily: FONTS.BROTHER_1816_REGULAR,
+                                    fontSize: 16,
+                                    lineHeight: 24,
+                                    color: COLORS.textColor,
+                                },
+                                itemContentStyle: { flex: 1 },
+                            },
+                        }}
                     />
                 </View>
                 <View style={{ height: 70 }} />

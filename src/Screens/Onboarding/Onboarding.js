@@ -22,21 +22,21 @@ const onboardingData = [
         title: 'Change your eating habits',
         description: 'Lorem ipsum dolor sit ame consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt utvolutpat.',
         image: IMAGES.ONBOARDING_1,
-        buttonText: 'Go Ahead',
+        buttonText: 'Next',
     },
     {
         id: '2',
         title: 'Track your weight-loss',
         description: 'Lorem ipsum dolor sit ame consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt utvolutpat.',
         image: IMAGES.ONBOARDING_2,
-        buttonText: 'Go Ahead',
+        buttonText: 'Next',
     },
     {
         id: '3',
         title: 'Update your progress daily',
         description: 'Lorem ipsum dolor sit ame consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt utvolutpat.',
         image: IMAGES.ONBOARDING_3,
-        buttonText: 'Go Ahead',
+        buttonText: 'Next',
     },
 ];
 

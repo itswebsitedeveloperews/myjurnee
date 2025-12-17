@@ -61,19 +61,23 @@ export const getCourseDetailAction = ({ courseId, userId, onSuccess, onFailure }
 export const getLessonDetailAction = ({ lessonId, onSuccess, onFailure }) => {
   return async dispatch => {
     try {
-      getLessonDetail(lessonId)
-        .then(response => {
-          if (response) {
-            if (isFunction(onSuccess)) {
-              onSuccess();
-            }
-            dispatch(onLessonDetailSuccess(response));
-          }
-        })
-        .catch(err => {
-          if (isFunction(onFailure)) {
-            onFailure();
-          }
+      localStorageHelper
+        .getItemFromStorage(StorageKeys.USER_ID)
+        .then(async userId => {
+          getLessonDetail(lessonId, userId)
+            .then(response => {
+              if (response) {
+                if (isFunction(onSuccess)) {
+                  onSuccess();
+                }
+                dispatch(onLessonDetailSuccess(response));
+              }
+            })
+            .catch(err => {
+              if (isFunction(onFailure)) {
+                onFailure();
+              }
+            });
         });
     } catch (error) {
       console.log('Error!', error);

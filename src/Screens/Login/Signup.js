@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, ImageBackground, StyleSheet, Platform, Alert, ScrollView, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from 'react-native'
+import { View, Text, ImageBackground, StyleSheet, Platform, Alert, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from 'react-native'
 import { IMAGES } from '../../Common/Constants/images';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { safeAreaStyle } from '../../Common/CommonStyles';
@@ -13,6 +13,7 @@ import IButton from '../Components/IButton';
 import { useDispatch } from 'react-redux';
 import { RegisterUser } from '../../redux/auth/authActions';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const Signup = props => {
 
@@ -148,11 +149,14 @@ const Signup = props => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <ScrollView
+            <KeyboardAwareScrollView
                 contentContainerStyle={styles.scrollContainer}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
                 bounces={false}
+                enableOnAndroid={true}
+                extraScrollHeight={Platform.OS === 'android' ? 24 : 0}
+                keyboardOpeningTime={0}
                 automaticallyAdjustKeyboardInsets={true}
             >
                 <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -236,7 +240,7 @@ const Signup = props => {
                                     mainViewStyle={styles.loginButton}
                                 />
                             </View>
-                            <View style={{ height: '9%' }} />
+                            <View style={{ height: '3%' }} />
                             {/* Register Link */}
                             <View style={styles.registerContainer}>
                                 <Text style={styles.registerText}>
@@ -248,7 +252,7 @@ const Signup = props => {
 
                     </View>
                 </TouchableWithoutFeedback>
-            </ScrollView>
+            </KeyboardAwareScrollView>
         </SafeAreaView>
     );
 };

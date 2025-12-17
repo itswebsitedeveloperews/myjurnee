@@ -59,6 +59,7 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit, weightType = 'lbs' }
             animationIn="slideInUp"
             animationOut="slideOutDown"
             backdropOpacity={0.5}
+
         >
             <View style={styles.modalContainer}>
                 {/* Header */}

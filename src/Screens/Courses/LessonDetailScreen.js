@@ -82,10 +82,10 @@ const LessonDetailScreen = (props) => {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Lesson Title */}
-                {lessonData?.title?.rendered && (
+                {!!lessonData?.title && (
                     <View style={styles.titleContainer}>
                         <Text style={styles.titleText} numberOfLines={3}>
-                            {lessonData.title.rendered}
+                            {lessonData.title}
                         </Text>
                     </View>
                 )}
@@ -100,26 +100,16 @@ const LessonDetailScreen = (props) => {
                 )}
 
                 {/* HTML Content of the lesson */}
-                {lessonData?.content?.rendered && (
+                {!!lessonData?.content && (
                     <View style={styles.htmlContainer}>
                         <RenderHtml
                             contentWidth={Dimensions.get('window').width - 30}
-                            source={{
-                                html: lessonData.content.rendered
-                            }}
+                            source={getLessonHtmlSource(lessonData.content)}
                             tagsStyles={htmlTagsStyles}
                             baseStyle={styles.htmlBaseStyle}
-                            defaultTextProps={{
-                                style: Platform.OS === 'android' ? {
-                                    fontFamily: FONTS.BROTHER_1816_REGULAR,
-                                } : undefined
-                            }}
+                            defaultTextProps={renderHtmlDefaultTextProps}
                             enableExperimentalMarginCollapsing={true}
-                            renderersProps={{
-                                img: {
-                                    enableExperimentalPercentWidth: true
-                                }
-                            }}
+                            renderersProps={renderHtmlRenderersProps}
                         />
                     </View>
                 )}
@@ -130,6 +120,38 @@ const LessonDetailScreen = (props) => {
 }
 
 export default LessonDetailScreen
+
+const LIST_MARKER_TEXT_STYLE = {
+    fontFamily: FONTS.BROTHER_1816_REGULAR,
+    fontSize: 16,
+    lineHeight: 24,
+    color: COLORS.textColor,
+};
+
+const renderHtmlDefaultTextProps = {
+    style: {
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
+    },
+};
+
+const renderHtmlRenderersProps = {
+    img: {
+        enableExperimentalPercentWidth: true,
+    },
+    ul: {
+        // Keep bullet marker aligned with first line of text (prevents marker stacking above content)
+        markerBoxStyle: { paddingTop: 2 },
+        markerTextStyle: LIST_MARKER_TEXT_STYLE,
+        itemContentStyle: { flex: 1 },
+    },
+    ol: {
+        markerBoxStyle: { paddingTop: 2 },
+        markerTextStyle: LIST_MARKER_TEXT_STYLE,
+        itemContentStyle: { flex: 1 },
+    },
+};
+
+const getLessonHtmlSource = (html) => ({ html: html || '' });
 
 // HTML Tags Styles - Platform specific font handling
 const getHtmlTagsStyles = () => {
@@ -181,8 +203,9 @@ const getHtmlTagsStyles = () => {
         li: {
             fontSize: 16,
             color: COLORS.textColor,
-            marginTop: 8,
-            marginBottom: 8,
+            lineHeight: 24,
+            marginTop: 0,
+            marginBottom: 0,
         },
         strong: {
             fontWeight: 'bold',

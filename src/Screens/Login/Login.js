@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useDispatch } from 'react-redux';
 import FastImage from 'react-native-fast-image';
 import { COLORS } from '../../Common/Constants/colors';
@@ -99,11 +100,14 @@ const Login = props => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView
+      <KeyboardAwareScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         bounces={false}
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'android' ? 24 : 0}
+        keyboardOpeningTime={0}
         automaticallyAdjustKeyboardInsets={true}
       >
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -165,7 +169,7 @@ const Login = props => {
                   mainViewStyle={styles.loginButton}
                 />
               </View>
-              <View style={{ height: '22%' }} />
+              <View style={{ height: '3%' }} />
               {/* Register Link */}
               <View style={styles.registerContainer}>
                 <Text style={styles.registerText}>
@@ -177,7 +181,7 @@ const Login = props => {
 
           </View>
         </TouchableWithoutFeedback>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
