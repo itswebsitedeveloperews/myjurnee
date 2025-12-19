@@ -1,4 +1,4 @@
-import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Dimensions, Platform } from 'react-native'
+import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Dimensions, Platform, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { COLORS } from '../../Common/Constants/colors'
@@ -7,13 +7,26 @@ import LessonNavBar from '../Components/LessonNavBar'
 import { windowWidth } from '../../Utils/Dimentions'
 import { FONTS } from '../../Common/Constants/fonts'
 import { useDispatch, useSelector } from 'react-redux'
-import { getLessonDetailAction } from '../../redux/cources/courceActions'
-
+import { getLessonDetailAction, createQuizSessionAction, markLessonCompleteAction } from '../../redux/cources/courceActions'
+import {
+    FileText,
+} from 'lucide-react-native';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
+import FastImage from 'react-native-fast-image';
+import { IMAGES } from '../../Common/Constants/images';
+import Snackbar from '../Components/Snackbar';
 
 
 const LessonDetailScreen = (props) => {
     const [loading, setLoading] = useState(false);
+    const [quizLoading, setQuizLoading] = useState(false);
+    const [markCompleteLoading, setMarkCompleteLoading] = useState(false);
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarType, setSnackbarType] = useState('success');
     const lessonId = props.route.params?.lessonId;
+    const lessons = props.route.params?.lessons || [];
+    const courseId = props.route.params?.courseId;
     const dispatch = useDispatch();
     const lessonData = useSelector(state => state.cource?.lessonDetailData || null);
 
@@ -32,20 +45,154 @@ const LessonDetailScreen = (props) => {
         setLoading(false);
     };
 
+    // Find current lesson index in the lessons array
+    const currentLessonIndex = lessons.findIndex(lesson => lesson.ID === lessonId);
+    const hasPrevLesson = currentLessonIndex > 0;
+    const hasNextLesson = currentLessonIndex >= 0 && currentLessonIndex < lessons.length - 1;
+
+    const handlePrevLesson = () => {
+        if (hasPrevLesson) {
+            const prevLesson = lessons[currentLessonIndex - 1];
+            props.navigation.replace('LessonDetailScreen', {
+                lessonId: prevLesson.ID,
+                lessons: lessons,
+                courseId: courseId
+            });
+        }
+    };
+
+    const handleNextLesson = () => {
+        if (hasNextLesson) {
+            const nextLesson = lessons[currentLessonIndex + 1];
+            props.navigation.replace('LessonDetailScreen', {
+                lessonId: nextLesson.ID,
+                lessons: lessons,
+                courseId: courseId
+            });
+        }
+    };
+
     const renderPrevButton = () => {
         return (
-            <TouchableOpacity style={styles.controlButtons} key={1}>
-                <Text style={styles.controlButtonsText}>Prev</Text>
+            <TouchableOpacity
+                style={[
+                    styles.controlButtons,
+                    !hasPrevLesson && styles.controlButtonsDisabled
+                ]}
+                key={1}
+                onPress={handlePrevLesson}
+                disabled={!hasPrevLesson}
+            >
+                <Text style={[
+                    styles.controlButtonsText,
+                    !hasPrevLesson && styles.controlButtonsTextDisabled
+                ]}>Prev</Text>
             </TouchableOpacity>
         )
     }
 
     const renderNextButton = () => {
         return (
-            <TouchableOpacity style={styles.controlButtons} key={2}>
-                <Text style={styles.controlButtonsText}>Next</Text>
+            <TouchableOpacity
+                style={[
+                    styles.controlButtons,
+                    !hasNextLesson && styles.controlButtonsDisabled
+                ]}
+                key={2}
+                onPress={handleNextLesson}
+                disabled={!hasNextLesson}
+            >
+                <Text style={[
+                    styles.controlButtonsText,
+                    !hasNextLesson && styles.controlButtonsTextDisabled
+                ]}>Next</Text>
             </TouchableOpacity>
         )
+    }
+
+    const OnQuizClick = (quiz) => {
+        if (!quiz?.permalink) {
+            console.log('Quiz permalink not available');
+            return;
+        }
+
+        setQuizLoading(true);
+
+        const onQuizSessionSuccess = async (response) => {
+            try {
+                setQuizLoading(false);
+                if (response?.url) {
+                    if (await InAppBrowser.isAvailable()) {
+                        await InAppBrowser.open(response.url, {
+                            // iOS
+                            dismissButtonStyle: 'cancel',
+                            preferredBarTintColor: COLORS.pr_blue,
+                            preferredControlTintColor: 'white',
+                            // Android
+                            showTitle: true,
+                            enableUrlBarHiding: true,
+                            enableDefaultShare: false,
+                        });
+                    } else {
+                        console.log('InAppBrowser not available');
+                    }
+                }
+            } catch (error) {
+                console.log('Error opening quiz in browser:', error);
+                setQuizLoading(false);
+            }
+        };
+
+        const onQuizSessionFailure = (error) => {
+            console.log('Failed to create quiz session:', error);
+            setQuizLoading(false);
+        };
+
+        dispatch(createQuizSessionAction({
+            quizUrl: quiz.permalink,
+            onSuccess: onQuizSessionSuccess,
+            onFailure: onQuizSessionFailure
+        }));
+    }
+
+    const OnTopicClick = async (topic) => {
+        props.navigation.navigate('TopicDetailScreen', { topicId: topic.ID });
+    }
+
+    const OnMarkAsCompleteClick = () => {
+        if (!lessonId) {
+            setSnackbarMessage('Lesson ID not found');
+            setSnackbarType('error');
+            setSnackbarVisible(true);
+            return;
+        }
+
+        setMarkCompleteLoading(true);
+
+        const onMarkCompleteSuccess = (response) => {
+            setMarkCompleteLoading(false);
+            setSnackbarMessage('Lesson marked as complete!');
+            setSnackbarType('success');
+            setSnackbarVisible(true);
+            // Optionally refresh lesson data to get updated completion status
+            if (lessonId) {
+                dispatch(getLessonDetailAction({ lessonId, onSuccess: () => { }, onFailure: () => { } }));
+            }
+        };
+
+        const onMarkCompleteFailure = (error) => {
+            setMarkCompleteLoading(false);
+            const errorMessage = error?.message || error?.error || 'Failed to mark lesson as complete';
+            setSnackbarMessage(errorMessage);
+            setSnackbarType('error');
+            setSnackbarVisible(true);
+        };
+
+        dispatch(markLessonCompleteAction({
+            lessonId,
+            onSuccess: onMarkCompleteSuccess,
+            onFailure: onMarkCompleteFailure
+        }));
     }
 
     if (loading) {
@@ -72,13 +219,13 @@ const LessonDetailScreen = (props) => {
             <View style={{ paddingHorizontal: 20 }}>
                 <LessonNavBar
                     onBackPress={() => props.navigation.goBack()}
-                // rightComponents={[renderPrevButton(), renderNextButton()]}
+                    rightComponents={lessons.length > 0 ? [renderPrevButton(), renderNextButton()] : []}
                 />
             </View>
 
             {/* Scrollable lesson container */}
             <ScrollView
-                style={{ flex: 1, paddingHorizontal: 15, }}
+                style={{ flex: 1, }}
                 showsVerticalScrollIndicator={false}
             >
                 {/* Lesson Title */}
@@ -114,7 +261,75 @@ const LessonDetailScreen = (props) => {
                     </View>
                 )}
 
+                {/* Topics component */}
+                {lessonData?.topics?.length > 0 && <View style={{ ...styles.contentSection, marginBottom: 0 }}>
+                    <Text style={styles.sectionTitle}>Lesson Topics</Text>
+
+                    {lessonData?.topics.map((topic) => (
+                        <TouchableOpacity onPress={() => OnTopicClick(topic)} key={topic.ID} style={styles.lessonCard}>
+                            <View style={styles.lessonContent}>
+                                <FileText color="#666" size={24} />
+                                <Text style={styles.lessonTitle} numberOfLines={2}>{topic.title}</Text>
+                            </View>
+                            {topic.is_completed ? <FastImage source={IMAGES.IC_GREEN_SUCCESS} style={styles.checkboxIcon} resizeMode="contain" /> : <View style={styles.checkbox} />}
+                        </TouchableOpacity>
+                    ))}
+                </View>}
+
+                {/* Quiz component */}
+                {lessonData?.quizzes?.length > 0 && <View style={styles.contentSection}>
+                    <Text style={styles.sectionTitle}>Lesson Quiz</Text>
+
+                    {lessonData?.quizzes.map((quiz) => (
+                        <TouchableOpacity onPress={() => OnQuizClick(quiz)} key={quiz.ID} style={styles.lessonCard}>
+                            <View style={styles.lessonContent}>
+                                <FileText color="#666" size={24} />
+                                <Text style={styles.lessonTitle} numberOfLines={2}>{quiz.title}</Text>
+                            </View>
+                            {quiz.is_completed ? <FastImage source={IMAGES.IC_GREEN_SUCCESS} style={styles.checkboxIcon} resizeMode="contain" /> : <View style={styles.checkbox} />}
+                        </TouchableOpacity>
+                    ))}
+                </View>}
+
+                {!lessonData?.is_completed ? <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        style={[styles.startButton, markCompleteLoading && styles.startButtonDisabled]}
+                        onPress={() => OnMarkAsCompleteClick()}
+                        disabled={markCompleteLoading}
+                    >
+                        {markCompleteLoading ? (
+                            <ActivityIndicator size="small" color={COLORS.white} />
+                        ) : (
+                            <Text style={styles.startButtonText}>Mark as Complete</Text>
+                        )}
+                    </TouchableOpacity>
+                </View> : null}
             </ScrollView>
+
+            {/* Quiz Loading Modal */}
+            <Modal
+                transparent={true}
+                animationType="fade"
+                visible={quizLoading}
+                onRequestClose={() => setQuizLoading(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <ActivityIndicator size="large" color={COLORS.pr_blue} />
+                        <Text style={styles.modalText}>Loading quiz...</Text>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Snackbar for success/error messages */}
+            <Snackbar
+                visible={snackbarVisible}
+                message={snackbarMessage}
+                type={snackbarType}
+                duration={3000}
+                onDismiss={() => setSnackbarVisible(false)}
+                position="bottom"
+            />
         </SafeAreaView>
     )
 }
@@ -280,11 +495,20 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: COLORS.white,
     },
+    controlButtonsDisabled: {
+        backgroundColor: COLORS.grayBg,
+        opacity: 0.5,
+    },
+    controlButtonsTextDisabled: {
+        color: COLORS.grayText,
+    },
     titleContainer: {
-        marginTop: 20
+        marginTop: 20,
+        paddingHorizontal: 15,
     },
     lessonNumContainer: {
-        marginTop: 10
+        marginTop: 10,
+        paddingHorizontal: 15,
     },
     titleText: {
         fontFamily: FONTS.BROTHER_1816_BOLD,
@@ -300,7 +524,8 @@ const styles = StyleSheet.create({
     },
     htmlContainer: {
         marginTop: 20,
-        paddingBottom: 50,
+        paddingHorizontal: 15,
+        paddingBottom: 10,
         width: '100%',
         ...(Platform.OS === 'android' && {
             flex: 1,
@@ -321,5 +546,107 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.textColor,
         fontFamily: FONTS.BROTHER_1816_REGULAR,
-    }
+    },
+    contentSection: {
+        marginBottom: 20,
+        paddingHorizontal: 15,
+    },
+    sectionTitle: {
+        fontSize: 24,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
+        color: COLORS.grayText,
+        marginBottom: 16,
+    },
+    lessonCard: {
+        backgroundColor: COLORS.white,
+        borderRadius: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 18,
+        marginBottom: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    lessonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    lessonTitle: {
+        fontSize: 17,
+        color: COLORS.textColor,
+        marginLeft: 16,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
+        flex: 1,
+    },
+    checkbox: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: '#d1d5db',
+        marginLeft: 12,
+    },
+    checkboxIcon: {
+        width: 24,
+        height: 24,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: COLORS.white,
+        borderRadius: 16,
+        padding: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 150,
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    modalText: {
+        marginTop: 16,
+        fontSize: 16,
+        color: COLORS.textColor,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
+        textAlign: 'center',
+    },
+    buttonContainer: {
+        // position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: COLORS.white,
+        borderTopColor: COLORS.pr_lavender,
+        borderTopWidth: 0.5,
+        borderBottomColor: COLORS.pr_lavender,
+        borderBottomWidth: 0.2,
+        paddingHorizontal: 20,
+        paddingVertical: 10
+    },
+    startButton: {
+        backgroundColor: COLORS.purple,
+        borderRadius: 12,
+        paddingVertical: 12,
+        alignItems: 'center',
+    },
+    startButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    startButtonDisabled: {
+        opacity: 0.6,
+    },
 })

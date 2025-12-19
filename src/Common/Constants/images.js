@@ -18,6 +18,7 @@ export const IMAGES = {
   IC_LOCK: require('../../assets/images_new/lock.png'),
   IC_SAVING: require('../../assets/images_new/saving.png'),
   IC_SUCCESS: require('../../assets/images_new/circle_checked.png'),
+  IC_GREEN_SUCCESS: require('../../assets/images_new/circle_green.png'),
 
   IC_MALE: require('../../assets/images_new/male.png'),
   IC_FEMALE: require('../../assets/images_new/female.png'),
