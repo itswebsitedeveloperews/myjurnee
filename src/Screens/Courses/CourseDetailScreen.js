@@ -9,7 +9,8 @@ import {
     StyleSheet,
     StatusBar,
     Dimensions,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform
 } from 'react-native';
 import {
     FileText,
@@ -439,33 +440,10 @@ const CourseDetailScreen = (props) => {
                                 source={{
                                     html: courseData.content
                                 }}
-                                defaultTextProps={{
-                                    style: {
-                                        fontFamily: FONTS.BROTHER_1816_REGULAR,
-                                    }
-                                }}
-                                renderersProps={{
-                                    ul: {
-                                        markerBoxStyle: { paddingTop: 2 },
-                                        markerTextStyle: {
-                                            fontFamily: FONTS.BROTHER_1816_REGULAR,
-                                            fontSize: 16,
-                                            lineHeight: 24,
-                                            color: COLORS.textColor,
-                                        },
-                                        itemContentStyle: { flex: 1 },
-                                    },
-                                    ol: {
-                                        markerBoxStyle: { paddingTop: 2 },
-                                        markerTextStyle: {
-                                            fontFamily: FONTS.BROTHER_1816_REGULAR,
-                                            fontSize: 16,
-                                            lineHeight: 24,
-                                            color: COLORS.textColor,
-                                        },
-                                        itemContentStyle: { flex: 1 },
-                                    },
-                                }}
+                                tagsStyles={htmlTagsStyles}
+                                baseStyle={styles.htmlBaseStyle}
+                                defaultTextProps={renderHtmlDefaultTextProps}
+                                renderersProps={renderHtmlRenderersProps}
                             />
                         </View>
                     </View>
@@ -524,6 +502,143 @@ const CourseDetailScreen = (props) => {
         </SafeAreaView >
     );
 }
+
+const renderHtmlDefaultTextProps = {
+    style: {
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
+    },
+};
+
+const renderHtmlRenderersProps = {
+    ul: {
+        markerBoxStyle: { paddingTop: 2 },
+        markerTextStyle: {
+            fontFamily: FONTS.BROTHER_1816_REGULAR,
+            fontSize: 16,
+            lineHeight: 24,
+            color: COLORS.textColor,
+        },
+        itemContentStyle: { flex: 1 },
+    },
+    ol: {
+        markerBoxStyle: { paddingTop: 2 },
+        markerTextStyle: {
+            fontFamily: FONTS.BROTHER_1816_REGULAR,
+            fontSize: 16,
+            lineHeight: 24,
+            color: COLORS.textColor,
+        },
+        itemContentStyle: { flex: 1 },
+    },
+};
+
+// HTML Tags Styles - Platform specific font handling
+const getHtmlTagsStyles = () => {
+    const baseStyles = {
+        h1: {
+            fontSize: 28,
+            color: COLORS.textColor,
+            marginTop: 24,
+            marginBottom: 12,
+            fontWeight: 'bold',
+        },
+        h2: {
+            fontSize: 24,
+            color: COLORS.textColor,
+            marginTop: 20,
+            marginBottom: 10,
+            fontWeight: 'bold',
+        },
+        h3: {
+            fontSize: 20,
+            color: COLORS.textColor,
+            marginTop: 18,
+            marginBottom: 8,
+            fontWeight: '600',
+        },
+        h4: {
+            fontSize: 18,
+            color: COLORS.textColor,
+            marginTop: 16,
+            marginBottom: 8,
+            fontWeight: '600',
+        },
+        p: {
+            fontSize: 16,
+            color: COLORS.textColor,
+            marginTop: 12,
+            marginBottom: 12,
+        },
+        ul: {
+            marginTop: 12,
+            marginBottom: 12,
+            paddingLeft: 20,
+        },
+        ol: {
+            marginTop: 12,
+            marginBottom: 12,
+            paddingLeft: 20,
+        },
+        li: {
+            fontSize: 16,
+            color: COLORS.textColor,
+            lineHeight: 24,
+            marginTop: 0,
+            marginBottom: 0,
+        },
+        strong: {
+            fontWeight: 'bold',
+            color: COLORS.textColor,
+        },
+        em: {
+            fontStyle: 'italic',
+            color: COLORS.textColor,
+        },
+        a: {
+            color: COLORS.pr_blue,
+            textDecorationLine: 'underline',
+            fontWeight: '600',
+        },
+        blockquote: {
+            fontSize: 16,
+            color: COLORS.textColor,
+            fontStyle: 'italic',
+            borderLeftWidth: 4,
+            borderLeftColor: COLORS.pr_blue,
+            paddingLeft: 16,
+            marginTop: 12,
+            marginBottom: 12,
+        },
+        code: {
+            fontSize: 14,
+            backgroundColor: COLORS.grayBg,
+            padding: 4,
+            borderRadius: 4,
+        },
+    };
+
+    // Add fontFamily for iOS, use fontWeight for Android
+    if (Platform.OS === 'ios') {
+        return {
+            ...baseStyles,
+            h1: { ...baseStyles.h1, fontFamily: FONTS.BROTHER_1816_BOLD },
+            h2: { ...baseStyles.h2, fontFamily: FONTS.BROTHER_1816_BOLD },
+            h3: { ...baseStyles.h3, fontFamily: FONTS.BROTHER_1816_MEDIUM },
+            h4: { ...baseStyles.h4, fontFamily: FONTS.BROTHER_1816_MEDIUM },
+            p: { ...baseStyles.p, fontFamily: FONTS.BROTHER_1816_REGULAR },
+            li: { ...baseStyles.li, fontFamily: FONTS.BROTHER_1816_REGULAR },
+            strong: { ...baseStyles.strong, fontFamily: FONTS.BROTHER_1816_BOLD },
+            em: { ...baseStyles.em, fontFamily: FONTS.BROTHER_1816_REGULAR },
+            a: { ...baseStyles.a, fontFamily: FONTS.BROTHER_1816_MEDIUM },
+            blockquote: { ...baseStyles.blockquote, fontFamily: FONTS.BROTHER_1816_REGULAR },
+            code: { ...baseStyles.code, fontFamily: FONTS.BROTHER_1816_REGULAR },
+        };
+    }
+
+    return baseStyles;
+};
+
+const htmlTagsStyles = getHtmlTagsStyles();
 
 const styles = StyleSheet.create({
 
@@ -687,6 +802,11 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         paddingHorizontal: 20,
         paddingVertical: 10
+    },
+    htmlBaseStyle: {
+        ...(Platform.OS === 'ios' && { fontFamily: FONTS.BROTHER_1816_REGULAR }),
+        fontSize: 16,
+        color: COLORS.textColor,
     },
     progressContainer: {
         marginHorizontal: 20,
