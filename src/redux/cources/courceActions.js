@@ -8,6 +8,7 @@ import {
   getTopicDetail,
   getCourseProgress,
   markLessonComplete,
+  enrollCourse,
 } from '../../api/courceApi.js';
 import {
   onCourseDetailSuccess,
@@ -218,6 +219,36 @@ export const markLessonCompleteAction = ({ lessonId, onSuccess, onFailure }) => 
                 onFailure(err?.response?.data || err);
               }
             });
+        });
+    } catch (error) {
+      console.log('Error!', error);
+      if (isFunction(onFailure)) {
+        onFailure(error);
+      }
+    }
+  };
+};
+
+export const enrollCourseAction = ({ courseId, userId, onSuccess, onFailure }) => {
+  return async dispatch => {
+    try {
+      enrollCourse(userId, courseId)
+        .then(response => {
+          if (response) {
+            if (isFunction(onSuccess)) {
+              onSuccess(response);
+            }
+          } else {
+            if (isFunction(onFailure)) {
+              onFailure(response || 'Failed to enroll in course');
+            }
+          }
+        })
+        .catch(err => {
+          console.log('Enroll course error:', err);
+          if (isFunction(onFailure)) {
+            onFailure(err?.response?.data || err);
+          }
         });
     } catch (error) {
       console.log('Error!', error);

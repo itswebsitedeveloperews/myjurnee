@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, CommonActions } from '@react-navigation/native';
 import {
     View,
     Text,
@@ -21,7 +21,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { windowHeight, windowWidth } from '../../Utils/Dimentions';
 import INavBar from '../Components/INavBar';
 import { FONTS } from '../../Common/Constants/fonts';
-import { getCourseDetailAction, getCourseProgressAction } from '../../redux/cources/courceActions';
+import { getCourseDetailAction, getCourseProgressAction, enrollCourseAction } from '../../redux/cources/courceActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatDate } from '../../Utils/Utils';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
@@ -278,6 +278,39 @@ const CourseDetailScreen = (props) => {
         });
     }
 
+    const OnEnrollCourseClick = () => {
+        setLoading(true);
+        localStorageHelper.getItemFromStorage(StorageKeys.USER_ID).then(userId => {
+            const onSuccess = () => {
+                setLoading(false);
+                setSnackbarMessage('Successfully enrolled in course');
+                setSnackbarType('success');
+                setSnackbarVisible(true);
+                // Refresh course data to get updated enrollment status
+                fetchCourseData(false);
+            };
+
+            const onFailure = (error) => {
+                setLoading(false);
+                const errorMessage = error?.message || error || 'Failed to enroll in course';
+                setSnackbarMessage(errorMessage);
+                setSnackbarType('error');
+                setSnackbarVisible(true);
+            };
+
+            dispatch(enrollCourseAction({ courseId, userId: userId, onSuccess, onFailure }));
+        });
+    }
+
+    const OnJoinNowClick = () => {
+        props.navigation.goBack();
+    }
+
+    // Check if membership is required but user doesn't have it
+    const isMembershipRequired = courseData?.membership_required === true &&
+        courseData?.user_has_membership === false &&
+        courseData?.can_enroll === false;
+
     if (loading) {
         return (
             <SafeAreaView style={styles.container}>
@@ -329,113 +362,163 @@ const CourseDetailScreen = (props) => {
                 scrollEventThrottle={16}
             >
                 <View style={{ height: windowHeight / 2.9 }} />
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>COURSE INCLUDES</Text>
-                    <View style={styles.includesRow}>
-                        <FileText color="#666" size={28} />
-                        <Text style={styles.includesText}>{courseData.lessons?.length || 0} Lessons</Text>
-                    </View>
-                </View>
 
-
-                {courseData?.lessons?.length > 0 && <View style={styles.contentSection}>
-                    <Text style={styles.sectionTitle}>Course Content</Text>
-
-                    {courseData?.lessons.map((lesson) => (
-                        <TouchableOpacity onPress={() => OnLessonClick(lesson.ID)} key={lesson.ID} style={styles.lessonCard}>
-                            <View style={styles.lessonContent}>
-                                <FileText color="#666" size={24} />
-                                <Text style={styles.lessonTitle} numberOfLines={2}>{lesson.title}</Text>
+                {/* Content Container - Wrapped for overlay positioning */}
+                <View style={styles.contentContainer}>
+                    {/* Hide COURSE INCLUDES card when membership is required */}
+                    {!isMembershipRequired && (
+                        <View style={styles.card}>
+                            <Text style={styles.cardTitle}>COURSE INCLUDES</Text>
+                            <View style={styles.includesRow}>
+                                <FileText color="#666" size={28} />
+                                <Text style={styles.includesText}>{courseData.lessons?.length || 0} Lessons</Text>
                             </View>
-                            {lesson.is_completed ? <FastImage source={IMAGES.IC_GREEN_SUCCESS} style={styles.checkboxIcon} resizeMode="contain" /> : <View style={styles.checkbox} />}
-                        </TouchableOpacity>
-                    ))}
-                </View>}
+                        </View>
+                    )}
 
-                {/* Progress Bar Section - Only show if status is not "not-enrolled" */}
-                {courseProgress && courseProgress.status && courseProgress.status !== 'not-enrolled' && (
-                    <View style={styles.progressContainer}>
-                        <View style={styles.progressBarWrapper}>
-                            <View style={styles.progressBarSection}>
-                                <View style={styles.progressBarBackground}>
-                                    <View
-                                        style={[
-                                            styles.progressBarFill,
-                                            {
-                                                width: `${progress}%`,
-                                            },
-                                        ]}
-                                    />
-                                </View>
-                                <View style={styles.progressInfo}>
-                                    <Text style={styles.progressText}>
-                                        {Math.round(progress)}% COMPLETE
-                                    </Text>
-                                    <View style={styles.statusButton}>
-                                        <Text style={styles.statusButtonText}>
-                                            {courseProgress.status === 'in-progress' ? 'IN PROGRESS' : courseProgress.status?.toUpperCase() || 'IN PROGRESS'}
-                                        </Text>
+                    {/* Hide Course Content section when membership is required */}
+                    {!isMembershipRequired && courseData?.lessons?.length > 0 && (
+                        <View style={styles.contentSection}>
+                            <Text style={styles.sectionTitle}>Course Content</Text>
+
+                            {courseData?.lessons.map((lesson) => (
+                                <TouchableOpacity
+                                    onPress={() => OnLessonClick(lesson.ID)}
+                                    key={lesson.ID}
+                                    style={styles.lessonCard}
+                                >
+                                    <View style={styles.lessonContent}>
+                                        <FileText color="#666" size={24} />
+                                        <Text style={styles.lessonTitle} numberOfLines={2}>{lesson.title}</Text>
+                                    </View>
+                                    {lesson.is_completed ? <FastImage source={IMAGES.IC_GREEN_SUCCESS} style={styles.checkboxIcon} resizeMode="contain" /> : <View style={styles.checkbox} />}
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    )}
+
+                    {/* Progress Bar Section - Only show if status is not "not-enrolled" and membership is not required */}
+                    {!isMembershipRequired &&
+                        courseProgress &&
+                        courseProgress.status &&
+                        courseProgress.status !== 'not-enrolled' && (
+                            <View style={styles.progressContainer}>
+                                <View style={styles.progressBarWrapper}>
+                                    <View style={styles.progressBarSection}>
+                                        <View style={styles.progressBarBackground}>
+                                            <View
+                                                style={[
+                                                    styles.progressBarFill,
+                                                    {
+                                                        width: `${progress}%`,
+                                                    },
+                                                ]}
+                                            />
+                                        </View>
+                                        <View style={styles.progressInfo}>
+                                            <Text style={styles.progressText}>
+                                                {Math.round(progress)}% COMPLETE
+                                            </Text>
+                                            <View style={styles.statusButton}>
+                                                <Text style={styles.statusButtonText}>
+                                                    {courseProgress.status === 'in-progress' ? 'IN PROGRESS' : courseProgress.status?.toUpperCase() || 'IN PROGRESS'}
+                                                </Text>
+                                            </View>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
+                        )}
+
+                    {/* Course Description */}
+                    <View style={styles.courseDescription}>
+                        <View style={isMembershipRequired ? styles.blurredContent : null}>
+                            <Text style={styles.sectionTitle}>Course Description</Text>
+                            <RenderHtml
+                                contentWidth={windowWidth}
+                                source={{
+                                    html: courseData.content
+                                }}
+                                defaultTextProps={{
+                                    style: {
+                                        fontFamily: FONTS.BROTHER_1816_REGULAR,
+                                    }
+                                }}
+                                renderersProps={{
+                                    ul: {
+                                        markerBoxStyle: { paddingTop: 2 },
+                                        markerTextStyle: {
+                                            fontFamily: FONTS.BROTHER_1816_REGULAR,
+                                            fontSize: 16,
+                                            lineHeight: 24,
+                                            color: COLORS.textColor,
+                                        },
+                                        itemContentStyle: { flex: 1 },
+                                    },
+                                    ol: {
+                                        markerBoxStyle: { paddingTop: 2 },
+                                        markerTextStyle: {
+                                            fontFamily: FONTS.BROTHER_1816_REGULAR,
+                                            fontSize: 16,
+                                            lineHeight: 24,
+                                            color: COLORS.textColor,
+                                        },
+                                        itemContentStyle: { flex: 1 },
+                                    },
+                                }}
+                            />
                         </View>
                     </View>
-                )}
 
-                {/* Course Description */}
-                <View style={styles.courseDescription}>
-                    <Text style={styles.sectionTitle}>Course Description</Text>
-                    <RenderHtml
-                        contentWidth={windowWidth}
-                        source={{
-                            html: courseData.content
-                        }}
-                        defaultTextProps={{
-                            style: {
-                                fontFamily: FONTS.BROTHER_1816_REGULAR,
-                            }
-                        }}
-                        renderersProps={{
-                            ul: {
-                                markerBoxStyle: { paddingTop: 2 },
-                                markerTextStyle: {
-                                    fontFamily: FONTS.BROTHER_1816_REGULAR,
-                                    fontSize: 16,
-                                    lineHeight: 24,
-                                    color: COLORS.textColor,
-                                },
-                                itemContentStyle: { flex: 1 },
-                            },
-                            ol: {
-                                markerBoxStyle: { paddingTop: 2 },
-                                markerTextStyle: {
-                                    fontFamily: FONTS.BROTHER_1816_REGULAR,
-                                    fontSize: 16,
-                                    lineHeight: 24,
-                                    color: COLORS.textColor,
-                                },
-                                itemContentStyle: { flex: 1 },
-                            },
-                        }}
-                    />
+                    {/* Membership Required Overlay - Positioned over content area */}
+                    {isMembershipRequired && (
+                        <View style={styles.membershipOverlay}>
+                            <View style={styles.membershipModal}>
+                                <Text style={styles.membershipHeader}>Subscription Membership Required</Text>
+                                <Text style={styles.membershipContent}>
+                                    You must be a 6 Months Subscription member to access this content.
+                                </Text>
+                                <TouchableOpacity style={styles.joinNowButton} onPress={() => OnJoinNowClick()}>
+                                    <Text style={styles.joinNowButtonText}>Go Back</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    )}
                 </View>
                 <View style={{ height: 70 }} />
             </Animated.ScrollView>
 
 
-            {/* Start Course Button */}
-            {courseData?.status == 'not-started' && courseData?.lessons?.length > 0 && <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.startButton} onPress={() => OnStartCourseClick()}>
-                    <Text style={styles.startButtonText}>Start Course</Text>
-                </TouchableOpacity>
-            </View>}
+            {/* Take this Course Button - Show when user can enroll but is not enrolled */}
+            {courseData?.can_enroll === true &&
+                courseData?.is_enrolled === false &&
+                !isMembershipRequired && (
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.startButton} onPress={() => OnEnrollCourseClick()}>
+                            <Text style={styles.startButtonText}>Take this Course</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
 
+            {/* Start Course Button - Show when enrolled and course is not started */}
+            {!isMembershipRequired &&
+                courseData?.status == 'not-started' &&
+                courseData?.lessons?.length > 0 &&
+                courseData?.is_enrolled === true && (
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.startButton} onPress={() => OnStartCourseClick()}>
+                            <Text style={styles.startButtonText}>Start Course</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
 
             <Snackbar
                 visible={snackbarVisible}
                 message={snackbarMessage}
                 type={snackbarType}
-                onClose={() => setSnackbarVisible(false)}
+                duration={3000}
+                position="top"
+                onDismiss={() => setSnackbarVisible(false)}
             />
 
         </SafeAreaView >
@@ -658,6 +741,69 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: FONTS.BROTHER_1816_MEDIUM,
         letterSpacing: 0.5,
+        fontWeight: '600',
+    },
+    blurredContent: {
+        opacity: 0.1,
+    },
+    disabledLessonCard: {
+        opacity: 0.3,
+    },
+    contentContainer: {
+        position: 'relative',
+    },
+    membershipOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        zIndex: 1000,
+        paddingTop: 40,
+    },
+    membershipModal: {
+        backgroundColor: COLORS.white,
+        borderRadius: 20,
+        padding: 24,
+        marginHorizontal: 20,
+        alignItems: 'center',
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+        maxWidth: windowWidth - 40,
+    },
+    membershipHeader: {
+        fontSize: 22,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
+        color: COLORS.textColor,
+        marginBottom: 16,
+        textAlign: 'center',
+    },
+    membershipContent: {
+        fontSize: 16,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
+        color: COLORS.grayText,
+        marginBottom: 24,
+        textAlign: 'center',
+        lineHeight: 24,
+    },
+    joinNowButton: {
+        backgroundColor: COLORS.purple,
+        borderRadius: 12,
+        paddingVertical: 14,
+        paddingHorizontal: 32,
+        minWidth: 150,
+        alignItems: 'center',
+    },
+    joinNowButtonText: {
+        color: COLORS.white,
+        fontSize: 18,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
         fontWeight: '600',
     },
 });

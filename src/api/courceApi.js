@@ -35,3 +35,8 @@ export const markLessonComplete = (userId, lessonId) =>
     userAuthFetch
         .post(`/wp-json/learndash/v1/lesson-topics/mark-complete?user_id=${userId}&lesson_id=${lessonId}`)
         .then(extractData);
+
+export const enrollCourse = (userId, courseId) =>
+    userAuthFetch
+        .post(`/wp-json/learndash/v1/enroll?user_id=${userId}&course_id=${courseId}`)
+        .then(extractData);

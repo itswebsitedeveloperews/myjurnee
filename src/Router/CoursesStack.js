@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 //Screens
-import Home from '../Screens/Home/Home';
+import HomeStack from './HomeStack';
 import CoursesScreen from '../Screens/Courses/Courses';
 import CourseDetailScreen from '../Screens/Courses/CourseDetailScreen';
 import LessonDetailScreen from '../Screens/Courses/LessonDetailScreen';
@@ -16,6 +16,7 @@ const CoursesStack = () => {
             screenOptions={{ headerShown: false }}
             initialRouteName="CoursesScreen">
             <Courses.Screen name="CoursesScreen" component={CoursesScreen} />
+            <Courses.Screen name="HomeStack" component={HomeStack} />
             <Courses.Screen name="CourseDetailScreen" component={CourseDetailScreen} />
             <Courses.Screen name="LessonDetailScreen" component={LessonDetailScreen} />
             <Courses.Screen name="TopicDetailScreen" component={TopicDetailScreen} />
