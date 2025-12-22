@@ -424,7 +424,7 @@ const CourseDetailScreen = (props) => {
 
 
             {/* Start Course Button */}
-            {courseData?.status == 'not-started' && <View style={styles.buttonContainer}>
+            {courseData?.status == 'not-started' && courseData?.lessons?.length > 0 && <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.startButton} onPress={() => OnStartCourseClick()}>
                     <Text style={styles.startButtonText}>Start Course</Text>
                 </TouchableOpacity>
