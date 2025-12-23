@@ -246,6 +246,18 @@ const CourseDetailScreen = (props) => {
     });
 
     const OnLessonClick = (lessonId) => {
+        // Prevent navigation if "Take this Course" button is visible
+        const isTakeCourseButtonVisible = courseData?.can_enroll === true &&
+            courseData?.is_enrolled === false &&
+            !isMembershipRequired;
+
+        if (isTakeCourseButtonVisible) {
+            setSnackbarMessage('Please enroll in the course first');
+            setSnackbarType('error');
+            setSnackbarVisible(true);
+            return; // Don't navigate if user needs to enroll first
+        }
+
         props.navigation.navigate('LessonDetailScreen', {
             lessonId,
             lessons: courseData?.lessons || [],
@@ -309,8 +321,29 @@ const CourseDetailScreen = (props) => {
 
     // Check if membership is required but user doesn't have it
     const isMembershipRequired = courseData?.membership_required === true &&
-        courseData?.user_has_membership === false &&
-        courseData?.can_enroll === false;
+        courseData?.user_has_membership === false;
+
+    // Get membership message based on membership_name array
+    const getMembershipMessage = () => {
+        const membershipNames = courseData?.membership_name;
+
+        if (!membershipNames || !Array.isArray(membershipNames) || membershipNames.length === 0) {
+            return 'Membership is required to access this content.';
+        }
+
+        if (membershipNames.length === 1) {
+            return `You must be a ${membershipNames[0]} member to access this content.`;
+        }
+
+        if (membershipNames.length === 2) {
+            return `You must be a ${membershipNames[0]} or ${membershipNames[1]} member to access this content.`;
+        }
+
+        // For more than 2 memberships, join with commas and "or" before the last one
+        const allButLast = membershipNames.slice(0, -1).join(', ');
+        const last = membershipNames[membershipNames.length - 1];
+        return `You must be a ${allButLast}, or ${last} member to access this content.`;
+    };
 
     if (loading) {
         return (
@@ -454,7 +487,7 @@ const CourseDetailScreen = (props) => {
                             <View style={styles.membershipModal}>
                                 <Text style={styles.membershipHeader}>Subscription Membership Required</Text>
                                 <Text style={styles.membershipContent}>
-                                    You must be a 6 Months Subscription member to access this content.
+                                    {getMembershipMessage()}
                                 </Text>
                                 <TouchableOpacity style={styles.joinNowButton} onPress={() => OnJoinNowClick()}>
                                     <Text style={styles.joinNowButtonText}>Go Back</Text>

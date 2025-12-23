@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
+import { IMAGES } from '../../Common/Constants/images';
 
 const ProfileBox = ({
     profileImage,
@@ -15,7 +16,11 @@ const ProfileBox = ({
     return (
         <TouchableOpacity style={[styles.container, containerStyle]} activeOpacity={0.4} onPress={() => onPress()}>
             <FastImage
-                source={{ uri: profileImage }}
+                // source={{ uri: profileImage }}
+                source={profileImage
+                    ? { uri: profileImage }
+                    : IMAGES.IC_PROFILE
+                }
                 style={[styles.profileImage, imageStyle]}
                 resizeMode="cover"
             />

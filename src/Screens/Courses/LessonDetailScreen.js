@@ -63,6 +63,14 @@ const LessonDetailScreen = (props) => {
     };
 
     const handleNextLesson = () => {
+        // Check if current lesson is completed before allowing navigation to next lesson
+        if (!lessonData?.is_completed) {
+            setSnackbarMessage('Please mark this lesson as complete before proceeding to the next lesson');
+            setSnackbarType('error');
+            setSnackbarVisible(true);
+            return;
+        }
+
         if (hasNextLesson) {
             const nextLesson = lessons[currentLessonIndex + 1];
             props.navigation.replace('LessonDetailScreen', {
@@ -238,11 +246,11 @@ const LessonDetailScreen = (props) => {
                     </View>
                 )}
 
-                {/* Lesson Number Container */}
-                {lessonData?.menu_order !== undefined && (
-                    <View style={styles.lessonNumContainer}>
-                        <Text style={styles.lessonNumText} numberOfLines={1}>
-                            Lesson {lessonData.menu_order + 1}
+                {/* Lesson Status Container */}
+                {lessonData?.status && (
+                    <View style={styles.lessonStatusContainer}>
+                        <Text style={styles.lessonStatusText} numberOfLines={1}>
+                            STATUS: {lessonData.status === 'in-progress' ? 'IN-PROGRESS' : lessonData.status?.toUpperCase() || lessonData.status}
                         </Text>
                     </View>
                 )}
@@ -690,9 +698,18 @@ const styles = StyleSheet.create({
         marginTop: 20,
         paddingHorizontal: 15,
     },
-    lessonNumContainer: {
-        marginTop: 10,
-        paddingHorizontal: 15,
+    // lessonStatusContainer: {
+    //     marginTop: 10,
+    //     paddingHorizontal: 15,
+    // },
+    lessonStatusContainer: {
+        backgroundColor: COLORS.purple,
+        borderRadius: 8,
+        paddingHorizontal: 14,
+        paddingVertical: 6,
+        marginTop: 15,
+        marginHorizontal: 15,
+        alignSelf: 'flex-start',
     },
     titleText: {
         fontFamily: FONTS.BROTHER_1816_BOLD,
@@ -700,14 +717,14 @@ const styles = StyleSheet.create({
         color: COLORS.textColor,
         textAlign: 'left'
     },
-    lessonNumText: {
+    lessonStatusText: {
         fontFamily: FONTS.BROTHER_1816_MEDIUM,
         fontSize: 14,
-        color: COLORS.textColor44,
+        color: COLORS.white,
         textAlign: 'left'
     },
     htmlContainer: {
-        marginTop: 20,
+        // marginTop: 10,
         paddingHorizontal: 15,
         paddingBottom: 10,
         width: '100%',

@@ -126,7 +126,7 @@ const Snackbar = ({
                     bottom: bottomOffset,
                 },
             ]}>
-            <View style={styles.content}>
+            <View style={[styles.content, { backgroundColor: type === 'error' ? COLORS.red : COLORS.purple }]}>
                 <View style={styles.iconContainer}>{getIcon()}</View>
                 <View style={styles.messageContainer}>
                     <Text style={styles.message}>{renderMessage()}</Text>
@@ -160,7 +160,6 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     content: {
-        backgroundColor: COLORS.purple,
         borderRadius: 12,
         paddingHorizontal: 16,
         paddingVertical: 14,
