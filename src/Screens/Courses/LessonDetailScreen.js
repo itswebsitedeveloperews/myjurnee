@@ -51,6 +51,10 @@ const LessonDetailScreen = (props) => {
     const hasPrevLesson = currentLessonIndex > 0;
     const hasNextLesson = currentLessonIndex >= 0 && currentLessonIndex < lessons.length - 1;
 
+    // Check if previous lesson is completed
+    const isPreviousLessonCompleted = lessonData?.previous_lesson_completed === true;
+    const showLockedDialog = !isPreviousLessonCompleted && lessonData && lessonData.hasOwnProperty('previous_lesson_completed');
+
     const handlePrevLesson = () => {
         if (hasPrevLesson) {
             const prevLesson = lessons[currentLessonIndex - 1];
@@ -101,19 +105,20 @@ const LessonDetailScreen = (props) => {
     }
 
     const renderNextButton = () => {
+        const isDisabled = !hasNextLesson || showLockedDialog;
         return (
             <TouchableOpacity
                 style={[
                     styles.controlButtons,
-                    !hasNextLesson && styles.controlButtonsDisabled
+                    isDisabled && styles.controlButtonsDisabled
                 ]}
                 key={2}
                 onPress={handleNextLesson}
-                disabled={!hasNextLesson}
+                disabled={isDisabled}
             >
                 <Text style={[
                     styles.controlButtonsText,
-                    !hasNextLesson && styles.controlButtonsTextDisabled
+                    isDisabled && styles.controlButtonsTextDisabled
                 ]}>Next</Text>
             </TouchableOpacity>
         )
@@ -246,78 +251,101 @@ const LessonDetailScreen = (props) => {
                     </View>
                 )}
 
-                {/* Lesson Status Container */}
-                {lessonData?.status && (
-                    <View style={styles.lessonStatusContainer}>
-                        <Text style={styles.lessonStatusText} numberOfLines={1}>
-                            STATUS: {lessonData.status === 'in-progress' ? 'IN-PROGRESS' : lessonData.status?.toUpperCase() || lessonData.status}
-                        </Text>
+                {/* Show locked box if previous lesson is not completed */}
+                {showLockedDialog && (
+                    <View style={styles.lockedBoxContainer}>
+                        <View style={styles.lockedBox}>
+                            <Text style={styles.lockedBoxTitle}>Lesson Locked</Text>
+                            <Text style={styles.lockedBoxMessage}>
+                                Please go back and complete the previous lesson.
+                            </Text>
+                            <TouchableOpacity
+                                style={styles.lockedBoxButton}
+                                onPress={() => props.navigation.goBack()}
+                            >
+                                <Text style={styles.lockedBoxButtonText}>Go Back</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 )}
 
-                {/* HTML Content of the lesson */}
-                {!!lessonData?.content && (
-                    <View style={styles.htmlContainer}>
-                        <RenderHtml
-                            contentWidth={Dimensions.get('window').width - 30}
-                            source={getLessonHtmlSource(lessonData.content)}
-                            tagsStyles={htmlTagsStyles}
-                            baseStyle={styles.htmlBaseStyle}
-                            defaultTextProps={renderHtmlDefaultTextProps}
-                            enableExperimentalMarginCollapsing={true}
-                            renderersProps={renderHtmlRenderersProps}
-                            renderers={customRenderers}
-                            defaultWebViewProps={{
-                                allowsInlineMediaPlayback: true,
-                                mediaPlaybackRequiresUserAction: false,
-                            }}
-                        />
-                    </View>
-                )}
-
-                {/* Topics component */}
-                {lessonData?.topics?.length > 0 && <View style={{ ...styles.contentSection, marginBottom: 0 }}>
-                    <Text style={styles.sectionTitle}>Lesson Topics</Text>
-
-                    {lessonData?.topics.map((topic) => (
-                        <TouchableOpacity onPress={() => OnTopicClick(topic)} key={topic.ID} style={styles.lessonCard}>
-                            <View style={styles.lessonContent}>
-                                <FileText color="#666" size={24} />
-                                <Text style={styles.lessonTitle} numberOfLines={2}>{topic.title}</Text>
+                {/* Only show content if previous lesson is completed */}
+                {isPreviousLessonCompleted && (
+                    <>
+                        {/* Lesson Status Container */}
+                        {lessonData?.status && (
+                            <View style={styles.lessonStatusContainer}>
+                                <Text style={styles.lessonStatusText} numberOfLines={1}>
+                                    STATUS: {lessonData.status === 'in-progress' ? 'IN-PROGRESS' : lessonData.status?.toUpperCase() || lessonData.status}
+                                </Text>
                             </View>
-                            {topic.is_completed ? <FastImage source={IMAGES.IC_GREEN_SUCCESS} style={styles.checkboxIcon} resizeMode="contain" /> : <View style={styles.checkbox} />}
-                        </TouchableOpacity>
-                    ))}
-                </View>}
-
-                {/* Quiz component */}
-                {lessonData?.quizzes?.length > 0 && <View style={styles.contentSection}>
-                    <Text style={styles.sectionTitle}>Lesson Quiz</Text>
-
-                    {lessonData?.quizzes.map((quiz) => (
-                        <TouchableOpacity onPress={() => OnQuizClick(quiz)} key={quiz.ID} style={styles.lessonCard}>
-                            <View style={styles.lessonContent}>
-                                <FileText color="#666" size={24} />
-                                <Text style={styles.lessonTitle} numberOfLines={2}>{quiz.title}</Text>
-                            </View>
-                            {quiz.is_completed ? <FastImage source={IMAGES.IC_GREEN_SUCCESS} style={styles.checkboxIcon} resizeMode="contain" /> : <View style={styles.checkbox} />}
-                        </TouchableOpacity>
-                    ))}
-                </View>}
-
-                {!lessonData?.is_completed ? <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={[styles.startButton, markCompleteLoading && styles.startButtonDisabled]}
-                        onPress={() => OnMarkAsCompleteClick()}
-                        disabled={markCompleteLoading}
-                    >
-                        {markCompleteLoading ? (
-                            <ActivityIndicator size="small" color={COLORS.white} />
-                        ) : (
-                            <Text style={styles.startButtonText}>Mark as Complete</Text>
                         )}
-                    </TouchableOpacity>
-                </View> : null}
+
+                        {/* HTML Content of the lesson */}
+                        {!!lessonData?.content && (
+                            <View style={styles.htmlContainer}>
+                                <RenderHtml
+                                    contentWidth={Dimensions.get('window').width - 30}
+                                    source={getLessonHtmlSource(lessonData.content)}
+                                    tagsStyles={htmlTagsStyles}
+                                    baseStyle={styles.htmlBaseStyle}
+                                    defaultTextProps={renderHtmlDefaultTextProps}
+                                    enableExperimentalMarginCollapsing={true}
+                                    renderersProps={renderHtmlRenderersProps}
+                                    renderers={customRenderers}
+                                    defaultWebViewProps={{
+                                        allowsInlineMediaPlayback: true,
+                                        mediaPlaybackRequiresUserAction: false,
+                                    }}
+                                />
+                            </View>
+                        )}
+
+                        {/* Topics component */}
+                        {lessonData?.topics?.length > 0 && <View style={{ ...styles.contentSection, marginBottom: 0 }}>
+                            <Text style={styles.sectionTitle}>Lesson Topics</Text>
+
+                            {lessonData?.topics.map((topic) => (
+                                <TouchableOpacity onPress={() => OnTopicClick(topic)} key={topic.ID} style={styles.lessonCard}>
+                                    <View style={styles.lessonContent}>
+                                        <FileText color="#666" size={24} />
+                                        <Text style={styles.lessonTitle} numberOfLines={2}>{topic.title}</Text>
+                                    </View>
+                                    {topic.is_completed ? <FastImage source={IMAGES.IC_GREEN_SUCCESS} style={styles.checkboxIcon} resizeMode="contain" /> : <View style={styles.checkbox} />}
+                                </TouchableOpacity>
+                            ))}
+                        </View>}
+
+                        {/* Quiz component */}
+                        {lessonData?.quizzes?.length > 0 && <View style={styles.contentSection}>
+                            <Text style={styles.sectionTitle}>Lesson Quiz</Text>
+
+                            {lessonData?.quizzes.map((quiz) => (
+                                <TouchableOpacity onPress={() => OnQuizClick(quiz)} key={quiz.ID} style={styles.lessonCard}>
+                                    <View style={styles.lessonContent}>
+                                        <FileText color="#666" size={24} />
+                                        <Text style={styles.lessonTitle} numberOfLines={2}>{quiz.title}</Text>
+                                    </View>
+                                    {quiz.is_completed ? <FastImage source={IMAGES.IC_GREEN_SUCCESS} style={styles.checkboxIcon} resizeMode="contain" /> : <View style={styles.checkbox} />}
+                                </TouchableOpacity>
+                            ))}
+                        </View>}
+
+                        {!lessonData?.is_completed ? <View style={styles.buttonContainer}>
+                            <TouchableOpacity
+                                style={[styles.startButton, markCompleteLoading && styles.startButtonDisabled]}
+                                onPress={() => OnMarkAsCompleteClick()}
+                                disabled={markCompleteLoading}
+                            >
+                                {markCompleteLoading ? (
+                                    <ActivityIndicator size="small" color={COLORS.white} />
+                                ) : (
+                                    <Text style={styles.startButtonText}>Mark as Complete</Text>
+                                )}
+                            </TouchableOpacity>
+                        </View> : null}
+                    </>
+                )}
             </ScrollView>
 
             {/* Quiz Loading Modal */}
@@ -861,5 +889,53 @@ const styles = StyleSheet.create({
         width: '100%',
         aspectRatio: 16 / 9,
         backgroundColor: COLORS.black,
+    },
+    lockedBoxContainer: {
+        paddingHorizontal: 15,
+        marginTop: 20,
+        marginBottom: 20,
+    },
+    lockedBox: {
+        backgroundColor: COLORS.white,
+        borderRadius: 16,
+        padding: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: COLORS.pr_lavender,
+    },
+    lockedBoxTitle: {
+        fontSize: 20,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
+        color: COLORS.textColor,
+        textAlign: 'center',
+        marginBottom: 12,
+    },
+    lockedBoxMessage: {
+        fontSize: 16,
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
+        color: COLORS.textColor,
+        textAlign: 'center',
+        marginBottom: 20,
+        lineHeight: 24,
+    },
+    lockedBoxButton: {
+        backgroundColor: COLORS.purple,
+        borderRadius: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 120,
+    },
+    lockedBoxButtonText: {
+        color: COLORS.white,
+        fontSize: 16,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
     },
 })
