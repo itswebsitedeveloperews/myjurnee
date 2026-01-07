@@ -15,7 +15,7 @@ export default function CoursesGrid({ items = [], loading = false, onCardPress =
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}>
-        <ActivityIndicator color={COLORS.black} size={'small'} />
+        <ActivityIndicator color={COLORS.purple} size={'small'} />
       </View>
     )
   }

@@ -181,7 +181,7 @@ const Home = props => {
         if (plansLoading) {
             return (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}>
-                    <ActivityIndicator color={COLORS.black} size={'small'} />
+                    <ActivityIndicator color={COLORS.purple} size={'small'} />
                 </View>
             )
         }
@@ -378,9 +378,9 @@ const Home = props => {
                 <View style={{ flex: 1, marginTop: 30 }}>
                     {/* <Text style={{ ...styles.headerTitle, fontSize: 20 }}>{`Courses`}</Text> */}
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={styles.subHeaderTitle}>{`Top featured courses`}</Text>
+                        <Text style={styles.subHeaderTitle}>{`Top Featured Courses`}</Text>
                         <TouchableOpacity onPress={() => onViewMoreClick()} style={styles.viewMoreBtn} activeOpacity={0.5}>
-                            <Text style={styles.viewMoreBtnText}>View more</Text>
+                            <Text style={styles.viewMoreBtnText}>View More</Text>
                         </TouchableOpacity>
                     </View>
                     <CoursesGrid items={courses} loading={loading} onCardPress={(item) => onCourseClick(item)} />

@@ -12,9 +12,8 @@ export const getLessonDetail = (lessonId, userId) =>
         .then(extractData);
 
 export const createQuizSession = (userId, quizUrl) => {
-    const encodedUrl = encodeURIComponent(quizUrl);
     return userAuthFetch
-        .post(`/wp-json/learndash/v1/session/create?user_id=${userId}&url=${encodedUrl}`)
+        .post(`/wp-json/learndash/v1/session/create?user_id=${userId}&url=${quizUrl}`)
         .then(extractData);
 };
 

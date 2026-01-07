@@ -30,111 +30,6 @@ import FastImage from 'react-native-fast-image';
 import { IMAGES } from '../../Common/Constants/images';
 import Snackbar from '../Components/Snackbar';
 
-const source = {
-    html: `
-  <div class="ld-tabs ld-tab-count-1">
-	
-	<div class="ld-tabs-content">
-		
-							<div class="ld-tab-content ld-visible" id="ld-tab-content-223">
-											
-<p><em>A Registered Dietician’s Practical Guide to Navigating Social Eating Without Sabotaging Your Goals</em></p>
-
-
-
-<h2 class="wp-block-heading">Welcome to Your Social Success Revolution!</h2>
-
-
-
-<p>Hey there, social butterfly! Welcome to what might be the most liberating course you’ll ever take for weight loss success. I’m absolutely thrilled you’re here because we’re about to tackle one of the biggest challenges people face on their weight loss journey – how to maintain your goals while still enjoying a rich, social life!</p>
-
-
-
-<p>You know what? So many people think that losing weight means becoming a social hermit, turning down invitations, or being “that person” who makes everyone else feel awkward about their food choices. But I’m here to tell you that’s complete rubbish! You can absolutely maintain an active social life AND achieve your weight loss goals.</p>
-
-
-
-<p>As a registered dietician, I’ve helped thousands of people navigate everything from pub nights to wedding receptions, from work lunches to family gatherings, all while staying true to their health goals. The secret isn’t avoiding social situations – it’s learning how to navigate them like a pro!</p>
-
-
-
-<h2 class="wp-block-heading">What You’ll Master in This Course</h2>
-
-
-
-<p>By the end of this empowering journey, you’ll be able to:</p>
-
-
-
-<ul class="wp-block-list">
-<li><strong>Communicate confidently</strong> with friends and family about your health goals</li>
-
-
-
-<li><strong>Handle peer pressure</strong> with grace and maintain your boundaries</li>
-
-
-
-<li><strong>Make smart choices</strong> at any UK restaurant, pub, or takeaway</li>
-
-
-
-<li><strong>Navigate group meals</strong> without feeling deprived or awkward</li>
-
-
-
-<li><strong>Choose better drinks</strong> (both alcoholic and non-alcoholic) that support your goals</li>
-
-
-
-<li><strong>Enjoy social eating</strong> while staying on track with your weight loss</li>
-
-
-
-<li><strong>Feel confident</strong> in any social eating situation</li>
-</ul>
-
-
-
-<h2 class="wp-block-heading">Who This Course Is For</h2>
-
-
-
-<p>This course is perfect for you if:</p>
-
-
-
-<ul class="wp-block-list">
-<li>You love socializing but worry it’s sabotaging your weight loss</li>
-
-
-
-<li>You feel awkward or different when trying to eat healthily around others</li>
-
-
-
-<li>You struggle with peer pressure around food and drinks</li>
-
-
-
-<li>You want practical strategies for real UK social eating situations</li>
-
-
-
-<li>You’re tired of feeling like you have to choose between your social life and your health goals</li>
-
-
-
-<li>You want to feel confident and comfortable in any eating situation</li>
-</ul>
-			</div>
-
-			
-	</div> <!--/.ld-tabs-content-->
-
-</div>
-    `
-};
 
 const CourseDetailScreen = (props) => {
     const [loading, setLoading] = useState(false);
@@ -350,7 +245,7 @@ const CourseDetailScreen = (props) => {
             <SafeAreaView style={styles.container}>
                 <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.pr_blue} />
+                    <ActivityIndicator size="large" color={COLORS.purple} />
                     <Text style={styles.loadingText}>Loading course detail...</Text>
                 </View>
             </SafeAreaView>
@@ -360,7 +255,7 @@ const CourseDetailScreen = (props) => {
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
-            <View style={{ paddingHorizontal: 20, }}>
+            <View style={{ paddingHorizontal: 20, zIndex: 1000 }}>
                 <INavBar title="" onBackPress={() => props.navigation.goBack()} />
             </View>
 
@@ -373,13 +268,20 @@ const CourseDetailScreen = (props) => {
                     }
                 ]}
             >
+                {courseData?.featured_image && (
+                    <FastImage
+                        source={{ uri: courseData.featured_image }}
+                        style={styles.headerBackgroundImage}
+                        resizeMode={FastImage.resizeMode.contain}
+                    />
+                )}
                 <LinearGradient
                     colors={['rgba(0, 0, 0, 0.6)', 'transparent']}
                     style={styles.gradientOverlay}
                     start={{ x: 0, y: 1 }}
                     end={{ x: 0, y: 0 }}
                 />
-                <View style={{ height: 30 }} />
+                <View style={{ height: 45 }} />
                 <Text style={styles.courseTitle} numberOfLines={5}>
                     {courseData.title || ''}
                 </Text>
@@ -702,25 +604,35 @@ const styles = StyleSheet.create({
         left: 0,
         height: 340,
     },
+    headerBackgroundImage: {
+        position: 'absolute',
+        // top: 0,
+        // left: 0,
+        // right: 0,
+        // bottom: 0,
+        width: '100%',
+        height: windowHeight / 3.1,
+        opacity: 0.5,
+    },
     gradientOverlay: {
         position: 'absolute',
         left: 0,
         right: 0,
         bottom: 0,
-        height: 340,
+        height: 480,
     },
     courseTitle: {
-        fontSize: 34,
+        fontSize: 28,
         fontFamily: FONTS.BROTHER_1816_MEDIUM,
-        color: COLORS.textColor,
+        color: COLORS.white,
         lineHeight: 38,
         marginBottom: 12,
-        paddingHorizontal: 15,
+        paddingHorizontal: 25,
         textAlign: 'center',
     },
     dateText: {
         fontSize: 14,
-        color: COLORS.grayText,
+        color: COLORS.white,
         marginTop: 8,
         textAlign: 'center'
     },
@@ -788,7 +700,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     lessonTitle: {
-        fontSize: 17,
+        fontSize: 14,
         color: COLORS.textColor,
         marginLeft: 16,
         fontFamily: FONTS.BROTHER_1816_MEDIUM,

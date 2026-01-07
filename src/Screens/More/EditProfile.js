@@ -227,7 +227,7 @@ const EditProfile = (props) => {
                     placeholderTextColor={COLORS.textColor64}
                     mainViewStyle={styles.inputField}
                 />
-                <SectionHeader title="Phone" />
+                <SectionHeader title="Phone" required={false} />
                 <ITextField
                     placeholder="Enter Phone"
                     value={phone}

@@ -250,7 +250,7 @@ const Profile = props => {
         />}
 
         {/* APP SETTINGS Section */}
-        <SectionHeader title="APP SETTINGS" />
+        <SectionHeader title="APP SETTINGS" required={false} />
         <MenuItem
           icon={IMAGES.IC_SETTINGS}
           title="Settings"
@@ -258,7 +258,7 @@ const Profile = props => {
         />
 
         {/* SHAKE THAT WEIGHT SHOP Section */}
-        <SectionHeader title="SHAKE THAT WEIGHT SHOP" />
+        <SectionHeader title="SHAKE THAT WEIGHT SHOP" required={false} />
         <MenuItem
           icon={IMAGES.IC_SHOPPING_BASKET}
           title="Courses"
@@ -271,11 +271,11 @@ const Profile = props => {
         />
 
         {/* APP SETTINGS Section */}
-        <SectionHeader title="DANGER ZONE" />
+        <SectionHeader title="DANGER ZONE" required={false} />
         {/* Show Cancel Membership only if membership data has been loaded and user has an active membership */}
         {(() => {
           // Debug logging
-          return membershipLoaded && userMembership?.status === 'active';
+          return membershipLoaded && userMembership?.subscription_status === 'active';
         })() && (
             <MenuItem
               icon={IMAGES.DELETE_ICON}

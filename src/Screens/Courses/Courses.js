@@ -179,7 +179,7 @@ const CoursesScreen = ({ navigation }) => {
             <SafeAreaView style={styles.container}>
                 <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.pr_blue} />
+                    <ActivityIndicator size="large" color={COLORS.purple} />
                     <Text style={styles.loadingText}>Loading courses...</Text>
                 </View>
             </SafeAreaView>

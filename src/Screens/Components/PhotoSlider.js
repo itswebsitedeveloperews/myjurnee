@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 4,
     },
     activeDot: {
-        backgroundColor: COLORS.pr_blue,
+        backgroundColor: COLORS.purple,
     },
 });
 

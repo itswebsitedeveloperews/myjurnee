@@ -233,7 +233,7 @@ const WeightTrackerScreen = ({ navigation }) => {
             <SafeAreaView style={safeAreaStyle} edges={['top']} >
                 <StatusBar barStyle="dark-content" backgroundColor={COLORS.pr_blue} />
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.black} />
+                    <ActivityIndicator size="large" color={COLORS.purple} />
                 </View>
             </SafeAreaView>
         );

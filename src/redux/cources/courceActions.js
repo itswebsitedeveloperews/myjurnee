@@ -107,11 +107,14 @@ export const createQuizSessionAction = ({ quizUrl, onSuccess, onFailure }) => {
           }
           createQuizSession(userId, quizUrl)
             .then(response => {
-              if (response?.ok && response?.url) {
+              console.log('Create quiz session response:', response);
+              // Check if response has a URL (either response.url or response.ok && response.url)
+              if (response?.url) {
                 if (isFunction(onSuccess)) {
                   onSuccess(response);
                 }
               } else {
+                console.log('Quiz session response missing URL:', response);
                 if (isFunction(onFailure)) {
                   onFailure(response || 'Failed to create quiz session');
                 }

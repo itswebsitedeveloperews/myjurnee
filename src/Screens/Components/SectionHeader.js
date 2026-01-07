@@ -3,10 +3,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
 
-const SectionHeader = ({ title, containerStyle }) => {
+const SectionHeader = ({ title, containerStyle, required = true }) => {
     return (
         <View style={[styles.container, containerStyle]}>
-            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.title}>{title} {required && <Text style={styles.requiredText}>*</Text>}</Text>
+
         </View>
     );
 };
@@ -23,5 +24,8 @@ const styles = StyleSheet.create({
         fontFamily: FONTS.BROTHER_1816_MEDIUM,
         fontSize: 16,
         color: COLORS.textColorSection,
+    },
+    requiredText: {
+        color: COLORS.red,
     },
 });

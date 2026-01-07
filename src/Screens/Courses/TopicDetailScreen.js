@@ -1,4 +1,4 @@
-import { ScrollView, StatusBar, StyleSheet, Text, View, ActivityIndicator, Dimensions, Platform } from 'react-native'
+import { ScrollView, StatusBar, StyleSheet, Text, View, ActivityIndicator, Dimensions, Platform, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { COLORS } from '../../Common/Constants/colors'
@@ -7,12 +7,19 @@ import { WebView } from 'react-native-webview';
 import LessonNavBar from '../Components/LessonNavBar'
 import { FONTS } from '../../Common/Constants/fonts'
 import { useDispatch, useSelector } from 'react-redux'
-import { getTopicDetailAction } from '../../redux/cources/courceActions'
+import { getLessonDetailAction, getTopicDetailAction, markLessonCompleteAction } from '../../redux/cources/courceActions'
+import Snackbar from '../Components/Snackbar';
 
 
 const TopicDetailScreen = (props) => {
     const [loading, setLoading] = useState(false);
+    const [markCompleteLoading, setMarkCompleteLoading] = useState(false);
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarType, setSnackbarType] = useState('success');
     const topicId = props.route.params?.topicId;
+    const lessonId = props.route.params?.lessonId;
+
     const dispatch = useDispatch();
     const topicData = useSelector(state => state.cource?.topicDetailData || null);
 
@@ -31,6 +38,47 @@ const TopicDetailScreen = (props) => {
         setLoading(false);
     };
 
+    const OnMarkAsCompleteClick = () => {
+        if (!topicId) {
+            setSnackbarMessage('Topic ID not found');
+            setSnackbarType('error');
+            setSnackbarVisible(true);
+            return;
+        }
+
+        setMarkCompleteLoading(true);
+
+        const onMarkCompleteSuccess = (response) => {
+            setMarkCompleteLoading(false);
+            setSnackbarMessage('Lesson marked as complete!');
+            setSnackbarType('success');
+            setSnackbarVisible(true);
+            // Optionally refresh lesson data to get updated completion status
+            if (lessonId) {
+                dispatch(getLessonDetailAction({ lessonId, onSuccess: () => { }, onFailure: () => { } }));
+            }
+            setTimeout(() => {
+                // Go back to LessonDetailScreen, which removes TopicDetailScreen from the stack
+                // The focus effect in LessonDetailScreen will automatically refresh the data
+                props.navigation.goBack();
+            }, 1000);
+        };
+
+        const onMarkCompleteFailure = (error) => {
+            setMarkCompleteLoading(false);
+            const errorMessage = error?.message || error?.error || 'Failed to mark lesson as complete';
+            setSnackbarMessage(errorMessage);
+            setSnackbarType('error');
+            setSnackbarVisible(true);
+        };
+
+        dispatch(markLessonCompleteAction({
+            lessonId: topicId,
+            onSuccess: onMarkCompleteSuccess,
+            onFailure: onMarkCompleteFailure
+        }));
+    }
+
     if (loading) {
         return (
             <SafeAreaView style={styles.container} edges={['top']}>
@@ -41,7 +89,7 @@ const TopicDetailScreen = (props) => {
                     />
                 </View>
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.pr_blue} />
+                    <ActivityIndicator size="large" color={COLORS.purple} />
                     <Text style={styles.loadingText}>Loading topic...</Text>
                 </View>
             </SafeAreaView>
@@ -59,7 +107,7 @@ const TopicDetailScreen = (props) => {
 
             {/* Scrollable topic container */}
             <ScrollView
-                style={{ flex: 1, paddingHorizontal: 15, }}
+                style={{ flex: 1, }}
                 showsVerticalScrollIndicator={false}
             >
                 {/* Topic Title */}
@@ -71,6 +119,13 @@ const TopicDetailScreen = (props) => {
                     </View>
                 )}
 
+                {topicData?.status && (
+                    <View style={styles.topicStatusContainer}>
+                        <Text style={styles.topicStatusText} numberOfLines={1}>
+                            STATUS: {topicData.status === 'in-progress' ? 'IN-PROGRESS' : topicData.status?.toUpperCase() || topicData.status}
+                        </Text>
+                    </View>
+                )}
                 {/* HTML Content of the topic */}
                 {!!topicData?.content && (
                     <View style={styles.htmlContainer}>
@@ -90,7 +145,30 @@ const TopicDetailScreen = (props) => {
                         />
                     </View>
                 )}
+
+                {!topicData?.is_completed && <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        style={[styles.startButton, markCompleteLoading && styles.startButtonDisabled]}
+                        onPress={() => OnMarkAsCompleteClick()}
+                        disabled={markCompleteLoading}
+                    >
+                        {markCompleteLoading ? (
+                            <ActivityIndicator size="small" color={COLORS.white} />
+                        ) : (
+                            <Text style={styles.startButtonText}>Mark as Complete</Text>
+                        )}
+                    </TouchableOpacity>
+                </View>}
             </ScrollView>
+            {/* Snackbar for success/error messages */}
+            <Snackbar
+                visible={snackbarVisible}
+                message={snackbarMessage}
+                type={snackbarType}
+                duration={3000}
+                onDismiss={() => setSnackbarVisible(false)}
+                position="bottom"
+            />
         </SafeAreaView>
     )
 }
@@ -420,8 +498,24 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.bg_color,
     },
+    topicStatusContainer: {
+        backgroundColor: COLORS.purple,
+        borderRadius: 8,
+        paddingHorizontal: 14,
+        paddingVertical: 6,
+        marginTop: 15,
+        marginHorizontal: 15,
+        alignSelf: 'flex-start',
+    },
+    topicStatusText: {
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
+        fontSize: 14,
+        color: COLORS.white,
+        textAlign: 'left'
+    },
     titleContainer: {
-        marginTop: 20
+        marginTop: 20,
+        paddingHorizontal: 15,
     },
     titleText: {
         fontFamily: FONTS.BROTHER_1816_BOLD,
@@ -430,7 +524,8 @@ const styles = StyleSheet.create({
         textAlign: 'left'
     },
     htmlContainer: {
-        marginTop: 20,
+        marginTop: 7,
+        paddingHorizontal: 15,
         paddingBottom: 10,
         width: '100%',
         ...(Platform.OS === 'android' && {
@@ -464,6 +559,33 @@ const styles = StyleSheet.create({
         width: '100%',
         aspectRatio: 16 / 9,
         backgroundColor: COLORS.black,
+    },
+    buttonContainer: {
+        // position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: COLORS.white,
+        borderTopColor: COLORS.pr_lavender,
+        borderTopWidth: 0.5,
+        borderBottomColor: COLORS.pr_lavender,
+        borderBottomWidth: 0.2,
+        paddingHorizontal: 20,
+        paddingVertical: 10
+    },
+    startButton: {
+        backgroundColor: COLORS.purple,
+        borderRadius: 12,
+        paddingVertical: 12,
+        alignItems: 'center',
+    },
+    startButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    startButtonDisabled: {
+        opacity: 0.6,
     },
 })
 

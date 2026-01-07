@@ -82,7 +82,7 @@ const SimpleTabBar = ({ state, descriptors, navigation }) => {
                                         source={tabInfo.icon}
                                         style={[
                                             styles.icon,
-                                            { tintColor: isFocused ? COLORS.pr_blue : COLORS.black }
+                                            { tintColor: isFocused ? COLORS.purple : COLORS.black }
                                         ]}
                                         resizeMode="contain"
                                     />
@@ -91,7 +91,7 @@ const SimpleTabBar = ({ state, descriptors, navigation }) => {
                                     style={[
                                         styles.label,
                                         {
-                                            color: isFocused ? COLORS.pr_blue : COLORS.black,
+                                            color: isFocused ? COLORS.purple : COLORS.black,
                                             fontFamily: isFocused ? FONTS.BROTHER_1816_MEDIUM : FONTS.BROTHER_1816_MEDIUM,
                                         }
                                     ]}
@@ -149,21 +149,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 4,
-    },
-    activeIconContainer: {
-        // backgroundColor: COLORS.pr_blue,
-        tintColor: COLORS.pr_blue,
-        borderRadius: 12,
-        width: 32,
-        height: 32,
-        shadowColor: COLORS.pr_blue,
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        elevation: 4,
     },
     icon: {
         width: 20,

@@ -80,7 +80,7 @@ export default function MembershipCard({
 
                         <View style={styles.priceWrap}>
                             {/* <Text style={styles.priceSymbol}>£</Text> */}
-                            <Text style={styles.price}>£ {price}</Text>
+                            <Text style={styles.price}>£{price}</Text>
                             <Text style={styles.period}>{period}</Text>
                         </View>
                     </View>

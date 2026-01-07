@@ -119,8 +119,9 @@ const ForgotPassword = props => {
             >
                 <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                     <View style={styles.container}>
+
                         <View style={styles.contentContainer}>
-                            <View style={{ paddingHorizontal: 20, }}>
+                            <View style={styles.navBarContainer}>
                                 <INavBar title="" onBackPress={() => props.navigation.goBack()} />
                             </View>
                             <View style={styles.formContainer}>
@@ -131,6 +132,7 @@ const ForgotPassword = props => {
                                         placeholder="Email Address"
                                         value={email}
                                         onChangeText={text => onChangeEmail(text)}
+                                        placeholderTextColor={COLORS.textColor64}
                                         mainViewStyle={styles.inputField}
                                         hasError={errorState.email.hasError}
                                         errorText={errorState.email.errorText}
@@ -142,6 +144,7 @@ const ForgotPassword = props => {
                                         value={otp}
                                         keyboardType="numeric"
                                         onChangeText={text => onChangeOtp(text)}
+                                        placeholderTextColor={COLORS.textColor64}
                                         mainViewStyle={styles.inputField}
                                         hasError={errorState.otp.hasError}
                                         errorText={errorState.otp.errorText}
@@ -179,31 +182,32 @@ const ForgotPassword = props => {
 const styles = StyleSheet.create({
     scrollContainer: {
         flexGrow: 1,
-        minHeight: '100%',
+        backgroundColor: COLORS.bg_color,
     },
     container: {
         flex: 1,
+    },
+    navBarContainer: {
+        paddingHorizontal: 20,
+        paddingTop: 10,
     },
     contentContainer: {
         flex: 1,
     },
     formContainer: {
+        justifyContent: 'center',
         flex: 1,
         paddingHorizontal: 20,
-        justifyContent: 'center',
+
+        marginTop: windowHeight * -0.08,
     },
-    backgroundImage: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-    },
+
     title: {
-        fontFamily: FONTS.BROTHER_1816_MEDIUM,
+        fontFamily: FONTS.BROTHER_1816_BOLD,
         fontSize: 30,
-        color: COLORS.textColor,
+        color: COLORS.black,
         textAlign: 'center',
+        marginBottom: 14,
     },
     description: {
         fontFamily: FONTS.BROTHER_1816_REGULAR,
@@ -211,12 +215,12 @@ const styles = StyleSheet.create({
         color: COLORS.textColor,
         numberOfLines: 2,
         textAlign: 'center',
-
+        marginBottom: 10,
     },
     inputContainer: {
-        flex: 1,
-        maxHeight: windowHeight * 0.07,
-        marginTop: 30,
+        // flex: 1,
+        // maxHeight: windowHeight * 0.07,
+        marginTop: 16,
     },
     inputField: {
         flex: 1,

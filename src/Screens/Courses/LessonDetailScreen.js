@@ -1,5 +1,6 @@
 import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Dimensions, Platform, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { COLORS } from '../../Common/Constants/colors'
 import RenderHtml from 'react-native-render-html';
@@ -31,20 +32,35 @@ const LessonDetailScreen = (props) => {
     const dispatch = useDispatch();
     const lessonData = useSelector(state => state.cource?.lessonDetailData || null);
 
-    useEffect(() => {
-        if (lessonId) {
+    const fetchLessonData = React.useCallback((showLoading = true) => {
+        if (!lessonId) return;
+
+        if (showLoading) {
             setLoading(true);
-            dispatch(getLessonDetailAction({ lessonId, onSuccess, onFailure }));
         }
-    }, [lessonId]);
 
-    const onSuccess = () => {
-        setLoading(false);
-    };
+        const onSuccess = () => {
+            setLoading(false);
+        };
 
-    const onFailure = () => {
-        setLoading(false);
-    };
+        const onFailure = () => {
+            setLoading(false);
+        };
+
+        dispatch(getLessonDetailAction({ lessonId, onSuccess, onFailure }));
+    }, [lessonId, dispatch]);
+
+    useEffect(() => {
+        fetchLessonData(true);
+    }, [fetchLessonData]);
+
+    // Refresh lesson data when screen comes into focus
+    useFocusEffect(
+        React.useCallback(() => {
+            // Refresh data when returning to this screen (e.g., after completing a topic)
+            fetchLessonData(false);
+        }, [fetchLessonData])
+    );
 
     // Find current lesson index in the lessons array
     const currentLessonIndex = lessons.findIndex(lesson => lesson.ID === lessonId);
@@ -134,32 +150,68 @@ const LessonDetailScreen = (props) => {
 
         const onQuizSessionSuccess = async (response) => {
             try {
-                setQuizLoading(false);
-                if (response?.url) {
-                    if (await InAppBrowser.isAvailable()) {
-                        await InAppBrowser.open(response.url, {
-                            // iOS
-                            dismissButtonStyle: 'cancel',
-                            preferredBarTintColor: COLORS.pr_blue,
-                            preferredControlTintColor: 'white',
-                            // Android
-                            showTitle: true,
-                            enableUrlBarHiding: true,
-                            enableDefaultShare: false,
-                        });
-                    } else {
-                        console.log('InAppBrowser not available');
-                    }
+                console.log('Quiz session response:', response);
+
+                if (!response?.url) {
+                    console.log('No URL in quiz session response');
+                    setQuizLoading(false);
+                    setSnackbarMessage('Failed to get quiz URL');
+                    setSnackbarType('error');
+                    setSnackbarVisible(true);
+                    return;
+                }
+
+                // Check if InAppBrowser is available
+                const isAvailable = await InAppBrowser.isAvailable();
+                if (!isAvailable) {
+                    console.log('InAppBrowser not available');
+                    setQuizLoading(false);
+                    setSnackbarMessage('Browser not available');
+                    setSnackbarType('error');
+                    setSnackbarVisible(true);
+                    return;
+                }
+
+                try {
+                    // Open the browser - this promise resolves when the browser is closed
+                    await InAppBrowser.open(response.url, {
+                        // iOS
+                        dismissButtonStyle: 'cancel',
+                        preferredBarTintColor: COLORS.pr_blue,
+                        preferredControlTintColor: 'white',
+                        // Android
+                        showTitle: true,
+                        enableUrlBarHiding: true,
+                        enableDefaultShare: false,
+                    });
+
+                    // Browser was closed - refresh lesson data
+                    fetchLessonData(false);
+                } catch (browserError) {
+                    console.log('Error opening InAppBrowser:', browserError);
+                    setSnackbarMessage('Failed to open quiz');
+                    setSnackbarType('error');
+                    setSnackbarVisible(true);
+                } finally {
+                    // Always set loading to false after attempting to open browser
+                    setQuizLoading(false);
                 }
             } catch (error) {
-                console.log('Error opening quiz in browser:', error);
+                console.log('Error in quiz session success handler:', error);
                 setQuizLoading(false);
+                setSnackbarMessage('Error opening quiz');
+                setSnackbarType('error');
+                setSnackbarVisible(true);
             }
         };
 
         const onQuizSessionFailure = (error) => {
             console.log('Failed to create quiz session:', error);
             setQuizLoading(false);
+            const errorMessage = error?.message || error?.error || 'Failed to create quiz session';
+            setSnackbarMessage(errorMessage);
+            setSnackbarType('error');
+            setSnackbarVisible(true);
         };
 
         dispatch(createQuizSessionAction({
@@ -170,12 +222,28 @@ const LessonDetailScreen = (props) => {
     }
 
     const OnTopicClick = async (topic) => {
-        props.navigation.navigate('TopicDetailScreen', { topicId: topic.ID });
+        props.navigation.navigate('TopicDetailScreen',
+            {
+                topicId: topic.ID,
+                lessonId: lessonId,
+                lessons: lessons,
+                courseId: courseId
+            });
     }
 
     const OnMarkAsCompleteClick = () => {
         if (!lessonId) {
             setSnackbarMessage('Lesson ID not found');
+            setSnackbarType('error');
+            setSnackbarVisible(true);
+            return;
+        }
+
+        //Check if the user has completed all the topics and quizzes
+        const allTopicsCompleted = lessonData?.topics?.every(topic => topic.is_completed);
+        const allQuizzesCompleted = lessonData?.quizzes?.every(quiz => quiz.is_completed);
+        if (!allTopicsCompleted || !allQuizzesCompleted) {
+            setSnackbarMessage('Please complete all the topics and quizzes before marking the lesson as complete');
             setSnackbarType('error');
             setSnackbarVisible(true);
             return;
@@ -188,9 +256,16 @@ const LessonDetailScreen = (props) => {
             setSnackbarMessage('Lesson marked as complete!');
             setSnackbarType('success');
             setSnackbarVisible(true);
-            // Optionally refresh lesson data to get updated completion status
-            if (lessonId) {
-                dispatch(getLessonDetailAction({ lessonId, onSuccess: () => { }, onFailure: () => { } }));
+            // Refresh lesson data to get updated completion status
+            fetchLessonData(false);
+
+            // Check if this is the last lesson
+            const isLastLesson = !hasNextLesson;
+            if (isLastLesson && courseId) {
+                // Navigate back to CourseDetailScreen after a short delay to show the success message
+                setTimeout(() => {
+                    props.navigation.replace('CourseDetailScreen', { courseId });
+                }, 1500);
             }
         };
 
@@ -220,7 +295,7 @@ const LessonDetailScreen = (props) => {
                     />
                 </View>
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.pr_blue} />
+                    <ActivityIndicator size="large" color={COLORS.purple} />
                     <Text style={styles.loadingText}>Loading lesson...</Text>
                 </View>
             </SafeAreaView>
@@ -357,7 +432,7 @@ const LessonDetailScreen = (props) => {
             >
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
-                        <ActivityIndicator size="large" color={COLORS.pr_blue} />
+                        <ActivityIndicator size="large" color={COLORS.purple} />
                         <Text style={styles.modalText}>Loading quiz...</Text>
                     </View>
                 </View>

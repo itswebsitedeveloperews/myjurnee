@@ -79,11 +79,10 @@ const ITextField = ({
           </TouchableOpacity>
         )}
       </View>
-      <View>
-        {hasError && !!errorText && (
+      {hasError && !!errorText && (
+        <View style={styles.errorTextContainer}>
           <Text style={styles.errorText}>{errorText}</Text>
-        )}
-      </View>
+        </View>)}
     </>
   );
 };
@@ -136,5 +135,9 @@ const styles = StyleSheet.create({
     color: COLORS.red,
     marginLeft: 5,
     marginTop: 2
+  },
+  errorTextContainer: {
+
+    // marginTop: 5,
   }
 });
