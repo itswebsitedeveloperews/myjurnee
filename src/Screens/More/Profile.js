@@ -18,7 +18,8 @@ import IButton from '../Components/IButton';
 import DeleteAccountModal from '../Components/DeleteAccountModal';
 import CancelMembershipModal from '../Components/CancelMembershipModal';
 import Snackbar from '../Components/Snackbar';
-import { DeleteUserAccount, LogUserOut } from '../../redux/auth/authActions';
+import { DeleteUserAccount } from '../../redux/auth/authActions';
+import { handleLogout } from '../../Utils/authUtils';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 import { getMembershipByEmailAction, cancelMembershipAction } from '../../redux/dashboard/dashboardActions';
 import { getProfileData } from '../../redux/profile/profileActions';
@@ -230,19 +231,7 @@ const Profile = props => {
   }
 
   const onLogoutPress = () => {
-    dispatch(LogUserOut({
-      onSuccess: () => {
-        // Navigate to AuthStack after successful logout
-        props.navigation.reset({
-          index: 0,
-          routes: [{ name: 'Splash' }],
-        });
-      },
-      onFailure: (error) => {
-        console.log('Logout failed:', error);
-        // You can show an alert or toast here if needed
-      }
-    }));
+    handleLogout(dispatch, props.navigation);
   };
 
   return (

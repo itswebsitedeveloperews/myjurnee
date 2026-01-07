@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, Alert } from 'react-native'
+import { View, Text, StyleSheet, Alert, TouchableWithoutFeedback, Keyboard, Platform } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { safeAreaStyle } from '../../Common/CommonStyles';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import FastImage from 'react-native-fast-image';
 import { IMAGES } from '../../Common/Constants/images';
 import { COLORS } from '../../Common/Constants/colors';
@@ -11,7 +12,7 @@ import ITextField from '../Components/ITextField';
 import { windowHeight } from '../../Utils/Dimentions';
 import IButton from '../Components/IButton';
 import { useDispatch } from 'react-redux';
-import { ForgotPasswordAction } from '../../redux/auth/authActions';
+import { ForgotPasswordAction, VerifyResetCodeAction } from '../../redux/auth/authActions';
 
 const ForgotPassword = props => {
 
@@ -19,10 +20,16 @@ const ForgotPassword = props => {
         email: {
             hasError: false,
             errorText: ''
+        },
+        otp: {
+            hasError: false,
+            errorText: ''
         }
     }
 
     const [email, setEmail] = useState('');
+    const [otp, setOtp] = useState('');
+    const [showOtpField, setShowOtpField] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorState, setErrorState] = useState(defaultErrorState);
     const dispatch = useDispatch();
@@ -32,15 +39,31 @@ const ForgotPassword = props => {
         setEmail(text)
     }
 
-    const handleError = (error) => {
-        setErrorState({ ...errorState, email: { hasError: true, errorText: error || 'Email error.' } })
+    const onChangeOtp = (text) => {
+        setErrorState({ ...errorState, otp: { hasError: false, errorText: '' } })
+        setOtp(text)
+    }
+
+    const handleError = (error, field = 'email') => {
+        if (field === 'otp') {
+            setErrorState({ ...errorState, otp: { hasError: true, errorText: error || 'OTP error.' } })
+        } else {
+            setErrorState({ ...errorState, email: { hasError: true, errorText: error || 'Email error.' } })
+        }
     }
 
     const onSubmit = () => {
+
+        // props.navigation.navigate('ResetPassword');
+        // return;
         if (!email) {
             setErrorState({ ...errorState, email: { hasError: true, errorText: 'Please enter email address' } })
             return;
         }
+        // if (!otp) {
+        //     setErrorState({ ...errorState, otp: { hasError: true, errorText: 'Please enter OTP' } })
+        //     return;
+        // }
 
         setIsLoading(true);
 
@@ -48,12 +71,7 @@ const ForgotPassword = props => {
             email: email,
             onSuccess: (response) => {
                 setIsLoading(false);
-                Alert.alert('Success', response?.message ?? 'Link shared successfully!', [
-                    {
-                        text: 'OK',
-                        onPress: () => props.navigation.navigate('Login')
-                    }
-                ]);
+                setShowOtpField(true);
             },
             onFailure: (error) => {
                 setIsLoading(false);
@@ -62,44 +80,117 @@ const ForgotPassword = props => {
             }
         }));
     }
+
+    const onOtpSubmit = () => {
+        if (!otp) {
+            setErrorState({ ...errorState, otp: { hasError: true, errorText: 'Please enter OTP' } })
+            return;
+        }
+
+        setIsLoading(true);
+
+        dispatch(VerifyResetCodeAction({
+            email: email,
+            code: otp,
+            onSuccess: (response) => {
+                setIsLoading(false);
+                // Navigate to ResetPassword screen on successful OTP verification
+                props.navigation.navigate('ResetPassword', { email: email, code: otp });
+            },
+            onFailure: (error) => {
+                setIsLoading(false);
+                handleError(error, 'otp');
+            }
+        }));
+    }
+
+
     return (
         <SafeAreaView style={safeAreaStyle}>
-            {/* <FastImage source={IMAGES.LOGIN_BG_IMAGE} style={styles.backgroundImage} resizeMode="cover" /> */}
-            <View style={{ paddingHorizontal: 20, }}>
-                <INavBar title="" onBackPress={() => props.navigation.goBack()} />
-            </View>
-            <View style={styles.container}>
-                <Text style={styles.title}>Forgot Password?</Text>
-                <Text style={styles.description}>Enter your email address and we'll {"\n"}send instructions to reset your password.</Text>
-                <View style={styles.inputContainer}>
-                    <ITextField
-                        placeholder="Email Address"
-                        value={email}
-                        onChangeText={text => onChangeEmail(text)}
-                        mainViewStyle={styles.inputField}
-                        hasError={errorState.email.hasError}
-                        errorText={errorState.email.errorText}
-                    />
-                </View>
-                <View style={styles.buttonContainer}>
-                    <IButton
-                        title={isLoading ? "Submitting Account..." : "Submit"}
-                        loading={isLoading}
-                        onPress={onSubmit}
-                        mainViewStyle={styles.submitButton}
-                    />
-                </View>
-            </View>
+            <KeyboardAwareScrollView
+                contentContainerStyle={styles.scrollContainer}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                enableOnAndroid={true}
+                extraScrollHeight={Platform.OS === 'android' ? 24 : 0}
+                keyboardOpeningTime={0}
+                automaticallyAdjustKeyboardInsets={true}
+            >
+                <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                    <View style={styles.container}>
+                        <View style={styles.contentContainer}>
+                            <View style={{ paddingHorizontal: 20, }}>
+                                <INavBar title="" onBackPress={() => props.navigation.goBack()} />
+                            </View>
+                            <View style={styles.formContainer}>
+                                <Text style={styles.title}>Forgot Password?</Text>
+                                <Text style={styles.description}>Enter your email address and we'll {"\n"}send instructions to reset your password.</Text>
+                                <View style={styles.inputContainer}>
+                                    <ITextField
+                                        placeholder="Email Address"
+                                        value={email}
+                                        onChangeText={text => onChangeEmail(text)}
+                                        mainViewStyle={styles.inputField}
+                                        hasError={errorState.email.hasError}
+                                        errorText={errorState.email.errorText}
+                                    />
+                                </View>
+                                {showOtpField && <View style={{ ...styles.inputContainer, marginTop: 5 }}>
+                                    <ITextField
+                                        placeholder="Enter OTP"
+                                        value={otp}
+                                        keyboardType="numeric"
+                                        onChangeText={text => onChangeOtp(text)}
+                                        mainViewStyle={styles.inputField}
+                                        hasError={errorState.otp.hasError}
+                                        errorText={errorState.otp.errorText}
+                                    />
+                                </View>}
+                                <View style={styles.buttonContainer}>
+                                    <IButton
+                                        title={
+                                            isLoading
+                                                ? (showOtpField ? "Verifying OTP..." : "Submitting Account...")
+                                                : (showOtpField ? "Verify OTP" : "Submit")
+                                        }
+                                        loading={isLoading}
+                                        onPress={() => {
+                                            if (showOtpField) {
+                                                // Handle OTP Submit: hit different api for OTP verification/reset-password
+                                                onOtpSubmit && onOtpSubmit();
+                                            } else {
+                                                // Handle Forgot Password (send email for reset)
+                                                onSubmit && onSubmit();
+                                            }
+                                        }}
+                                        mainViewStyle={styles.submitButton}
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </TouchableWithoutFeedback>
+            </KeyboardAwareScrollView>
         </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
+    scrollContainer: {
+        flexGrow: 1,
+        minHeight: '100%',
+    },
     container: {
+        flex: 1,
+    },
+    contentContainer: {
+        flex: 1,
+    },
+    formContainer: {
         flex: 1,
         paddingHorizontal: 20,
         justifyContent: 'center',
-        // alignItems: 'center',
     },
     backgroundImage: {
         position: 'absolute',

@@ -30,6 +30,7 @@ import { getProfileData } from '../../redux/profile/profileActions';
 import IButton from '../Components/IButton';
 import { getUserFitnessDetails } from '../../api/profileApi';
 import ISearchBar from '../Components/ISearchBar';
+import { handleLogout, isJWTTokenExpired } from '../../Utils/authUtils';
 
 const benefits = [
     { id: '1', icon: IMAGES.IC_LOCK, title: 'Unlock Extra Discount', subtitle: '& Low Prices' },
@@ -313,24 +314,12 @@ const Home = props => {
                 })
                 .catch(error => {
                     setCheckingOnboarding(false);
-                    // Handle different error types with detailed logging
-                    if (error?.response) {
-                        // Server responded with error status
-                        console.error('API Error Response:', {
-                            status: error.response.status,
-                            statusText: error.response.statusText,
-                            data: error.response.data,
-                            url: error.config?.url,
-                        });
-                    } else if (error?.request) {
-                        // Request was made but no response received
-                        console.error('API Request Error (no response):', {
-                            message: error.message,
-                            url: error.config?.url,
-                        });
-                    } else {
-                        // Error setting up the request
-                        console.error('API Setup Error:', error.message || error);
+
+                    // Check if JWT token has expired or is invalid
+                    if (isJWTTokenExpired(error)) {
+                        console.warn('JWT token expired or invalid. Logging out user...');
+                        handleLogout(dispatch, props.navigation);
+                        return; // Exit early, don't continue processing
                     }
 
                     // Handle specific error cases

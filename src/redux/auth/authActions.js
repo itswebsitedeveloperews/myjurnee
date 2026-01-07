@@ -25,6 +25,8 @@ import {
   signIn,
   register,
   forgotPassword,
+  verifyResetCode,
+  resetPassword,
   userDelete,
 } from '../../api/authApis';
 
@@ -149,7 +151,7 @@ export const ForgotPasswordAction = ({ email, onSuccess, onFailure }) => {
     try {
       forgotPassword(email)
         .then(response => {
-          // console.log('Forgot password response---', response);
+          console.log('Forgot password response---', response);
 
           // Check if response contains user data (id, username, email) indicating successful registration
           if (response) {
@@ -172,6 +174,70 @@ export const ForgotPasswordAction = ({ email, onSuccess, onFailure }) => {
       console.log('Register Error!', error);
       if (isFunction(onFailure)) {
         onFailure('An unexpected error occurred during sending link for forgot password');
+      }
+    }
+  };
+};
+
+export const VerifyResetCodeAction = ({ email, code, onSuccess, onFailure }) => {
+  return async dispatch => {
+    try {
+      verifyResetCode(email, code)
+        .then(response => {
+          console.log('Verify reset code response---', response);
+
+          if (response) {
+            if (isFunction(onSuccess)) {
+              onSuccess(response);
+            }
+          } else {
+            if (isFunction(onFailure)) {
+              onFailure(cleanErrorMessage(response?.message || 'OTP verification failed'));
+            }
+          }
+        })
+        .catch(err => {
+          console.log('Verify reset code error:', err);
+          if (isFunction(onFailure)) {
+            onFailure(cleanErrorMessage(err?.response?.data?.message || 'OTP verification failed'));
+          }
+        });
+    } catch (error) {
+      console.log('Verify Reset Code Error!', error);
+      if (isFunction(onFailure)) {
+        onFailure('An unexpected error occurred during OTP verification');
+      }
+    }
+  };
+};
+
+export const ResetPasswordAction = ({ email, code, newPassword, confirmPassword, onSuccess, onFailure }) => {
+  return async dispatch => {
+    try {
+      resetPassword(email, code, newPassword, confirmPassword)
+        .then(response => {
+          console.log('Reset password response---', response);
+
+          if (response?.success || response) {
+            if (isFunction(onSuccess)) {
+              onSuccess(response);
+            }
+          } else {
+            if (isFunction(onFailure)) {
+              onFailure(cleanErrorMessage(response?.message || 'Password reset failed'));
+            }
+          }
+        })
+        .catch(err => {
+          console.log('Reset password error:', err);
+          if (isFunction(onFailure)) {
+            onFailure(cleanErrorMessage(err?.response?.data?.message || 'Password reset failed'));
+          }
+        });
+    } catch (error) {
+      console.log('Reset Password Error!', error);
+      if (isFunction(onFailure)) {
+        onFailure('An unexpected error occurred during password reset');
       }
     }
   };

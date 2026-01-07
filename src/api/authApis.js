@@ -58,12 +58,15 @@ export const register = (username, email, password) => {
 
 //Forgot password API
 export const forgotPassword = (email) => {
-  const params = new URLSearchParams();
-  params.append('email', email);
+  return userRawFetch.post(`wp-json/custom-api/v1/forgot-password?email=${email}`).then(extractData);
+};
 
-  return userRawFetch.post('wp-json/custom-api/v1/forgot-password?email', params.toString(), {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  }).then(extractData);
+//Verify reset code API
+export const verifyResetCode = (email, code) => {
+  return userRawFetch.post(`wp-json/custom-api/v1/verify-reset-code?email=${email}&code=${code}`).then(extractData);
+};
+
+//Reset password API
+export const resetPassword = (email, code, newPassword, confirmPassword) => {
+  return userRawFetch.post(`wp-json/custom-api/v1/reset-password?email=${email}&code=${code}&new_password=${newPassword}&confirm_password=${confirmPassword}`).then(extractData);
 };
