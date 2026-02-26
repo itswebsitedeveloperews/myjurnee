@@ -10,6 +10,7 @@ import {
     Image,
     ScrollView,
     Platform,
+    useColorScheme,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
@@ -21,6 +22,7 @@ import { FONTS } from '../../Common/Constants/fonts';
 const { width, height } = Dimensions.get('window');
 
 const SetGoalWeightModal = ({ isVisible, onClose, onSubmit, weightType = 'lbs' }) => {
+    const colorScheme = useColorScheme();
     const [weight, setWeight] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [dateString, setDateString] = useState(
@@ -322,6 +324,8 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit, weightType = 'lbs' }
                             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                             onChange={onDateChange}
                             maximumDate={new Date()}
+                            themeVariant="light"
+                            textColor={Platform.OS === 'ios' ? COLORS.textColor : undefined}
                             style={styles.datePicker}
                         />
                     </View>

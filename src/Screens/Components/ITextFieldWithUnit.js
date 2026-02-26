@@ -58,6 +58,7 @@ const ITextFieldWithUnit = ({
                     <TouchableOpacity
                         activeOpacity={0.8}
                         onPress={() => handleUnitChange('lbs')}
+                        disabled={unit === 'lbs'}
                         style={[
                             styles.unitBtn,
                             unit === 'lbs' ? styles.unitBtnActive : styles.unitBtnInactiveLeft,
@@ -69,6 +70,7 @@ const ITextFieldWithUnit = ({
                     <TouchableOpacity
                         activeOpacity={0.8}
                         onPress={() => handleUnitChange('kg')}
+                        disabled={unit === 'kg'}
                         style={[
                             styles.unitBtn,
                             unit === 'kg' ? styles.unitBtnActiveRight : styles.unitBtnInactiveRight,

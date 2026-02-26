@@ -4,6 +4,8 @@ import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
 import { windowWidth } from '../../Utils/Dimentions';
 import IBackButton from './IBackButton';
+import FastImage from 'react-native-fast-image';
+import { IMAGES } from '../../Common/Constants/images';
 
 const INavBar = ({ onBackPress = () => { }, title = '', EmptyBackButton = false, showCalendar = false, onCalendarPress = () => { } }) => {
   return (
@@ -14,7 +16,8 @@ const INavBar = ({ onBackPress = () => { }, title = '', EmptyBackButton = false,
       </View>
       {showCalendar ? (
         <TouchableOpacity onPress={onCalendarPress} style={styles.calendarButton}>
-          <Text style={styles.calendarIcon}>📅</Text>
+          {/* <Text style={styles.calendarIcon}>📅</Text> */}
+          <FastImage source={IMAGES.IC_CALENDAR} style={styles.calendarIcon} resizeMode="contain" />
         </TouchableOpacity>
       ) : (
         <View style={{ width: windowWidth / 10.5 }} />
@@ -52,6 +55,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   calendarIcon: {
-    fontSize: 20,
+    height: 20,
+    width: 20,
   },
 });

@@ -2,7 +2,7 @@ export const IMAGES = {
   //splash screen
   SPLASH_BG: require('../../assets/images_new/splash_bg.jpeg'),
   DOWNLOAD_BLACK: require('../../assets/images_new/download_black.png'),
-  DELETE_ICON: require('../../assets/images_new/delete.png'),
+  DELETE_ICON: require('../../assets/images_new/Trash.png'),
   LOGIN_BG_IMAGE: require('../../assets/images_new/login_background_img.png'),
   HOME_SCREEN_LOGO_V1: require('../../assets/images_new/home_screen_logo_v1.png'),
   WHITE_LOGO: require('../../assets/images_new/white_logo.png'),
@@ -27,6 +27,12 @@ export const IMAGES = {
   IC_SEARCH: require('../../assets/images/search.png'),
   IC_GRAY_SEARCH: require('../../assets/images_new/gray_search.png'),
   IC_CAMERA: require('../../assets/images_new/camera.png'),
+  IC_CAMERA: require('../../assets/images_new/camera.png'),
+  // IC_DUSTBIN: require('../../assets/images_new/Trash.png'),
+  IC_DUSTBIN: require('../../assets/images/dustbin.png'),
+  IC_CALENDAR: require('../../assets/images_new/calendar.png'),
+  IC_SETTINGS: require('../../assets/images_new/settings.png'),
+
   //Onboarding image
   IC_ONBOARDING_TOP: require('../../assets/images/onboardingTop.png'),
   ONBOARDING_1: require('../../assets/images_new/onboarding_1.jpg'),
@@ -59,7 +65,7 @@ export const IMAGES = {
   IC_LOGOUT: require('../../assets/images/log_out.png'),
   IC_PENCIL: require('../../assets/images/pencil.png'),
 
-  IC_DUSTBIN: require('../../assets/images/dustbin.png'),
+  
   IC_PROFILE_DOTS: require('../../assets/images/profileBG.png'),
   FILLED_CHECKBOX: require('../../assets/images/FilledCheckbox.png'),
   UNFILLED_CHECKBOX: require('../../assets/images/UnFilledCheckbox.png'),
@@ -71,7 +77,7 @@ export const IMAGES = {
   IC_UPLOAD: require('../../assets/images/upload.png'),
   MESSAGE_BOX: require('../../assets/images/messageBox.png'),
   IC_USERS: require('../../assets/images/users.png'),
-  IC_SCALE: require('../../assets/images/scale.png'),
+  IC_SCALE: require('../../assets/images_new/WeightTracker.png'),
 
   // Login screen icons
   IC_USER_PROFILE: require('../../assets/images/user.png'),
@@ -80,7 +86,7 @@ export const IMAGES = {
   IC_ARROW_RIGHT_CHEVRON: require('../../assets/images/arrow_right.png'),
 
   // Profile screen icons
-  IC_SETTINGS: require('../../assets/images/briefcase.png'), // Using briefcase as settings placeholder
+  // IC_SETTINGS: require('../../assets/images/briefcase.png'), // Using briefcase as settings placeholder
   IC_SHOPPING_BASKET: require('../../assets/images/briefcase.png'), // Using briefcase as shopping basket placeholder
   IC_LIBRARY: require('../../assets/images/file_text.png'), // Using file_text as library placeholder
 };

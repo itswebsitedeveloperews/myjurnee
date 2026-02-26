@@ -260,12 +260,12 @@ const Profile = props => {
         {/* SHAKE THAT WEIGHT SHOP Section */}
         <SectionHeader title="SHAKE THAT WEIGHT SHOP" required={false} />
         <MenuItem
-          icon={IMAGES.IC_SHOPPING_BASKET}
+          icon={IMAGES.IC_FILE}
           title="Courses"
           onPress={onCoursesPress}
         />
         <MenuItem
-          icon={IMAGES.IC_LIBRARY}
+          icon={IMAGES.IC_SCALE}
           title="Weight Tracker"
           onPress={onWeightTrackerPress}
         />

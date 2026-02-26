@@ -38,7 +38,7 @@ const Button: React.FC<ButtonProps> = ({
       activeOpacity={0.8}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? '#000000' : '#8B5CF6'} />
+        <ActivityIndicator color={variant === 'primary' ? '#000000' : COLORS.purple} />
       ) : (
         <Text style={[styles.buttonText, textColor, textStyle]}>{title}</Text>
       )}
