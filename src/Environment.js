@@ -8,6 +8,7 @@ const ENVIRONMENT_LIST = {
 
   RELEASE_PRODUCTION_MAIN: {
     baseUrl: DEV_URL,
+    WebViewUrl: 'https://shakethatweight.co.uk/',
   },
 };
 

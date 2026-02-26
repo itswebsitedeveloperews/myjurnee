@@ -31,6 +31,8 @@ import IButton from '../Components/IButton';
 import { getUserFitnessDetails } from '../../api/profileApi';
 import ISearchBar from '../Components/ISearchBar';
 import { handleLogout, isJWTTokenExpired } from '../../Utils/authUtils';
+import WebView from 'react-native-webview';
+import { ENVIRONMENT } from '../../Environment';
 
 const benefits = [
     { id: '1', icon: IMAGES.IC_LOCK, title: 'Unlock Extra Discount', subtitle: '& Low Prices' },
@@ -46,6 +48,7 @@ const Home = props => {
     const [courses, setCourses] = useState([]);
     const [checkingOnboarding, setCheckingOnboarding] = useState(true);
     const [searchValue, setSearchValue] = useState('');
+    // const [accessToken, setAccessToken] = useState('');
     const dispatch = useDispatch();
 
     const membershipPlans = useSelector(state => state.dashboard?.membershipPlansData)
@@ -131,6 +134,7 @@ const Home = props => {
     const checkAuthentication = async () => {
         try {
             const isLoggedIn = await localStorageHelper.getItemFromStorage(StorageKeys.IS_LOGGED);
+            // console.log('isLoggedIn on home screen ---', isLoggedIn);
             if (isLoggedIn === 'true') {
                 setIsAuthenticated(true);
                 getUserDetailsFromLocalStorage();
@@ -146,12 +150,22 @@ const Home = props => {
     const getInitial = (name) => name?.charAt(0).toUpperCase();
 
     const getUserDetailsFromLocalStorage = () => {
+        setLoading(true);
+        // console.log('getUserDetailsFromLocalStorage on home screen ---');
         localStorageHelper
-            .getItemsFromStorage([StorageKeys.USER_NAME])
+            .getItemsFromStorage([StorageKeys.USER_NAME, StorageKeys.ACCESS_TOKEN])
             .then(resp => {
                 let userName = resp[StorageKeys.USER_NAME];
+                let accessToken = resp[StorageKeys.ACCESS_TOKEN];
+                // console.log('accessToken on home screen ---', accessToken);
+                // setAccessToken(accessToken);
                 // const charOfName = getInitial(userName);
                 setUserChar(userName);
+                // setLoading(false);
+            })
+            .catch(error => {
+                console.log('Error getting user details from local storage:', error);
+                // setLoading(false);
             });
     }
 
@@ -341,6 +355,27 @@ const Home = props => {
     const onCourseClick = (course) => {
         props.navigation.navigate('CourseDetailScreen', { courseId: course.id || '' });
     }
+
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}>
+                <ActivityIndicator color={COLORS.purple} size={'small'} />
+            </View>
+        )
+    }
+
+    return (
+        <SafeAreaView style={{ ...safeAreaStyle, backgroundColor: COLORS.bg_color }} edges={['top']}>
+            <WebView
+                source={{ uri: `${ENVIRONMENT.WebViewUrl}` }}
+                style={{ flex: 1 }}
+                // cacheEnabled={false}
+                // cacheMode="LOAD_NO_CACHE"
+                // incognito={true}
+                // Also, add other props if needed to clear cache aggressively
+            />
+        </SafeAreaView>
+    )
 
     return (
         <SafeAreaView style={{ ...safeAreaStyle, backgroundColor: COLORS.bg_color }} edges={['top']}>

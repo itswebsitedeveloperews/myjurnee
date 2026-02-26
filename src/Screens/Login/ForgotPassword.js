@@ -32,6 +32,7 @@ const ForgotPassword = props => {
     const [showOtpField, setShowOtpField] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorState, setErrorState] = useState(defaultErrorState);
+    const [emailResponse, setEmailResponse] = useState(null);
     const dispatch = useDispatch();
 
     const onChangeEmail = (text) => {
@@ -72,6 +73,7 @@ const ForgotPassword = props => {
             onSuccess: (response) => {
                 setIsLoading(false);
                 setShowOtpField(true);
+                setEmailResponse(response);
             },
             onFailure: (error) => {
                 setIsLoading(false);
