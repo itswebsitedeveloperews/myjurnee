@@ -7,6 +7,7 @@ import Signup from '../Screens/Login/Signup';
 import ForgotPassword from '../Screens/Login/ForgotPassword';
 import FitnessOnboardingWizard from '../Screens/Components/fitness_onboarding_wizard';
 import ResetPassword from '../Screens/Login/ResetPassword';
+import UpgradeIntroScreen from '../Screens/Onboarding/UpgradeIntroScreen';
 
 const AuthStack = createNativeStackNavigator();
 
@@ -16,6 +17,7 @@ const AuthStacks = () => {
       screenOptions={{ headerShown: false }}
       initialRouteName="Login">
       <AuthStack.Screen name="Login" component={Login} />
+      <AuthStack.Screen name="UpgradeIntroScreen" component={UpgradeIntroScreen} />
       <AuthStack.Screen name="Signup" component={Signup} />
       <AuthStack.Screen name="ForgotPassword" component={ForgotPassword} />
       <AuthStack.Screen name="ResetPassword" component={ResetPassword} />

@@ -20,21 +20,21 @@ const onboardingData = [
     {
         id: '1',
         title: 'Change your eating habits',
-        description: 'Lorem ipsum dolor sit ame consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt utvolutpat.',
+        description: 'Expert-led audio courses on meal replacements, mindset and nutrition. Learn while you live, walk, commute, anywhere.',
         image: IMAGES.ONBOARDING_1,
         buttonText: 'Next',
     },
     {
         id: '2',
         title: 'Track your weight-loss',
-        description: 'Lorem ipsum dolor sit ame consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt utvolutpat.',
+        description: 'Log your weight daily and watch your progress unfold. See your 30 and 90 day trends that keeps you motivated.',
         image: IMAGES.ONBOARDING_2,
         buttonText: 'Next',
     },
     {
         id: '3',
         title: 'Update your progress daily',
-        description: 'Lorem ipsum dolor sit ame consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt utvolutpat.',
+        description: 'Upload your progress photos privately. See your transformation side by side in your personal gallery.',
         image: IMAGES.ONBOARDING_3,
         buttonText: 'Next',
     },
@@ -112,7 +112,7 @@ const Onboarding = ({ navigation }) => {
                             style={styles.button}
                             onPress={handleNext}
                             activeOpacity={0.8}>
-                            <Text style={styles.buttonText}>{item.buttonText}</Text>
+                            <Text style={styles.buttonText}>{item.buttonText} <Text style={{...styles.buttonText, fontSize: 20, fontWeight: 'bold'}}>→</Text> </Text>
                         </TouchableOpacity>
                     </View>
                 </ImageBackground>
@@ -224,12 +224,12 @@ const styles = StyleSheet.create({
         // paddingVertical: 12,
         paddingBottom: 12,
         paddingTop: 8,
-        paddingHorizontal: 32,
-        borderRadius: 8,
+        // paddingHorizontal: 32,
+        borderRadius: 28,
         alignItems: 'center',
         justifyContent: 'center',
-        // width: '100%',
-        marginHorizontal: 80
+        width: '100%',
+        // marginHorizontal: 80
     },
     buttonText: {
         fontSize: 24,

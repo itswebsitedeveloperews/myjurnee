@@ -89,7 +89,7 @@ const Login = props => {
 
   const onSignUp = () => {
     // Navigate to sign up screen
-    props.navigation.navigate('Signup');
+    props.navigation.navigate('UpgradeIntroScreen');
   };
 
   const onForgotPassword = () => {

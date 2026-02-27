@@ -31,11 +31,12 @@ import { setUserFitnessDetails } from '../../api/profileApi';
 import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 import { useDispatch } from 'react-redux';
 import { JWTLogin } from '../../redux/auth/authActions';
+import { windowHeight } from '../../Utils/Dimentions';
 
 const AnimatedFlatList = AnimatedReanimated.createAnimatedComponent(FlatList<number>);
 
 // ---- Types ----
-export type Gender = 'male' | 'female' | null;
+export type Gender = 'male' | 'female' | 'other' | null;
 export type WeightUnit = 'kg' | 'lbs' | 'st';
 
 export type FitnessOnboardingValues = {
@@ -486,7 +487,7 @@ export default function FitnessOnboardingWizard({
         <StepHeader step={steps[index]} />
       </View>
 
-      <View style={{ flex: 1, }}>
+      <View style={{ flex: 1 }}>
         {renderCurrentStep()}
       </View>
 
@@ -532,7 +533,7 @@ const GenderStep = React.memo(({
   accentColor: string;
 }) => {
   return (
-    <View style={{ flex: 1, paddingHorizontal: 20, marginTop: 40 }}>
+    <View style={{ flex: 1, paddingHorizontal: 20, marginTop: 30 }}>
       <Pressable
         onPress={() => onChange('male')}
         style={{ marginVertical: 12, width: '100%' }}
@@ -589,6 +590,36 @@ const GenderStep = React.memo(({
           />
         </View>
       </Pressable>
+
+      <Pressable
+        onPress={() => onChange('other')}
+        style={{ marginVertical: 12, width: '100%' }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 20,
+            height: 82,
+            borderRadius: 14,
+            borderWidth: 2,
+            borderColor: accentColor,
+            backgroundColor: value === 'other' ? accentColor : 'transparent',
+          }}
+        >
+          <Text style={{ color: value === 'other' ? COLORS.white : COLORS.black, fontSize: 16, fontFamily: FONTS.BROTHER_1816_REGULAR }}>
+            Other
+          </Text>
+          {/* <Text style={{ fontSize: 40 }}>👨</Text> */}
+          <FastImage
+            source={IMAGES.IC_OTHER}
+            style={{ width: 46, height: 46 }}
+            resizeMode="contain" 
+          />
+        </View>
+      </Pressable>
+
     </View>
   );
 });
@@ -597,8 +628,8 @@ const GenderStep = React.memo(({
 const StepHeader = React.memo(({ step }: { step: 'gender' | 'age' | 'currentWeight' | 'goalWeight' }) => {
   const title = (() => {
     switch (step) {
-      case 'gender': return 'What Is Your';
-      case 'age': return 'What Is Your';
+      case 'gender': return `What's Your`;
+      case 'age': return `What's Your`;
       case 'currentWeight': return 'Your Current';
       case 'goalWeight': return 'Your Goal';
     }
@@ -623,9 +654,9 @@ const StepHeader = React.memo(({ step }: { step: 'gender' | 'age' | 'currentWeig
   })();
 
   return (
-    <View style={{ alignItems: 'center' }}>
+    <View style={{ alignItems: 'center', marginTop: step === 'age' ? 20 : 0 }}>
       <Text style={styles.h1}>{title} <Text style={{ color: COLORS.purple }}>{titleQue}</Text></Text>
-      <Text style={styles.sub}>{subtitle}</Text>
+      {/* <Text style={styles.sub}>{subtitle}</Text> */}
     </View>
   );
 });
@@ -635,7 +666,7 @@ function AgeStep({ value, onChange, accentColor }: { value: number | null; onCha
   const ages = useMemo(() => Array.from({ length: 83 }, (_, i) => ({ id: i + 13, text: String(i + 13) })), []);
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', paddingTop: 40 }}>
+    <View style={{ flex: 1, alignItems: 'center', paddingTop: 30 }}>
       <BoxCarousel data={ages} onChange={onChange} value={value} />
     </View>
   );
@@ -797,7 +828,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bg_color,
   },
-  header: { alignItems: 'center', marginBottom: 12, marginTop: 50 },
+  header: { alignItems: 'center', marginBottom: 12, marginTop: windowHeight * 0.11 },
   h1: { fontSize: 24, fontFamily: FONTS.BROTHER_1816_BOLD, color: COLORS.black, textAlign: 'center' },
   sub: { color: COLORS.black, textAlign: 'center', fontFamily: FONTS.BROTHER_1816_REGULAR, fontSize: 14, marginTop: 10 },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 18 },

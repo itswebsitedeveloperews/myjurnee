@@ -329,9 +329,9 @@ const Item = ({ index, item, transX }: { index: number; item: any; transX: any }
                 },
             ],
             // Card visual to match Figma
-            backgroundColor: isCenter.value ? '#9B5CF6' : COLORS.bg_color,
+            backgroundColor: isCenter.value ? COLORS.purple : COLORS.bg_color,
             borderWidth: 2,
-            borderColor: '#9B5CF6',
+            borderColor: COLORS.purple,
         };
     });
 
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 12,
         borderLeftColor: 'transparent',
         borderRightColor: 'transparent',
-        borderBottomColor: '#9B5CF6',
+        borderBottomColor: COLORS.purple,
     },
     listContainer: {
         height: ITEM_WIDTH + 250,

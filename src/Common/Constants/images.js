@@ -22,6 +22,7 @@ export const IMAGES = {
 
   IC_MALE: require('../../assets/images_new/male.png'),
   IC_FEMALE: require('../../assets/images_new/female.png'),
+  IC_OTHER: require('../../assets/images_new/other.png'),
   IC_BELL: require('../../assets/images_new/bell.png'),
   IC_FILTER: require('../../assets/images_new/filter.png'),
   IC_SEARCH: require('../../assets/images/search.png'),
