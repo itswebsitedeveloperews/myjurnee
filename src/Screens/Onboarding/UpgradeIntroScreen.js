@@ -14,6 +14,7 @@ import FastImage from "react-native-fast-image";
 import { IMAGES } from "../../Common/Constants/images";
 import { windowHeight, windowWidth } from "../../Utils/Dimentions";
 import { FONTS } from "../../Common/Constants/fonts";
+import { StorageKeys, localStorageHelper } from "../../Common/localStorageHelper";
 
 const AVATAR_SIZE = 150;
 
@@ -61,7 +62,20 @@ const Ripple = ({ delay }) => {
 };
 
 
-export default function UpgradeIntroScreen() {
+export default function UpgradeIntroScreen({ navigation }) {
+    const goToOnboarding = () => navigation.navigate('Onboarding');
+    const skipToLogin = async () => {
+        try {
+            await localStorageHelper.setStorageItem({
+                key: StorageKeys.ONBOARDING_SHOWN,
+                value: 'true',
+            });
+        } catch (e) {
+            console.log('Error saving onboarding skip:', e);
+        }
+        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             {/* Avatar with Pulse */}
@@ -74,7 +88,7 @@ export default function UpgradeIntroScreen() {
 
 
                 <FastImage
-                    source={IMAGES.ONBOARDING_1}
+                    source={IMAGES.ONBOARDING_AVATAR}
                     style={styles.avatar}
                     resizeMode="cover"
                 />
@@ -103,17 +117,18 @@ export default function UpgradeIntroScreen() {
             <View style={{ flex: 1, justifyContent: 'flex-end' }}>
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    // onPress={goNext}
+                    onPress={goToOnboarding}
                     style={[
                         styles.nextBtn,
                     ]}
                 >
                     <Text style={styles.nextText}>
-                        See What’s New
+                        See What’s New             
                     </Text>
+                    <FastImage source={IMAGES.IC_NEXT_ARROW} style={styles.rightArrow} resizeMode="contain" />
                 </TouchableOpacity>
 
-                <TouchableOpacity>
+                <TouchableOpacity onPress={skipToLogin}>
                     <Text style={styles.skip}>Skip Intro</Text>
                 </TouchableOpacity>
             </View>
@@ -200,12 +215,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20
     },
 
-    skip: {
-        marginTop: 18,
-        textDecorationLine: "underline",
-        color: "#333",
-    },
-
     nextBtn: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -219,7 +228,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.purple,
         alignSelf: 'center',
     },
-    nextText: { color: 'white', fontSize: 18, fontFamily: FONTS.BROTHER_1816_MEDIUM, },
+    nextText: { color: 'white', fontSize: 22, fontFamily: FONTS.BROTHER_1816_MEDIUM, },
     skip: {
         marginTop: 18,
         borderBottomWidth: 1,
@@ -228,5 +237,13 @@ const styles = StyleSheet.create({
         color: COLORS.black,
         textAlign: 'center',
         alignSelf: 'center',
+    },
+
+    rightArrow: {
+        width: 24,
+        height: 24,
+        marginTop: 2,
+        position:'absolute',
+        right : 20
     },
 });

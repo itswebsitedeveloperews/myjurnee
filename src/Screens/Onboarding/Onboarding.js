@@ -61,11 +61,11 @@ const Onboarding = ({ navigation }) => {
                 value: 'true',
             });
 
-            // Navigate to auth stack after onboarding
-            navigation.replace('AuthStack');
+            // Navigate to Login after onboarding (we're inside AuthStack)
+            navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         } catch (error) {
             console.log('Error saving onboarding status:', error);
-            navigation.replace('AuthStack');
+            navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         }
     };
 

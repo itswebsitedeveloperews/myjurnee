@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { COLORS } from '../../Common/Constants/colors'
-import RenderHtml from 'react-native-render-html';
+import RenderHtml, { defaultHTMLElementModels, HTMLContentModel } from 'react-native-render-html';
 import { WebView } from 'react-native-webview';
 import LessonNavBar from '../Components/LessonNavBar'
 import { windowWidth } from '../../Utils/Dimentions'
@@ -356,8 +356,8 @@ const LessonDetailScreen = (props) => {
                             </View>
                         )}
 
-                        {/* HTML Content of the lesson */}
-                        {!!lessonData?.content && (
+                        {/* HTML Content of the lesson (content may be string or { rendered: string } from API) */}
+                        {(lessonData?.content != null && (typeof lessonData.content === 'string' ? lessonData.content : lessonData.content?.rendered)) && (
                             <View style={styles.htmlContainer}>
                                 <RenderHtml
                                     contentWidth={Dimensions.get('window').width - 30}
@@ -368,6 +368,7 @@ const LessonDetailScreen = (props) => {
                                     enableExperimentalMarginCollapsing={true}
                                     renderersProps={renderHtmlRenderersProps}
                                     renderers={customRenderers}
+                                    customHTMLElementModels={customHTMLElementModels}
                                     defaultWebViewProps={{
                                         allowsInlineMediaPlayback: true,
                                         mediaPlaybackRequiresUserAction: false,
@@ -518,72 +519,149 @@ const VideoRenderer = ({ tnode }) => {
     );
 };
 
-// Custom Figure Renderer to handle figure tags with video
-// We only intercept figure tags that contain videos
-const FigureRenderer = ({ tnode, TDefaultRenderer, ...props }) => {
-    // Check if this is a video figure by class name first (quick check)
-    const className = tnode.attributes?.class || tnode.domNode?.getAttribute?.('class') || '';
-    const isVideoFigure = className.includes('wp-block-video');
+// Custom Audio Renderer for standalone <audio> tags
+const AudioRenderer = ({ tnode }) => {
+    console.log('AudioRenderer', tnode);
+    const audioSrc = tnode.attributes?.src || '';
+    if (!audioSrc) return null;
+    const audioHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body { margin: 0; padding: 12px; background: transparent; }
+                audio { width: 100%; height: 48px; }
+            </style>
+        </head>
+        <body>
+            <audio controls playsinline>
+                <source src="${audioSrc}" type="audio/mpeg">
+                <source src="${audioSrc}" type="audio/mp3">
+                Your browser does not support the audio tag.
+            </audio>
+        </body>
+        </html>
+    `;
+    return (
+        <View style={styles.audioContainer}>
+            <WebView
+                source={{ html: audioHTML }}
+                style={styles.audioWebView}
+                scrollEnabled={false}
+                javaScriptEnabled={true}
+                allowsInlineMediaPlayback={true}
+                mediaPlaybackRequiresUserAction={false}
+                originWhitelist={['*']}
+            />
+        </View>
+    );
+};
 
-    // If it's not a video figure, don't intercept - let default handle images
-    if (!isVideoFigure) {
-        if (TDefaultRenderer) {
-            return <TDefaultRenderer tnode={tnode} {...props} />;
+// Extract audio src from raw HTML or domNode (for wp-block-audio)
+const extractAudioSrc = (tnode) => {
+    let audioSrc = null;
+    if (tnode.rawHTML) {
+        const audioMatch = tnode.rawHTML.match(/<audio[^>]+src=["']([^"']+)["']/i);
+        if (audioMatch && audioMatch[1]) audioSrc = audioMatch[1];
+        if (!audioSrc) {
+            const sourceMatch = tnode.rawHTML.match(/<source[^>]+src=["']([^"']+)["']/i);
+            if (sourceMatch && sourceMatch[1]) audioSrc = sourceMatch[1];
         }
+    }
+    if (!audioSrc && tnode.domNode) {
+        try {
+            const audioEl = tnode.domNode.querySelector?.('audio');
+            if (audioEl) audioSrc = audioEl.getAttribute('src') || audioEl.src;
+            if (!audioSrc) {
+                const sourceEl = tnode.domNode.querySelector?.('source');
+                if (sourceEl) audioSrc = sourceEl.getAttribute('src') || sourceEl.src;
+            }
+        } catch (e) {}
+    }
+    return audioSrc;
+};
+
+// Custom Figure Renderer to handle figure tags with video or audio
+const FigureRenderer = ({ tnode, TDefaultRenderer, ...props }) => {
+    const className = (tnode.attributes?.class || tnode.domNode?.getAttribute?.('class') || '').toLowerCase();
+    const rawHTML = (tnode.rawHTML || '').toLowerCase();
+    const isVideoFigure = className.includes('wp-block-video');
+    const hasAudioTag = className.includes('wp-block-audio') || rawHTML.includes('<audio');
+
+    // --- Audio: any figure that contains an audio tag (wp-block-audio or <audio> inside) ---
+    if (hasAudioTag) {
+        const audioSrc = extractAudioSrc(tnode);
+        if (audioSrc) {
+            const audioHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        body { margin: 0; padding: 12px; background: transparent; }
+                        audio { width: 100%; height: 48px; }
+                    </style>
+                </head>
+                <body>
+                    <audio controls playsinline>
+                        <source src="${audioSrc}" type="audio/mpeg">
+                        <source src="${audioSrc}" type="audio/mp3">
+                        Your browser does not support the audio tag.
+                    </audio>
+                </body>
+                </html>
+            `;
+            return (
+                <View style={styles.audioContainer}>
+                    <WebView
+                        source={{ html: audioHTML }}
+                        style={styles.audioWebView}
+                        scrollEnabled={false}
+                        javaScriptEnabled={true}
+                        allowsInlineMediaPlayback={true}
+                        mediaPlaybackRequiresUserAction={false}
+                        originWhitelist={['*']}
+                    />
+                </View>
+            );
+        }
+        if (TDefaultRenderer) return <TDefaultRenderer tnode={tnode} {...props} />;
         return null;
     }
 
-    // Try to extract video source from figure tag
+    // --- Video: extract src and render video player ---
     let videoSrc = null;
-
-    // Method 1: Check raw HTML string for video tag (most reliable)
     if (tnode.rawHTML) {
         const videoMatch = tnode.rawHTML.match(/<video[^>]+src=["']([^"']+)["']/i);
-        if (videoMatch && videoMatch[1]) {
-            videoSrc = videoMatch[1];
-        }
+        if (videoMatch && videoMatch[1]) videoSrc = videoMatch[1];
     }
-
-    // Method 2: Try to find video in domNode
     if (!videoSrc && tnode.domNode) {
         try {
             const videoElement = tnode.domNode.querySelector?.('video');
-            if (videoElement) {
-                videoSrc = videoElement.getAttribute('src') || videoElement.src;
-            }
-        } catch (e) {
-            // Ignore errors
-        }
+            if (videoElement) videoSrc = videoElement.getAttribute('src') || videoElement.src;
+        } catch (e) {}
     }
-
-    // Method 3: Check children recursively
     if (!videoSrc && tnode.children) {
         const findVideoSrc = (child) => {
             if (!child) return null;
-
-            if (child.tagName === 'video' || child.type === 'video') {
-                return child.attributes?.src || child.props?.src;
-            }
-
+            if (child.tagName === 'video' || child.type === 'video') return child.attributes?.src || child.props?.src;
             if (child.children) {
-                const childrenArray = Array.isArray(child.children) ? child.children : [child.children].filter(Boolean);
-                for (const subChild of childrenArray) {
-                    const found = findVideoSrc(subChild);
+                const arr = Array.isArray(child.children) ? child.children : [child.children].filter(Boolean);
+                for (const sub of arr) {
+                    const found = findVideoSrc(sub);
                     if (found) return found;
                 }
             }
-
             return null;
         };
-
-        const childrenArray = Array.isArray(tnode.children) ? tnode.children : [tnode.children].filter(Boolean);
-        for (const child of childrenArray) {
+        const arr = Array.isArray(tnode.children) ? tnode.children : [tnode.children].filter(Boolean);
+        for (const child of arr) {
             videoSrc = findVideoSrc(child);
             if (videoSrc) break;
         }
     }
 
-    // If video found, render custom video player
     if (videoSrc) {
         const videoHTML = `
             <!DOCTYPE html>
@@ -591,16 +669,8 @@ const FigureRenderer = ({ tnode, TDefaultRenderer, ...props }) => {
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    body {
-                        margin: 0;
-                        padding: 0;
-                        background-color: #000;
-                    }
-                    video {
-                        width: 100%;
-                        height: auto;
-                        max-width: 100%;
-                    }
+                    body { margin: 0; padding: 0; background-color: #000; }
+                    video { width: 100%; height: auto; max-width: 100%; }
                 </style>
             </head>
             <body>
@@ -611,7 +681,6 @@ const FigureRenderer = ({ tnode, TDefaultRenderer, ...props }) => {
             </body>
             </html>
         `;
-
         return (
             <View style={styles.videoContainer}>
                 <WebView
@@ -628,13 +697,7 @@ const FigureRenderer = ({ tnode, TDefaultRenderer, ...props }) => {
         );
     }
 
-    // If no video found, use TDefaultRenderer if available, otherwise return null
-    // This allows images to render normally
-    if (TDefaultRenderer) {
-        return <TDefaultRenderer tnode={tnode} {...props} />;
-    }
-
-    // Fallback: return null to let default renderer handle it
+    if (TDefaultRenderer) return <TDefaultRenderer tnode={tnode} {...props} />;
     return null;
 };
 
@@ -655,13 +718,25 @@ const renderHtmlRenderersProps = {
     },
 };
 
-// Custom renderers for video and figure tags
+// Custom renderers for video, audio, and figure tags
 const customRenderers = {
     video: VideoRenderer,
+    audio: AudioRenderer,
     figure: FigureRenderer,
 };
 
-const getLessonHtmlSource = (html) => ({ html: html || '' });
+// Extend audio element model so the library renders it (default is contentModel: none)
+const customHTMLElementModels = {
+    audio: defaultHTMLElementModels.audio.extend({
+        contentModel: HTMLContentModel.block,
+    }),
+};
+
+// WordPress API returns content as { rendered: "<html>...", protected: false }; support both shapes
+const getLessonHtmlSource = (content) => {
+    const html = typeof content === 'string' ? content : (content?.rendered ?? '');
+    return { html: html || '' };
+};
 
 // HTML Tags Styles - Platform specific font handling
 const getHtmlTagsStyles = () => {
@@ -964,6 +1039,20 @@ const styles = StyleSheet.create({
         width: '100%',
         aspectRatio: 16 / 9,
         backgroundColor: COLORS.black,
+    },
+    audioContainer: {
+        width: '100%',
+        marginVertical: 12,
+        borderRadius: 8,
+        overflow: 'hidden',
+        backgroundColor: COLORS.grayBg || '#f5f5f5',
+        minHeight: 80,
+    },
+    audioWebView: {
+        width: '100%',
+        minHeight: 80,
+        height: 80,
+        backgroundColor: 'transparent',
     },
     lockedBoxContainer: {
         paddingHorizontal: 15,

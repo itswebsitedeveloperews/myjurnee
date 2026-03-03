@@ -243,14 +243,29 @@ export const ResetPasswordAction = ({ email, code, newPassword, confirmPassword,
   };
 };
 
+// Keys to clear on logout; preserve ONBOARDING_SHOWN so onboarding/upgrade intro only shows after new install
+const AUTH_KEYS_TO_CLEAR_ON_LOGOUT = [
+  StorageKeys.FCM_TOKEN,
+  StorageKeys.PHONE,
+  StorageKeys.USER_ID,
+  StorageKeys.USER_NAME,
+  StorageKeys.USER_NICKNAME,
+  StorageKeys.USER_TYPE,
+  StorageKeys.ACCESS_TOKEN,
+  StorageKeys.NAME,
+  StorageKeys.IS_LOGGED,
+  StorageKeys.FIRST_TIME_LOGIN,
+  StorageKeys.TEMP_SIGNUP_CREDENTIALS,
+];
+
 export const LogUserOut = ({ onSuccess, onFailure }) => {
   return async dispatch => {
     try {
-      // Clear all local storage
+      // Clear only auth/session data; keep ONBOARDING_SHOWN so user goes to Login, not onboarding
       localStorageHelper
-        .clearStorage()
+        .removeStorageItems(AUTH_KEYS_TO_CLEAR_ON_LOGOUT)
         .then(() => {
-          console.log('User logged out successfully - storage cleared');
+          console.log('User logged out successfully - auth storage cleared');
 
           // Reset auth state
           dispatch(onLogin(null));
@@ -284,11 +299,11 @@ export const DeleteUserAccount = ({ userId, onSuccess, onFailure }) => {
           console.log('Delete account response---', response);
 
           if (response?.success || response) {
-            // Clear all local storage and logout after successful deletion
+            // Clear auth data (preserve ONBOARDING_SHOWN) and logout after successful deletion
             localStorageHelper
-              .clearStorage()
+              .removeStorageItems(AUTH_KEYS_TO_CLEAR_ON_LOGOUT)
               .then(() => {
-                console.log('Account deleted successfully - storage cleared');
+                console.log('Account deleted successfully - auth storage cleared');
 
                 // Reset auth state
                 dispatch(onLogin(null));

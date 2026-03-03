@@ -19,6 +19,7 @@ export const IMAGES = {
   IC_SAVING: require('../../assets/images_new/saving.png'),
   IC_SUCCESS: require('../../assets/images_new/circle_checked.png'),
   IC_GREEN_SUCCESS: require('../../assets/images_new/circle_green.png'),
+  IC_NEXT_ARROW: require('../../assets/images_new/next.png'),
 
   IC_MALE: require('../../assets/images_new/male.png'),
   IC_FEMALE: require('../../assets/images_new/female.png'),
@@ -36,6 +37,7 @@ export const IMAGES = {
 
   //Onboarding image
   IC_ONBOARDING_TOP: require('../../assets/images/onboardingTop.png'),
+  ONBOARDING_AVATAR: require('../../assets/images_new/women_pic.jpg'),
   ONBOARDING_1: require('../../assets/images_new/onboarding_1.jpg'),
   ONBOARDING_2: require('../../assets/images_new/onboarding_2.jpg'),
   ONBOARDING_3: require('../../assets/images_new/onboarding_3.jpg'),

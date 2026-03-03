@@ -89,7 +89,8 @@ const Login = props => {
 
   const onSignUp = () => {
     // Navigate to sign up screen
-    props.navigation.navigate('UpgradeIntroScreen');
+    props.navigation.navigate('Signup');
+    // props.navigation.navigate('FitnessOnboardingWizard');    
   };
 
   const onForgotPassword = () => {

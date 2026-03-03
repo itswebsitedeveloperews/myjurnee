@@ -18,9 +18,9 @@ const Splash = props => {
           console.log('resp', resp);
           const onboardingShown = resp[StorageKeys.ONBOARDING_SHOWN];
 
-          // Check if onboarding has been shown
+          // Check if onboarding has been shown - send to AuthStack (UpgradeIntroScreen first, then Onboarding)
           if (onboardingShown !== 'true') {
-            props.navigation.replace('Onboarding');
+            props.navigation.replace('AuthStack');
             return;
           }
 
@@ -31,7 +31,7 @@ const Splash = props => {
             dispatch(onUserIdSuccess(resp[StorageKeys.USER_ID]));
             props.navigation.replace('DashboardStack');
           } else {
-            props.navigation.replace('AuthStack'); //replace when completed with Authstack
+            props.navigation.replace('AuthStack', { screen: 'Login' });
           }
         });
     }, 1500);
