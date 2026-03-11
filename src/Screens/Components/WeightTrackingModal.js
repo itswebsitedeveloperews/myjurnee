@@ -18,10 +18,19 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { COLORS } from '../../Common/Constants/colors';
 import { FONTS } from '../../Common/Constants/fonts';
+import Card from './Card';
 
 const { width, height } = Dimensions.get('window');
 
-const SetGoalWeightModal = ({ isVisible, onClose, onSubmit, weightType = 'lbs' }) => {
+const SetGoalWeightModal = ({
+    isVisible,
+    onClose,
+    onSubmit,
+    weightType = 'lbs',
+    weightLost = 0,
+    currentWeight = 0,
+    goalWeight = 0,
+}) => {
     const colorScheme = useColorScheme();
     const [weight, setWeight] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -213,6 +222,25 @@ const SetGoalWeightModal = ({ isVisible, onClose, onSubmit, weightType = 'lbs' }
                     extraScrollHeight={0}
                     enableOnAndroid={true}
                 >
+                    {/* Reference: Weight Lost, Current Weight, Goal Weight */}
+                    <View style={styles.referenceCardRow}>
+                        <Card
+                            title={`${Number(weightLost).toFixed(1)} ${weightType}`}
+                            subtitle="Weight Lost"
+                            style={styles.referenceCard}
+                        />
+                        <Card
+                            title={`${Number(currentWeight).toFixed(1)} ${weightType}`}
+                            subtitle="Current Weight"
+                            style={styles.referenceCard}
+                        />
+                        <Card
+                            title={`${Number(goalWeight).toFixed(1)} ${weightType}`}
+                            subtitle="Goal Weight"
+                            style={styles.referenceCard}
+                        />
+                    </View>
+
                     {/* Weight and Date Input Section */}
                     <View style={styles.inputSection}>
                         <View style={styles.inputRow}>
@@ -392,6 +420,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 20,
     },
+    referenceCardRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+        gap: 8,
+    },
+    referenceCard: {
+        flex: 1,
+        marginHorizontal: 0,
+        backgroundColor: COLORS.pr_background,
+    },
     inputSection: {
         backgroundColor: COLORS.white,
         borderRadius: 12,
@@ -504,6 +543,7 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderRadius: 12,
         alignItems: 'center',
+        marginBottom: 50,
     },
     updateButtonEnabled: {
         backgroundColor: COLORS.purple,

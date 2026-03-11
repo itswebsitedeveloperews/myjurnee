@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StatusBar, StyleSheet, Alert, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, StatusBar, StyleSheet, Alert, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { safeAreaStyle } from '../../Common/CommonStyles';
 import WeightTrackerChart from '../Components/WeightTrackerChart';
@@ -14,7 +14,7 @@ import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper
 import { FONTS } from '../../Common/Constants/fonts';
 import { COLORS } from '../../Common/Constants/colors';
 import SetGoalWeightModal from '../Components/SetGoalWeightModal';
-import { getCurrentWeekDates, getFullWeekDatesArray } from '../../Utils/Utils';
+import { getFullWeekDatesArray, getWeekStartDate, getFullWeekDatesArrayForWeek, getWeekRangeLabel } from '../../Utils/Utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { setWeightGoalAction, setWeightGoalProgessAction } from '../../redux/WeightLogs/weightLogActions';
 import { getGoalWeight, getWeightLogs } from '../../api/weightGoalApi';
@@ -34,6 +34,8 @@ const WeightTrackerScreen = ({ navigation }) => {
     const [chartData, setChartData] = useState([]);
     const [recentPhotos, setRecentPhotos] = useState([]);
     const [weightLogs, setWeightLogs] = useState([]);
+    const [weeksWithData, setWeeksWithData] = useState([]);
+    const [selectedWeekStart, setSelectedWeekStart] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const dispatch = useDispatch();
@@ -74,6 +76,26 @@ const WeightTrackerScreen = ({ navigation }) => {
         setLoading(false);
     };
 
+    const normalizeDateToYYYYMMDD = (dateStr) => {
+        if (!dateStr) return '';
+        const d = new Date(typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr);
+        return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+    };
+
+    const computeWeeksWithData = (logs) => {
+        const weightEntries = (logs || []).filter(e => e.type === 'weight' || e.type === 'weightwithphoto');
+        const dateSet = new Set();
+        weightEntries.forEach(entry => {
+            const normalized = normalizeDateToYYYYMMDD(entry.date);
+            if (normalized) dateSet.add(normalized);
+        });
+        const weekStarts = [...new Set([...dateSet].map(d => getWeekStartDate(d)))].filter(Boolean);
+        weekStarts.sort((a, b) => b.localeCompare(a));
+        return weekStarts.map(ws => ({ id: ws, label: getWeekRangeLabel(ws), value: ws }));
+    };
+
+    const getCurrentWeekStart = () => getWeekStartDate(new Date());
+
     const loadWeightData = async () => {
         try {
             setLoading(true);
@@ -87,8 +109,16 @@ const WeightTrackerScreen = ({ navigation }) => {
                     const response = await getWeightLogs(userId);
                     const goalWeightResponse = await getGoalWeight(userId);
                     if (response?.success) {
-                        setWeightLogs(response?.data || []);
-                        await handleStatistics(response?.data || [], goalWeightResponse?.data);
+                        const data = response?.data || [];
+                        setWeightLogs(data);
+                        const weeks = computeWeeksWithData(data);
+                        setWeeksWithData(weeks);
+                        const currentStart = getCurrentWeekStart();
+                        const defaultWeek = weeks.length > 0
+                            ? (weeks.some(w => w.value === currentStart) ? currentStart : weeks[0].value)
+                            : currentStart;
+                        setSelectedWeekStart(defaultWeek);
+                        await handleStatistics(data, goalWeightResponse?.data, defaultWeek);
                     }
                 });
         } catch (error) {
@@ -98,46 +128,52 @@ const WeightTrackerScreen = ({ navigation }) => {
         }
     };
 
-    const handleStatistics = async (weightLogs, goalWeight) => {
+    const handleStatistics = async (weightLogs, goalWeight, weekStartDate) => {
         const stats = await WeightTrackingService.getWeightStatistics(weightLogs, goalWeight);
         const photos = await WeightTrackingService.getRecentPhotos(weightLogs);
-        const chartData = await prepareChartData(weightLogs);
+        const chartData = await prepareChartData(weightLogs, weekStartDate);
 
         setWeightStats(stats);
         setChartData(chartData);
         setRecentPhotos(photos);
     }
 
-    const prepareChartData = async (weightLogs) => {
+    const prepareChartData = async (weightLogs, weekStartDate) => {
         try {
-            const chart = await WeightTrackingService.getChartData(weightLogs);
+            const fullWeekDates = weekStartDate
+                ? getFullWeekDatesArrayForWeek(weekStartDate)
+                : getFullWeekDatesArray();
+            const weekDateSet = new Set(fullWeekDates);
+            const filteredLogs = (weightLogs || []).filter(entry => {
+                const normalized = normalizeDateToYYYYMMDD(entry.date);
+                return weekDateSet.has(normalized);
+            });
+            const chart = await WeightTrackingService.getChartData(filteredLogs);
 
-            if (chart && chart.length == 0) {
-                return [0, 0, 0, 0, 0, 0, 0]
+            if (chart && chart.length === 0) {
+                return fullWeekDates.map(date => ({ xLabel: date.split('-')[2], value: 0 }));
             }
-            const fullWeekDates = getFullWeekDatesArray();
-            const fullWeekDateOnly = getCurrentWeekDates();
-
-            // Create a map of date to weight
             const weightMap = {};
             chart.forEach(entry => {
-                weightMap[entry.date] = entry.weight;
+                const key = normalizeDateToYYYYMMDD(entry.date);
+                if (key) weightMap[key] = entry.weight;
             });
-            // Map full dates to weights (null if no data)
-            // const data = fullWeekDates.map(date => weightMap[date] ?? 0);
-
-            const data = fullWeekDates.map(date => {
-                return {
-                    xLabel: date.split("-")[2],
-                    value: (weightMap[date]) ?? 0,
-                }
-            });
-
+            const data = fullWeekDates.map(date => ({
+                xLabel: date.split('-')[2],
+                value: weightMap[date] ?? 0,
+            }));
             return data;
         } catch (error) {
             console.log('Error preparing chart data:', error);
             return [];
         }
+    };
+
+    const handleWeekSelect = (option) => {
+        const weekStart = option?.value;
+        if (!weekStart) return;
+        setSelectedWeekStart(weekStart);
+        prepareChartData(weightLogs, weekStart).then(setChartData);
     };
 
     const handleOpenModal = () => {
@@ -292,35 +328,40 @@ const WeightTrackerScreen = ({ navigation }) => {
                 </View>
 
                 {/* Update Progress Button */}
-                <Button
-                    title="Update Progress"
-                    onPress={handleOpenModal}
-                    style={styles.updateButton}
-                />
+                <View style={styles.buttonContainer}>
+                    <Button
+                        title="Update Progress"
+                        onPress={handleOpenModal}
+                        style={styles.updateButton}
+                    />
+                    <Button
+                        title="View Log History"
+                        onPress={() => navigation.navigate('LogHistoryScreen', { onDataRefresh: loadWeightData })}
+                        style={styles.logHistoryButton}
+                    />
 
-                <Button
-                    title="Set Goal Weight"
-                    onPress={handleSetGoalWeight}
+                </View>
+                <View style={styles.setGoalWeightButton}>
+                    <TouchableOpacity onPress={handleSetGoalWeight}>  
+                        <Text style={styles.setGoalWeightButtonText}>Set Goal Weight</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* <Button
+                    
+                    
                     style={styles.logHistoryButton}
-                />
-
-                {/* Temporary Log History Button */}
-                <Button
-                    title="View Log History"
-                    onPress={() => navigation.navigate('LogHistoryScreen', { onDataRefresh: loadWeightData })}
-                    style={styles.logHistoryButton}
-                />
-
-                {/* Weight Tracker Chart */}
-                {/* <WeightTrackerChart
-                    data={chartData}
-                    goalWeight={weightStats.goalWeight}
-                    selectedIndex={1}
-                    onDataPointPress={(data) => {
-                        console.log('Data point pressed:', data);
-                    }}
                 /> */}
-                <WeightChart data={chartData} weightGoal={weightStats.goalWeight} weightType={profileData?.weight_type} />
+
+                {/* Weight Tracker Chart - week selector is inside the chart card beside the title */}
+                <WeightChart
+                    data={chartData}
+                    weightGoal={weightStats.goalWeight}
+                    weightType={profileData?.weight_type}
+                    weekOptions={isAuthenticated && weeksWithData.length > 0 ? weeksWithData : []}
+                    selectedWeekLabel={weeksWithData.find(w => w.value === selectedWeekStart)?.label ?? (selectedWeekStart ? getWeekRangeLabel(selectedWeekStart) : undefined)}
+                    onWeekSelect={handleWeekSelect}
+                />
 
                 {/* Progress Photos */}
                 <ProgressPhotos
@@ -342,6 +383,9 @@ const WeightTrackerScreen = ({ navigation }) => {
                 onClose={handleCloseModal}
                 onSubmit={handleWeightSubmit}
                 weightType={profileData?.weight_type}
+                weightLost={weightStats.weightLost}
+                currentWeight={weightStats.currentWeight}
+                goalWeight={weightStats.goalWeight}
             />
 
             {/* Set Goal Weight Modal */}
@@ -394,12 +438,13 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
     },
     updateButton: {
-        marginTop: 20,
-        width: '100%',
+        paddingHorizontal: 12,
+        width: '49%',
     },
+
     logHistoryButton: {
-        marginTop: 10,
-        width: '100%',
+        paddingHorizontal: 12,
+        width: '49%',
     },
     progressPhotos: {
         marginTop: 20,
@@ -433,5 +478,21 @@ const styles = StyleSheet.create({
         color: '#1976D2',
         textAlign: 'center',
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        flex: 1,
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    setGoalWeightButton:{
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    setGoalWeightButtonText:{
+        fontSize: 16,
+        fontFamily: FONTS.BROTHER_1816_MEDIUM,
+        color: COLORS.purple,
+        textDecorationLine: 'underline',
+    }
 });
 export default WeightTrackerScreen;

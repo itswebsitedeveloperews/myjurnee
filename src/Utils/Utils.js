@@ -61,6 +61,55 @@ export const getFullWeekDatesArray = () => {
   return labels;
 };
 
+/**
+ * Get the Sunday (start of week) for a given date as YYYY-MM-DD.
+ * @param {Date|string} dateInput - Date instance or date string
+ * @returns {string} Sunday of that week in YYYY-MM-DD
+ */
+export const getWeekStartDate = (dateInput) => {
+  const d = typeof dateInput === 'string' ? new Date(dateInput.replace(' ', 'T')) : new Date(dateInput);
+  if (isNaN(d.getTime())) return '';
+  const startOfWeek = new Date(d);
+  startOfWeek.setDate(d.getDate() - d.getDay());
+  return startOfWeek.toISOString().split('T')[0];
+};
+
+/**
+ * Get the 7 dates (Sun–Sat) for a given week start (Sunday in YYYY-MM-DD).
+ * @param {string} weekStartDate - Sunday in YYYY-MM-DD
+ * @returns {string[]} Array of 7 date strings in YYYY-MM-DD
+ */
+export const getFullWeekDatesArrayForWeek = (weekStartDate) => {
+  if (!weekStartDate) return [];
+  const start = new Date(weekStartDate + 'T12:00:00');
+  if (isNaN(start.getTime())) return [];
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    return d.toISOString().split('T')[0];
+  });
+};
+
+/**
+ * Format a week range for display, e.g. "Mar 3 – Mar 9, 2026".
+ * @param {string} weekStartDate - Sunday in YYYY-MM-DD
+ * @returns {string} User-facing label with month names
+ */
+export const getWeekRangeLabel = (weekStartDate) => {
+  if (!weekStartDate) return '';
+  const start = new Date(weekStartDate + 'T12:00:00');
+  if (isNaN(start.getTime())) return '';
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  const opts = { month: 'short', day: 'numeric' };
+  const startStr = start.toLocaleDateString('en-US', opts);
+  const endStr = end.toLocaleDateString('en-US', opts);
+  const year = start.getFullYear();
+  const currentYear = new Date().getFullYear();
+  const yearSuffix = year !== currentYear ? `, ${year}` : '';
+  return `${startStr} – ${endStr}${yearSuffix}`;
+};
+
 export function formatDate(dateInput) {
   if (!dateInput) return "";
 

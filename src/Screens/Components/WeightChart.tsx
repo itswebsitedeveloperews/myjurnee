@@ -1,6 +1,8 @@
 // WeightChart.js
 import React, { useMemo, useState } from "react";
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Modal, Pressable, FlatList } from "react-native";
+import FastImage from "react-native-fast-image";
+import { IMAGES } from "../../Common/Constants/images";
 import Svg, {
   Path,
   Defs,
@@ -31,42 +33,59 @@ const sampleData = [
   { xLabel: "22", value: 88 },
 ];
 
-export default function WeightChart({ data = sampleData, weightGoal = 75, weightType = 'lbs' }) {
-  const [selectedIndex, setSelectedIndex] = useState();
+type WeekOption = { id: string | number; label: string; value: string };
 
-  const xScale = (i) =>
-    PADDING.left + (i * (CHART_WIDTH - PADDING.left - PADDING.right)) / (data.length - 1);
+type DataPoint = { xLabel: string; value: number | string };
 
-  const values = data.map((d) => d.value);
+type WeightChartProps = {
+  data?: DataPoint[];
+  weightGoal?: number;
+  weightType?: string;
+  weekOptions?: WeekOption[];
+  selectedWeekLabel?: string;
+  onWeekSelect?: (option: WeekOption) => void;
+};
+
+export default function WeightChart({ data = sampleData, weightGoal = 75, weightType = 'lbs', weekOptions = [], selectedWeekLabel, onWeekSelect }: WeightChartProps) {
+  const [selectedIndex, setSelectedIndex] = useState<number | undefined>();
+  const [weekPickerOpen, setWeekPickerOpen] = useState(false);
+  const showWeekSelector = weekOptions.length > 0 && selectedWeekLabel != null;
+
+  const xScale = (i: number) =>
+    PADDING.left + (i * (CHART_WIDTH - PADDING.left - PADDING.right)) / (Math.max(data.length - 1, 1));
+
+  const values = data.map((d) => Number(d.value));
   const maxVal = Math.max(...values, weightGoal) + 8;
   const minVal = 0;
 
   const innerHeight = CHART_HEIGHT - PADDING.top - PADDING.bottom;
-  const yScale = (val) =>
+  const yScale = (val: number) =>
     PADDING.top + ((maxVal - val) * innerHeight) / (maxVal - minVal);
 
   const linePath = useMemo(() => {
     const lineGenerator = d3
-      .line()
+      .line<DataPoint>()
       .x((_, i) => xScale(i))
-      .y((d) => yScale(d.value))
+      .y((d) => yScale(Number(d.value)))
       .curve(d3.curveMonotoneX);
     return lineGenerator(data) || "";
   }, [data]);
 
   const areaPath = useMemo(() => {
     const area = d3
-      .area()
+      .area<DataPoint>()
       .x((_, i) => xScale(i))
       .y0(CHART_HEIGHT - PADDING.bottom)
-      .y1((d) => yScale(d.value))
+      .y1((d) => yScale(Number(d.value)))
       .curve(d3.curveMonotoneX);
     return area(data) || "";
   }, [data]);
 
-  const getFormatedValue = (value: string) => {
-    if (!value) return '0';
-    return value.replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
+  const getFormatedValue = (value: string | number) => {
+    if (value === undefined || value === null) return '0';
+    const s = String(value);
+    if (!s) return '0';
+    return s.replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
   };
 
   // Generate dynamic Y tick values based on data - always returns exactly 6 items
@@ -112,7 +131,49 @@ export default function WeightChart({ data = sampleData, weightGoal = 75, weight
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{`Weight Tracker (${weightType})`}</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title} numberOfLines={1}>{`Weight Tracker (${weightType})`}</Text>
+        {showWeekSelector && (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => setWeekPickerOpen(true)}
+            style={styles.weekSelectorTrigger}
+            accessibilityRole="button"
+            accessibilityLabel="Select week"
+          >
+            <Text style={styles.weekSelectorLabel} numberOfLines={1}>{selectedWeekLabel}</Text>
+            <FastImage source={IMAGES.IC_DOWN_CHEVRON} style={styles.weekSelectorChevron} resizeMode="contain" />
+          </TouchableOpacity>
+        )}
+      </View>
+      {showWeekSelector && (
+        <Modal
+          visible={weekPickerOpen}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setWeekPickerOpen(false)}
+        >
+          <Pressable style={styles.weekModalOverlay} onPress={() => setWeekPickerOpen(false)}>
+            <View style={styles.weekModalContent}>
+              <FlatList
+                data={weekOptions}
+                keyExtractor={(item) => String(item.id)}
+                renderItem={({ item }) => (
+                  <Pressable
+                    style={styles.weekOptionRow}
+                    onPress={() => {
+                      setWeekPickerOpen(false);
+                      onWeekSelect?.(item);
+                    }}
+                  >
+                    <Text style={styles.weekOptionText}>{item.label}</Text>
+                  </Pressable>
+                )}
+              />
+            </View>
+          </Pressable>
+        </Modal>
+      )}
       <View style={styles.divider} />
       <View style={styles.legendRow}>
 
@@ -172,7 +233,7 @@ export default function WeightChart({ data = sampleData, weightGoal = 75, weight
           <G>
             {data.map((d, i) => {
               const cx = xScale(i);
-              const cy = yScale(d.value);
+              const cy = yScale(Number(d.value));
               const isSelected = i === selectedIndex;
 
               return (
@@ -231,7 +292,7 @@ export default function WeightChart({ data = sampleData, weightGoal = 75, weight
         >
           {data.map((d, i) => {
             const left = xScale(i) - 24; // center the 48px touch box on the marker
-            const top = yScale(d.value) - 4; // keep touches aligned with marker
+            const top = yScale(Number(d.value)) - 4; // keep touches aligned with marker
             const isSelected = i === selectedIndex;
 
             return (
@@ -257,7 +318,7 @@ export default function WeightChart({ data = sampleData, weightGoal = 75, weight
                 {isSelected && (
                   <View style={[styles.roundedTooltip, { transform: [{ translateY: -72 }] }]}>
                     <View style={styles.roundedTooltipBubble}>
-                      <Text style={styles.tooltipValue}>{getFormatedValue(d.value)}</Text>
+                      <Text style={styles.tooltipValue}>{getFormatedValue(Number(d.value))}</Text>
                       {/* <Text style={styles.tooltipUnit}>kg</Text> */}
                     </View>
                   </View>
@@ -289,18 +350,72 @@ const styles = StyleSheet.create({
     // shadowRadius: 8,
     // elevation: 2,
   },
-  legendRow: {
+  titleRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 8,
+    justifyContent: "space-between",
+    marginTop: 10,
+    marginBottom: 12,
+    paddingHorizontal: 10,
+    gap: 8,
   },
   title: {
     fontSize: 20,
     fontFamily: FONTS.BROTHER_1816_BOLD,
     color: COLORS.black,
-    marginBottom: 12,
-    marginTop: 10,
-    paddingLeft: 10
+    flex: 1,
+    flexShrink: 1,
+  },
+  weekSelectorTrigger: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexShrink: 0,
+    minHeight: 36,
+    maxHeight: 36,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.textColor14,
+    backgroundColor: COLORS.white,
+    gap: 4,
+  },
+  weekSelectorLabel: {
+    fontSize: 13,
+    fontFamily: FONTS.BROTHER_1816_REGULAR,
+    color: "#333",
+    maxWidth: 120,
+  },
+  weekSelectorChevron: {
+    height: 10,
+    width: 10,
+  },
+  weekModalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    justifyContent: "center",
+    padding: 24,
+  },
+  weekModalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    maxHeight: "60%",
+    overflow: "hidden",
+  },
+  weekOptionRow: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+  },
+  weekOptionText: {
+    fontSize: 16,
+    color: "#111827",
+  },
+  legendRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
   },
   divider: {
     height: 1,
