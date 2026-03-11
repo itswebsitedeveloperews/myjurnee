@@ -231,12 +231,12 @@ const SetGoalWeightModal = ({
                         />
                         <Card
                             title={`${Number(currentWeight).toFixed(1)} ${weightType}`}
-                            subtitle="Current Weight"
+                            subtitle="Current"
                             style={styles.referenceCard}
                         />
                         <Card
                             title={`${Number(goalWeight).toFixed(1)} ${weightType}`}
-                            subtitle="Goal Weight"
+                            subtitle="Goal"
                             style={styles.referenceCard}
                         />
                     </View>

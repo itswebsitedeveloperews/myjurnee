@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Keyboard,
@@ -19,6 +19,7 @@ import { IMAGES } from '../../Common/Constants/images';
 import IButton from '../Components/IButton';
 import ITextField from '../Components/ITextField';
 import { JWTLogin } from '../../redux/auth/authActions';
+import { localStorageHelper, StorageKeys } from '../../Common/localStorageHelper';
 
 const Login = props => {
   const defaultErrorState = {
@@ -32,12 +33,25 @@ const Login = props => {
     },
   }
 
-  const [username, setUsername] = useState(__DEV__ ? 'educatebystw' : '');
-  const [password, setPassword] = useState(__DEV__ ? 'a$ipMwVbGYseEhEz$C' : '');
+  // const [username, setUsername] = useState(__DEV__ ? 'educatebystw' : '');
+  // const [password, setPassword] = useState(__DEV__ ? 'a$ipMwVbGYseEhEz$C' : '');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberPassword, setRememberPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorState, setErrorState] = useState(defaultErrorState);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    localStorageHelper.getArrayItemFromStorage(StorageKeys.REMEMBERED_CREDENTIALS).then((saved) => {
+      if (saved && typeof saved === 'object' && saved.username != null && saved.password != null) {
+        setUsername(saved.username || '');
+        setPassword(saved.password || '');
+        setRememberPassword(true);
+      }
+    }).catch(() => {});
+  }, []);
 
   const onChangeUsername = (text) => {
     setErrorState({ ...errorState, userName: { hasError: false, errorText: '' } })
@@ -75,7 +89,14 @@ const Login = props => {
       onSuccess: (response) => {
         setLoading(false);
         console.log('Login successful:', response);
-        // Navigate to dashboard or next screen
+        if (rememberPassword) {
+          localStorageHelper.setStorageArrayItem({
+            key: StorageKeys.REMEMBERED_CREDENTIALS,
+            value: { username: username.trim(), password },
+          }).catch(() => {});
+        } else {
+          localStorageHelper.removeStorageItems([StorageKeys.REMEMBERED_CREDENTIALS]).catch(() => {});
+        }
         props.navigation.replace('DashboardStack');
       },
       onFailure: (error) => {
@@ -155,6 +176,20 @@ const Login = props => {
                   placeholderTextColor={COLORS.textColor64}
                   mainViewStyle={[styles.inputField, styles.passwordField]}
                 />
+
+                <View style={styles.rememberRow}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => setRememberPassword(!rememberPassword)}
+                  >
+                    <FastImage
+                      source={rememberPassword ? IMAGES.FILLED_CHECKBOX : IMAGES.UNFILLED_CHECKBOX}
+                      style={styles.checkbox}
+                      resizeMode="contain"
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.rememberText}>Remember password</Text>
+                </View>
 
                 <TouchableOpacity onPress={onForgotPassword} style={styles.forgotPasswordContainer}>
                   <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
@@ -242,6 +277,23 @@ const styles = StyleSheet.create({
   },
   passwordField: {
     // marginBottom: 8,
+  },
+  rememberRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    marginRight: 5,
+    marginTop: 2,
+  },
+  rememberText: {
+    fontFamily: FONTS.BROTHER_1816_REGULAR,
+    fontSize: 14,
+    color: COLORS.black,
   },
   forgotPasswordContainer: {
     alignSelf: 'flex-end',

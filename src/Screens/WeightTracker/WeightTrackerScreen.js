@@ -303,12 +303,12 @@ const WeightTrackerScreen = ({ navigation }) => {
                     />
                     <Card
                         title={`${weightStats.currentWeight.toFixed(1)} ${profileData?.weight_type || 'lbs'}`}
-                        subtitle="Current Weight"
+                        subtitle="Current"
                         style={styles.card}
                     />
                     <Card
                         title={`${weightStats.goalWeight.toFixed(1)} ${profileData?.weight_type || 'lbs'}`}
-                        subtitle="Goal Weight"
+                        subtitle="Goal"
                         style={styles.card}
                     />
                 </View>

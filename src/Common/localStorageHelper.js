@@ -14,6 +14,7 @@ export const StorageKeys = {
   FIRST_TIME_LOGIN: 'FIRST_TIME_LOGIN',
   ONBOARDING_SHOWN: 'ONBOARDING_SHOWN',
   TEMP_SIGNUP_CREDENTIALS: 'TEMP_SIGNUP_CREDENTIALS', // Temporary storage for signup credentials
+  REMEMBERED_CREDENTIALS: 'REMEMBERED_CREDENTIALS', // { username, password } when "Remember password" is checked
 };
 
 class LocalStorageHelper {

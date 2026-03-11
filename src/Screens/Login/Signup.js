@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, ImageBackground, StyleSheet, Platform, Alert, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from 'react-native'
+import FastImage from 'react-native-fast-image'
 import { IMAGES } from '../../Common/Constants/images';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { safeAreaStyle } from '../../Common/CommonStyles';
 import INavBar from '../Components/INavBar';
 import ITextField from '../Components/ITextField';
-import FastImage from 'react-native-fast-image';
 import { FONTS } from '../../Common/Constants/fonts';
 import { COLORS } from '../../Common/Constants/colors';
 import { windowHeight } from '../../Utils/Dimentions';
@@ -39,9 +39,10 @@ const Signup = props => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [rememberPassword, setRememberPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [errorState, setErrorState] = useState(defaultErrorState);
 
     const dispatch = useDispatch();
@@ -109,6 +110,14 @@ const Signup = props => {
             password: password,
             onSuccess: (response) => {
                 setLoading(false);
+                if (rememberPassword) {
+                    localStorageHelper.setStorageArrayItem({
+                        key: StorageKeys.REMEMBERED_CREDENTIALS,
+                        value: { username: username.trim(), password },
+                    }).catch(() => {});
+                } else {
+                    localStorageHelper.removeStorageItems([StorageKeys.REMEMBERED_CREDENTIALS]).catch(() => {});
+                }
                 // Save user_id to storage for the fitness onboarding wizard
                 if (response?.id) {
                     // Store temporary signup credentials for auto-login after onboarding
@@ -228,7 +237,19 @@ const Signup = props => {
                                     placeholderTextColor={COLORS.textColor64}
                                     mainViewStyle={[styles.inputField, styles.passwordField]}
                                 />
-
+                                <View style={styles.rememberRow}>
+                                    <TouchableOpacity
+                                        activeOpacity={0.8}
+                                        onPress={() => setRememberPassword(!rememberPassword)}
+                                    >
+                                        <FastImage
+                                            source={rememberPassword ? IMAGES.FILLED_CHECKBOX : IMAGES.UNFILLED_CHECKBOX}
+                                            style={styles.checkbox}
+                                            resizeMode="contain"
+                                        />
+                                    </TouchableOpacity>
+                                    <Text style={styles.rememberText}>Remember password</Text>
+                                </View>
                             </View>
 
                             {/* Login Button */}
@@ -311,6 +332,23 @@ const styles = StyleSheet.create({
         marginTop: 16,
         backgroundColor: COLORS.bg_color,
         borderWidth: 1,
+    },
+    rememberRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 2,
+        // marginBottom: 4,
+    },
+    checkbox: {
+        width: 22,
+        height: 22,
+        marginRight: 5,
+        marginTop: 2,
+    },
+    rememberText: {
+        fontFamily: FONTS.BROTHER_1816_REGULAR,
+        fontSize: 14,
+        color: COLORS.black,
     },
     passwordField: {
         marginBottom: 8,
